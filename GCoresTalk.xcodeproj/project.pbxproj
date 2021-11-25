@@ -1,0 +1,482 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07AE59F6274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E3274F5AFF00FF9649 /* GCoresTalk.xcdatamodeld */; };
+		07AE59F7274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E3274F5AFF00FF9649 /* GCoresTalk.xcdatamodeld */; };
+		07AE59F8274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E5274F5AFF00FF9649 /* GCoresTalkApp.swift */; };
+		07AE59F9274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E5274F5AFF00FF9649 /* GCoresTalkApp.swift */; };
+		07AE59FA274F5B0300FF9649 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E6274F5AFF00FF9649 /* ContentView.swift */; };
+		07AE59FB274F5B0300FF9649 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E6274F5AFF00FF9649 /* ContentView.swift */; };
+		07AE59FC274F5B0300FF9649 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E7274F5AFF00FF9649 /* Persistence.swift */; };
+		07AE59FD274F5B0300FF9649 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE59E7274F5AFF00FF9649 /* Persistence.swift */; };
+		07AE59FE274F5B0300FF9649 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07AE59E8274F5B0300FF9649 /* Assets.xcassets */; };
+		07AE59FF274F5B0300FF9649 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07AE59E8274F5B0300FF9649 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		07AE59E4274F5AFF00FF9649 /* Shared.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Shared.xcdatamodel; sourceTree = "<group>"; };
+		07AE59E5274F5AFF00FF9649 /* GCoresTalkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresTalkApp.swift; sourceTree = "<group>"; };
+		07AE59E6274F5AFF00FF9649 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		07AE59E7274F5AFF00FF9649 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		07AE59E8274F5B0300FF9649 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		07AE59ED274F5B0300FF9649 /* GCoresTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCoresTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07AE59F3274F5B0300FF9649 /* GCoresTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GCoresTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07AE59F5274F5B0300FF9649 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		07AE59EA274F5B0300FF9649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07AE59F0274F5B0300FF9649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		07AE59DD274F5AFE00FF9649 = {
+			isa = PBXGroup;
+			children = (
+				07AE59E2274F5AFE00FF9649 /* Shared */,
+				07AE59F4274F5B0300FF9649 /* macOS */,
+				07AE59EE274F5B0300FF9649 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		07AE59E2274F5AFE00FF9649 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				07AE59E5274F5AFF00FF9649 /* GCoresTalkApp.swift */,
+				07AE59E6274F5AFF00FF9649 /* ContentView.swift */,
+				07AE59E7274F5AFF00FF9649 /* Persistence.swift */,
+				07AE59E8274F5B0300FF9649 /* Assets.xcassets */,
+				07AE59E3274F5AFF00FF9649 /* GCoresTalk.xcdatamodeld */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		07AE59EE274F5B0300FF9649 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				07AE59ED274F5B0300FF9649 /* GCoresTalk.app */,
+				07AE59F3274F5B0300FF9649 /* GCoresTalk.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		07AE59F4274F5B0300FF9649 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				07AE59F5274F5B0300FF9649 /* macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		07AE59EC274F5B0300FF9649 /* GCoresTalk (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07AE5A02274F5B0300FF9649 /* Build configuration list for PBXNativeTarget "GCoresTalk (iOS)" */;
+			buildPhases = (
+				07AE59E9274F5B0300FF9649 /* Sources */,
+				07AE59EA274F5B0300FF9649 /* Frameworks */,
+				07AE59EB274F5B0300FF9649 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GCoresTalk (iOS)";
+			productName = "GCoresTalk (iOS)";
+			productReference = 07AE59ED274F5B0300FF9649 /* GCoresTalk.app */;
+			productType = "com.apple.product-type.application";
+		};
+		07AE59F2274F5B0300FF9649 /* GCoresTalk (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07AE5A05274F5B0300FF9649 /* Build configuration list for PBXNativeTarget "GCoresTalk (macOS)" */;
+			buildPhases = (
+				07AE59EF274F5B0300FF9649 /* Sources */,
+				07AE59F0274F5B0300FF9649 /* Frameworks */,
+				07AE59F1274F5B0300FF9649 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GCoresTalk (macOS)";
+			productName = "GCoresTalk (macOS)";
+			productReference = 07AE59F3274F5B0300FF9649 /* GCoresTalk.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		07AE59DE274F5AFE00FF9649 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1310;
+				LastUpgradeCheck = 1310;
+				TargetAttributes = {
+					07AE59EC274F5B0300FF9649 = {
+						CreatedOnToolsVersion = 13.1;
+					};
+					07AE59F2274F5B0300FF9649 = {
+						CreatedOnToolsVersion = 13.1;
+					};
+				};
+			};
+			buildConfigurationList = 07AE59E1274F5AFE00FF9649 /* Build configuration list for PBXProject "GCoresTalk" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 07AE59DD274F5AFE00FF9649;
+			productRefGroup = 07AE59EE274F5B0300FF9649 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07AE59EC274F5B0300FF9649 /* GCoresTalk (iOS) */,
+				07AE59F2274F5B0300FF9649 /* GCoresTalk (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		07AE59EB274F5B0300FF9649 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07AE59FE274F5B0300FF9649 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07AE59F1274F5B0300FF9649 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07AE59FF274F5B0300FF9649 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		07AE59E9274F5B0300FF9649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07AE59F8274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */,
+				07AE59FC274F5B0300FF9649 /* Persistence.swift in Sources */,
+				07AE59F6274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
+				07AE59FA274F5B0300FF9649 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07AE59EF274F5B0300FF9649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07AE59F9274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */,
+				07AE59FD274F5B0300FF9649 /* Persistence.swift in Sources */,
+				07AE59F7274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
+				07AE59FB274F5B0300FF9649 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		07AE5A00274F5B0300FF9649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		07AE5A01274F5B0300FF9649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		07AE5A03274F5B0300FF9649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65B8CU243A;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.catbaron.GCoresTalk;
+				PRODUCT_NAME = GCoresTalk;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		07AE5A04274F5B0300FF9649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65B8CU243A;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.catbaron.GCoresTalk;
+				PRODUCT_NAME = GCoresTalk;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		07AE5A06274F5B0300FF9649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65B8CU243A;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.catbaron.GCoresTalk;
+				PRODUCT_NAME = GCoresTalk;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		07AE5A07274F5B0300FF9649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65B8CU243A;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.catbaron.GCoresTalk;
+				PRODUCT_NAME = GCoresTalk;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		07AE59E1274F5AFE00FF9649 /* Build configuration list for PBXProject "GCoresTalk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07AE5A00274F5B0300FF9649 /* Debug */,
+				07AE5A01274F5B0300FF9649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07AE5A02274F5B0300FF9649 /* Build configuration list for PBXNativeTarget "GCoresTalk (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07AE5A03274F5B0300FF9649 /* Debug */,
+				07AE5A04274F5B0300FF9649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07AE5A05274F5B0300FF9649 /* Build configuration list for PBXNativeTarget "GCoresTalk (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07AE5A06274F5B0300FF9649 /* Debug */,
+				07AE5A07274F5B0300FF9649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		07AE59E3274F5AFF00FF9649 /* GCoresTalk.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				07AE59E4274F5AFF00FF9649 /* Shared.xcdatamodel */,
+			);
+			currentVersion = 07AE59E4274F5AFF00FF9649 /* Shared.xcdatamodel */;
+			path = GCoresTalk.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 07AE59DE274F5AFE00FF9649 /* Project object */;
+}
