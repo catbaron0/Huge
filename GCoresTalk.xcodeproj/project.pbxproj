@@ -38,14 +38,14 @@
 		0780F91B275797FC0062F9B7 /* GCoresCommentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F919275797FC0062F9B7 /* GCoresCommentData.swift */; };
 		0780F91D2757985C0062F9B7 /* GCoresData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91C2757985C0062F9B7 /* GCoresData.swift */; };
 		0780F91E2757985C0062F9B7 /* GCoresData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91C2757985C0062F9B7 /* GCoresData.swift */; };
-		0780F920275798940062F9B7 /* GCoresTagData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91F275798940062F9B7 /* GCoresTagData.swift */; };
-		0780F921275798940062F9B7 /* GCoresTagData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91F275798940062F9B7 /* GCoresTagData.swift */; };
+		0780F920275798940062F9B7 /* GCoresTopicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91F275798940062F9B7 /* GCoresTopicData.swift */; };
+		0780F921275798940062F9B7 /* GCoresTopicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F91F275798940062F9B7 /* GCoresTopicData.swift */; };
 		0780F9232757E3A30062F9B7 /* ReadableScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F9222757E3A30062F9B7 /* ReadableScroller.swift */; };
 		0780F9242757E3A30062F9B7 /* ReadableScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F9222757E3A30062F9B7 /* ReadableScroller.swift */; };
-		0780F92C275A385F0062F9B7 /* StatusTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92B275A385F0062F9B7 /* StatusTagsView.swift */; };
-		0780F92D275A385F0062F9B7 /* StatusTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92B275A385F0062F9B7 /* StatusTagsView.swift */; };
-		0780F930275A53AE0062F9B7 /* TagTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* TagTimeline.swift */; };
-		0780F931275A53AE0062F9B7 /* TagTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* TagTimeline.swift */; };
+		0780F92C275A385F0062F9B7 /* StatusTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */; };
+		0780F92D275A385F0062F9B7 /* StatusTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */; };
+		0780F930275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */; };
+		0780F931275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */; };
 		07A100F72754742C00D599D5 /* StatusTalksTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100F62754742B00D599D5 /* StatusTalksTimelineView.swift */; };
 		07A100F9275474B900D599D5 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100F8275474B900D599D5 /* ImageView.swift */; };
 		07A100FB2754750600D599D5 /* ComponentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100FA2754750600D599D5 /* ComponentsView.swift */; };
@@ -85,10 +85,10 @@
 		0780F916275797A60062F9B7 /* GCoresTalkData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresTalkData.swift; sourceTree = "<group>"; };
 		0780F919275797FC0062F9B7 /* GCoresCommentData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresCommentData.swift; sourceTree = "<group>"; };
 		0780F91C2757985C0062F9B7 /* GCoresData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresData.swift; sourceTree = "<group>"; };
-		0780F91F275798940062F9B7 /* GCoresTagData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresTagData.swift; sourceTree = "<group>"; };
+		0780F91F275798940062F9B7 /* GCoresTopicData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresTopicData.swift; sourceTree = "<group>"; };
 		0780F9222757E3A30062F9B7 /* ReadableScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadableScroller.swift; sourceTree = "<group>"; };
-		0780F92B275A385F0062F9B7 /* StatusTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTagsView.swift; sourceTree = "<group>"; };
-		0780F92F275A53AE0062F9B7 /* TagTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTimeline.swift; sourceTree = "<group>"; };
+		0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTopicsView.swift; sourceTree = "<group>"; };
+		0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTopicTimelineView.swift; sourceTree = "<group>"; };
 		07A100F42753361600D599D5 /* GCoresTalk--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GCoresTalk--macOS--Info.plist"; sourceTree = "<group>"; };
 		07A100F62754742B00D599D5 /* StatusTalksTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTalksTimelineView.swift; sourceTree = "<group>"; };
 		07A100F8275474B900D599D5 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
@@ -184,7 +184,7 @@
 				0780F916275797A60062F9B7 /* GCoresTalkData.swift */,
 				0780F919275797FC0062F9B7 /* GCoresCommentData.swift */,
 				0780F91C2757985C0062F9B7 /* GCoresData.swift */,
-				0780F91F275798940062F9B7 /* GCoresTagData.swift */,
+				0780F91F275798940062F9B7 /* GCoresTopicData.swift */,
 				075BC88C275B5FA100EAC204 /* GCoresUserData.swift */,
 				075BC89C275CD45900EAC204 /* GCoresFollowship.swift */,
 				075BC8AB275F43EB00EAC204 /* GCoresVote.swift */,
@@ -195,8 +195,8 @@
 		0780F92E275A537D0062F9B7 /* Tags */ = {
 			isa = PBXGroup;
 			children = (
-				0780F92B275A385F0062F9B7 /* StatusTagsView.swift */,
-				0780F92F275A53AE0062F9B7 /* TagTimeline.swift */,
+				0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */,
+				0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */,
 			);
 			path = Tags;
 			sourceTree = "<group>";
@@ -363,19 +363,19 @@
 			files = (
 				071C49312755BB35000D879B /* ImageReader.swift in Sources */,
 				075BC89D275CD45900EAC204 /* GCoresFollowship.swift in Sources */,
-				0780F920275798940062F9B7 /* GCoresTagData.swift in Sources */,
+				0780F920275798940062F9B7 /* GCoresTopicData.swift in Sources */,
 				07AE5A09274F5B7B00FF9649 /* GCoresTalk.swift in Sources */,
 				0780F917275797A60062F9B7 /* GCoresTalkData.swift in Sources */,
 				0780F9232757E3A30062F9B7 /* ReadableScroller.swift in Sources */,
 				075BC89A275C83F400EAC204 /* ScenesView.swift in Sources */,
-				0780F930275A53AE0062F9B7 /* TagTimeline.swift in Sources */,
+				0780F930275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */,
 				075BC8A1275CF04900EAC204 /* StatusUserListView.swift in Sources */,
 				07AE59F8274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */,
 				075BC8A4275D16CA00EAC204 /* test.swift in Sources */,
 				07AE5A0F2750B0A100FF9649 /* Lib.swift in Sources */,
 				07AE59FC274F5B0300FF9649 /* Persistence.swift in Sources */,
 				071C492E2754D15A000D879B /* StatusCommentsView.swift in Sources */,
-				0780F92C275A385F0062F9B7 /* StatusTagsView.swift in Sources */,
+				0780F92C275A385F0062F9B7 /* StatusTopicsView.swift in Sources */,
 				075BC8AC275F43EB00EAC204 /* GCoresVote.swift in Sources */,
 				07AE59F6274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
 				070DE8962760890B008B3F08 /* NewCommentView.swift in Sources */,
@@ -400,12 +400,12 @@
 				07A100F9275474B900D599D5 /* ImageView.swift in Sources */,
 				07AE5A0D274FD09A00FF9649 /* TalkCardView.swift in Sources */,
 				075BC8A5275D16CA00EAC204 /* test.swift in Sources */,
-				0780F931275A53AE0062F9B7 /* TagTimeline.swift in Sources */,
+				0780F931275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */,
 				07A100F72754742C00D599D5 /* StatusTalksTimelineView.swift in Sources */,
 				0780F91E2757985C0062F9B7 /* GCoresData.swift in Sources */,
 				075BC88B275B294D00EAC204 /* LoginView.swift in Sources */,
 				075BC89E275CD45A00EAC204 /* GCoresFollowship.swift in Sources */,
-				0780F92D275A385F0062F9B7 /* StatusTagsView.swift in Sources */,
+				0780F92D275A385F0062F9B7 /* StatusTopicsView.swift in Sources */,
 				07AE5A0A274F5B7B00FF9649 /* GCoresTalk.swift in Sources */,
 				07AE59F9274F5B0300FF9649 /* GCoresTalkApp.swift in Sources */,
 				0780F91B275797FC0062F9B7 /* GCoresCommentData.swift in Sources */,
@@ -417,7 +417,7 @@
 				07AE59F7274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
 				070DE89427608885008B3F08 /* NSWindow.swift in Sources */,
 				071C492C2754C6CD000D879B /* PreviewData.swift in Sources */,
-				0780F921275798940062F9B7 /* GCoresTagData.swift in Sources */,
+				0780F921275798940062F9B7 /* GCoresTopicData.swift in Sources */,
 				075BC89B275C83F400EAC204 /* ScenesView.swift in Sources */,
 				07AE59FB274F5B0300FF9649 /* ContentView.swift in Sources */,
 				075BC8AD275F43EB00EAC204 /* GCoresVote.swift in Sources */,

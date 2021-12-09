@@ -72,7 +72,7 @@ struct StatusProfilePageView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
 //                                    withAnimation {
-                                        gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", targetTalk: nil, tag: nil, userId: status.userId!)
+                                        gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", targetTalk: nil, topic: nil, userId: status.userId!)
 //                                    }
                                 }
                                 VStack{
@@ -83,7 +83,7 @@ struct StatusProfilePageView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
 //                                    withAnimation{
-                                        gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", targetTalk: nil, tag: nil, userId: status.userId!)
+                                        gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", targetTalk: nil, topic: nil, userId: status.userId!)
 //                                    }
                                 }
                             }.font(.title2)

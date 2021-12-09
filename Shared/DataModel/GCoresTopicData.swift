@@ -1,5 +1,5 @@
 //
-//  GCoresTagData.swift
+//  GCoresTopicData.swift
 //  GCoresTalk
 //
 //  Created by catbaron on 2021/12/01.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GCoresTagCategoryResponse: Codable {
+struct GCoresTopicCategoryResponse: Codable {
     struct Meta: Codable {
         let recordCount: Int?
         
@@ -54,11 +54,11 @@ struct GCoresTagCategoryResponse: Codable {
     let data: [Data]
     let meta: Meta
     
-    func formalize() -> [TalkTagCategory] {
-        var talkTagCategory = [TalkTagCategory]()
+    func formalize() -> [TalkTopicCategory] {
+        var topicCategory = [TalkTopicCategory]()
         data.forEach { _category in
-            talkTagCategory.append(
-                TalkTagCategory(
+            topicCategory.append(
+                TalkTopicCategory(
                     id: _category.id,
                     name: _category.attributes.name,
                     desc: _category.attributes.name,
@@ -68,12 +68,12 @@ struct GCoresTagCategoryResponse: Codable {
                 )
             )
         }
-        return talkTagCategory
+        return topicCategory
     }
     
 }
 
-struct GCoresTagResponse: Codable {
+struct GCoresTopicResponse: Codable {
     struct Meta: Codable {
         let recordCount: Int?
         
@@ -142,18 +142,18 @@ struct GCoresTagResponse: Codable {
     let data: [Data]
     let meta: Meta
     
-    func formalize() -> [TalkTag] {
-        var talkTags = [TalkTag]()
-        data.forEach { _tag in
-            talkTags.append(
-                TalkTag(
-                    id: _tag.id,
-                    title: _tag.attributes.title,
-                    desc: _tag.attributes.desc,
-                    cover: _tag.attributes.cover,
-                    banner: _tag.attributes.banner)
+    func formalize() -> [Topic] {
+        var topics = [Topic]()
+        data.forEach { _topic in
+            topics.append(
+                Topic(
+                    id: _topic.id,
+                    title: _topic.attributes.title,
+                    desc: _topic.attributes.desc,
+                    cover: _topic.attributes.cover,
+                    banner: _topic.attributes.banner)
             )
         }
-        return talkTags
+        return topics
     }
 }

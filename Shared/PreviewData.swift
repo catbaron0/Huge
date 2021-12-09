@@ -88,7 +88,7 @@ let testComment = TalkCommentCard(
     oldestDescendants: [String](),
     depth: 1,
     text: "commentData.attributes.body",
-    images: nil, caption: nil, tags: nil, likesCount: 0,
+    images: nil, caption: nil, topics: nil, likesCount: 0,
     voteFlag: nil, voteId: nil,
     bookMarkId: nil, shareUrl: nil, related: nil)
 

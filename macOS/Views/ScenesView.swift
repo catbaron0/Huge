@@ -27,12 +27,12 @@ struct ScenesView: View {
                         case .followeeTimeline, .recommendTimeline:
 //                            Text("profile")
                             StatusTalksTimelineView(_status: status, headerView: nil, topOffsetTrigger: .timeline)
-                        case .tagTimeline:
+                        case .topicTimeline:
 //                            Text("profile")
-                            StatusTagTimelineView(_status: status)
-                        case .tags:
+                            StatusTopicTimelineView(_status: status)
+                        case .topics:
 //                            Text("tags")
-                            StatusTagsView(_status: status)
+                            StatusTopicsView(_status: status)
 //                            StatusUserListView(_status: status)
                         case .followers, .followees:
 //                            Text("profile")

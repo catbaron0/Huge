@@ -7,14 +7,14 @@
 //
 import SwiftUI
 //
-struct TagCategoryCardView: View {
+struct TopicCategoryCardView: View {
     // The card view shown in the sidebar of tagsview
-    let tagCategory: TalkTagCategory
+    let topicCategory: TalkTopicCategory
 
     var body: some View {
         HStack{
             Spacer()
-            Text(tagCategory.name)
+            Text(topicCategory.name)
             Spacer()
         }
         .padding(.top)
@@ -24,7 +24,7 @@ struct TagCategoryCardView: View {
     }
 }
 
-struct TagCategoriesView: View {
+struct TopicCategoriesView: View {
     let _status: TalkStatus
     @State private var offset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
@@ -35,21 +35,21 @@ struct TagCategoriesView: View {
 //        let status = gtalk.statusForScene[sceneType]![idx]
         ScrollView(showsIndicators: false) {
             VStack {
-                ForEach(gtalk.tagCategories) { category in
+                ForEach(gtalk.topicCategories) { category in
                     Group {
-                        if category == gtalk.selectedTagCategory {
-                            TagCategoryCardView(tagCategory: category)
+                        if category == gtalk.selectedTopicCategory {
+                            TopicCategoryCardView(topicCategory: category)
                                 .background(Rectangle().fill(.red).opacity(0.8))
                                 .font(.body.bold())
                         } else {
-                            TagCategoryCardView(tagCategory: category)
+                            TopicCategoryCardView(topicCategory: category)
                         }
 
                     }
                         .onTapGesture{
-                            gtalk.select(tagCategory: category)
+                            gtalk.select(topicCategory: category)
                             withAnimation {
-                                gtalk.readTags(categoryId: category.id)
+                                gtalk.readTopics(categoryId: category.id)
                             }
                         }
                 }
@@ -60,12 +60,12 @@ struct TagCategoriesView: View {
 }
 
 
-struct TagCardView: View {
-    let tag: TalkTag
+struct TopicCardView: View {
+    let topic: Topic
 
     var body: some View {
         HStack{
-            Text(tag.title)
+            Text(topic.title)
             Spacer()
         }
         .padding(.top)
@@ -74,17 +74,17 @@ struct TagCardView: View {
     }
 }
 
-struct TagsView: View {
+struct topicsView: View {
     @State var status: TalkStatus
     @EnvironmentObject var gtalk: GCoresTalk
 
     var body: some View {
         ScrollView {
             VStack {
-                ForEach(gtalk.selectedTags) { tag in
-                    TagCardView(tag: tag)
+                ForEach(gtalk.selectedTopics) { topic in
+                    TopicCardView(topic: topic)
                         .onTapGesture {
-                            gtalk.addStatusToCurrentScene(after: status, statusType: .tagTimeline, title: tag.title, icon: "tag.fill", targetTalk: nil, tag: tag)
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title, icon: "tag.fill", targetTalk: nil, topic: topic)
                         }
                 }
                 Spacer()
@@ -93,14 +93,15 @@ struct TagsView: View {
     }
 }
 
-struct StatusTagsView: View {
+struct StatusTopicsView: View {
     @State var _status: TalkStatus
     @EnvironmentObject var gtalk: GCoresTalk
 
     @State private var sending = false
     @State private var checkInfo: String = ""
     @State private var searchText: String = ""
-    @FocusState private var searchMode: Bool
+    @State private var searchMode: Bool = false
+    @FocusState private var focused: Bool
 //    @FocusState private var foncusOnSearchInput: Bool
     let uuid = UUID().uuidString
     var body: some View {
@@ -116,18 +117,13 @@ struct StatusTagsView: View {
                 TextField("title", text: $searchText, prompt: Text("prompt"))
                     .font(.title2)
                     .cornerRadius(16)
-                    .focused($searchMode)
+                    .focused($focused)
                     .padding(.bottom, 8)
                     .lineSpacing(20)
                     
 
                 Button {
-                    if searchText.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 {
-                        checkInfo = "评论不能为空！"
-                        return
-                    } else {
-                        checkInfo = ""
-                    }
+                    
 //                    if sendState == nil || sendState! == .failed {
 //                        gtalk.sendComment(talkId: targetTalkId, commentId: targetCommentId, _status: _status, comment: comment, uuid: uuid)
 //                    }
@@ -154,14 +150,21 @@ struct StatusTagsView: View {
 
             else {
                 HStack {
-                    TagCategoriesView(_status: status)
+                    TopicCategoriesView(_status: status)
                         .frame(width: 100)
-                        .onAppear { gtalk.readTagsCategories()}
-                    TagsView(status: status)
+                        .onAppear { gtalk.readTopicsCategories()}
+                    topicsView(status: status)
                     Spacer()
                 }
             }
         }
+    }
+    
+    func submit() {
+        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 {
+            return
+        }
+        // gtalk.searchTopic
     }
 }
 

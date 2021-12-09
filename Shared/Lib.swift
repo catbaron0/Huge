@@ -7,10 +7,10 @@
 
 import Foundation
 
-enum EndPoint {
+enum TimelineEndPoint {
     case recommend
     case followee
-    case tag
+    case topic
     case user
 //    case topic(id: String)
     

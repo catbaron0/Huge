@@ -38,14 +38,14 @@ struct TalkCardHeadView: View {
     }
 }
 
-struct TalkCardTagsView: View {
-    let tags: [TalkTag]
+struct TalkCardTopicsView: View {
+    let topics: [Topic]
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-        ForEach(tags) { tag in
+        ForEach(topics) { topic in
             HStack{
-                Text(tag.title)
+                Text(topic.title)
                 //                    .font(.caption.bold())
                     .padding(5)
                     .foregroundColor(Color.red)
@@ -53,8 +53,8 @@ struct TalkCardTagsView: View {
                     .cornerRadius(30)
                     .onTapGesture {
                         let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
-                        if let statusType = status?.statusType, statusType != .tagTimeline, tag != status?.tag {
-                            gtalk.addStatusToCurrentScene(after: status!, statusType: .tagTimeline, title: tag.title, icon: "tag.fill", tag: tag)
+                        if let statusType = status?.statusType, statusType != .topicTimeline, topic != status?.topic {
+                            gtalk.addStatusToCurrentScene(after: status!, statusType: .topicTimeline, title: topic.title, icon: "tag.fill", topic: topic)
                         }
                     }
                 Spacer()
@@ -125,7 +125,7 @@ struct TalkCardView: View {
                 TalkCardProfileView(user: card.user)
                     .onTapGesture {
 //                        withAnimation{
-                            gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", targetTalk: card, tag: nil, userId: card.user.id)
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", targetTalk: card, topic: nil, userId: card.user.id)
 //                        }
                     }
                 
@@ -147,8 +147,8 @@ struct TalkCardView: View {
                     if let related = card.related {
                         Text(related.title)
                     }
-                    if let tags = card.tags {
-                        TalkCardTagsView(tags: tags)
+                    if let topics = card.topics {
+                        TalkCardTopicsView(topics: topics)
                     }
                     TalkCardBottomView(_status: status, talkCard: card)
                 }

@@ -69,7 +69,7 @@ struct ReplyCardView: View {
             HStack(alignment: .top) {
                 TalkCardProfileView(user: reply.user)
                     .onTapGesture {
-                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", targetTalk: nil, tag: nil, userId: reply.user.id)
+                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", targetTalk: nil, topic: nil, userId: reply.user.id)
                     }
                 VStack(alignment: .leading) {
                     TalkCardHeadView(user: reply.user, created: reply.createdAt)
@@ -98,7 +98,7 @@ struct CommentCardView: View {
                         .onTapGesture {
                             gtalk.addStatusToCurrentScene(
                                 after: status, statusType: .profile, title: comment.user.nickname,
-                                icon: "person.fill", targetTalk: nil, tag: nil, userId: comment.user.id
+                                icon: "person.fill", targetTalk: nil, topic: nil, userId: comment.user.id
                             )
                         }
                     VStack(alignment: .leading) {
@@ -124,7 +124,7 @@ struct CommentCardView: View {
                             }
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetTalk: _status.targetTalk, tag: nil, userId: nil, targetComment: comment)
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetTalk: _status.targetTalk, topic: nil, userId: nil, targetComment: comment)
                             }
                         }
                     }

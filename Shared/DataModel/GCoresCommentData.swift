@@ -225,7 +225,7 @@ struct GCcoresTalkCommentResponse: Decodable {
             oldestDescendants: oldestDescendants ?? [String](),
             depth: commentIncluded.attributes.depth!,
             text: commentIncluded.attributes.body!,
-            images: nil, caption: nil, tags: nil, likesCount: commentIncluded.attributes.likesCount,
+            images: nil, caption: nil, topics: nil, likesCount: commentIncluded.attributes.likesCount,
             voteFlag: commentIncluded.meta.voteFlag, voteId: commentIncluded.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
 
@@ -257,7 +257,7 @@ struct GCcoresTalkCommentResponse: Decodable {
             oldestDescendants: oldestDescendants ?? [String](),
             depth: commentData.attributes.depth,
             text: commentData.attributes.body,
-            images: nil, caption: nil, tags: nil, likesCount: commentData.attributes.likesCount,
+            images: nil, caption: nil, topics: nil, likesCount: commentData.attributes.likesCount,
             voteFlag: commentData.meta.voteFlag, voteId: commentData.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
 
@@ -717,7 +717,7 @@ struct GCcoresTalkReplyResponse: Codable {
             oldestDescendants: oldestDescendants ?? [String](),
             depth: commentData.attributes.depth,
             text: commentData.attributes.body,
-            images: nil, caption: nil, tags: nil, likesCount: commentData.attributes.likesCount,
+            images: nil, caption: nil, topics: nil, likesCount: commentData.attributes.likesCount,
             voteFlag: commentData.meta.voteFlag, voteId: commentData.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
 
@@ -747,7 +747,7 @@ struct GCcoresTalkReplyResponse: Codable {
             oldestDescendants: oldestDescendants ?? [String](),
             depth: commentIncluded.attributes.depth!,
             text: commentIncluded.attributes.body!,
-            images: nil, caption: nil, tags: nil, likesCount: commentIncluded.attributes.likesCount,
+            images: nil, caption: nil, topics: nil, likesCount: commentIncluded.attributes.likesCount,
             voteFlag: commentIncluded.meta.voteFlag, voteId: commentIncluded.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
 
@@ -1273,7 +1273,7 @@ struct NewCommentResponse: Codable {
             oldestDescendants: oldestDescendants ?? [String](),
             depth: commentData.attributes.depth,
             text: commentData.attributes.body,
-            images: nil, caption: nil, tags: nil, likesCount: commentData.attributes.likesCount,
+            images: nil, caption: nil, topics: nil, likesCount: commentData.attributes.likesCount,
             voteFlag: commentData.meta.voteFlag, voteId: commentData.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
 

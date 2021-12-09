@@ -82,7 +82,7 @@ struct TalkStatus: Identifiable, Equatable {
     
     // For Timeline
     var talks = [TalkCard]()
-    var tag: TalkTag?
+    var topic: Topic?
     //    var selectedCardIndex: Int?
     //    var selectedCard: TalkCard?
     
@@ -212,11 +212,11 @@ struct TalkStatus: Identifiable, Equatable {
 enum TalkStatusType {
     case recommendTimeline
     case followeeTimeline
-    case tagTimeline
+    case topicTimeline
     case userTimeline
     case comments
     case replies
-    case tags
+    case topics
     case profile
     case followers
     case followees
@@ -233,18 +233,18 @@ enum LoadingState{
 enum TalkSceneType: String, CaseIterable {
     case recommend
     case followee
-    case tags
+    case topics
     case profile
 }
 
 struct TalkScene: Identifiable, Equatable {
-    let tag: TalkSceneType
+    let sceneType: TalkSceneType
     let label: String
     let selectedIcon: String
     let unselectedIcon: String
     
     var id: TalkSceneType {
-        return tag
+        return sceneType
     }
 }
 
@@ -325,7 +325,7 @@ struct TalkRelated {
     let contentString: String
 }
 
-struct TalkTagCategory: Equatable, Identifiable {
+struct TalkTopicCategory: Equatable, Identifiable {
     let id: String
     let name: String
     let desc: String?
@@ -334,7 +334,7 @@ struct TalkTagCategory: Equatable, Identifiable {
     //    var tags: [TalkTag]
 }
 
-struct TalkTag: Equatable, Identifiable{
+struct Topic: Equatable, Identifiable{
     let id: String
     let title: String
     let desc: String?
@@ -362,7 +362,7 @@ struct TalkCard: Identifiable, Equatable {
     let texts: [TalkText]
     let images: [TalkImage]?
     let caption: String?
-    let tags: [TalkTag]?
+    let topics: [Topic]?
     var likesCount: Int?
     var voteFlag: Bool?
     var voteId: String?
@@ -402,7 +402,7 @@ struct TalkCommentCard: Identifiable, Equatable {
     let text: String
     let images: [TalkImage]?
     let caption: String?
-    let tags: [TalkTag]?
+    let topics: [Topic]?
     var isVoting: Bool? = false
     var likesCount: Int?
     var voteFlag: Bool?
