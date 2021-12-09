@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct GCoresTalkApp: App {
     let persistenceController = PersistenceController.shared
+    @StateObject var gtalk = GCoresTalk()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-        }
+                .environment(\.managedObjectContext, persistenceController.container.viewContext).environmentObject(gtalk)
+        }.windowStyle(HiddenTitleBarWindowStyle())
+
     }
 }
