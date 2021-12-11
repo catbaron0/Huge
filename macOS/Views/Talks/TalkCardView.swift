@@ -39,13 +39,13 @@ struct TalkCardHeadView: View {
 }
 
 struct TalkCardTopicsView: View {
-    let topics: [Topic]
+    let topics: [TalkRelated]
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
         ForEach(topics) { topic in
             HStack{
-                Text(topic.title)
+                Text(topic.title!)
                 //                    .font(.caption.bold())
                     .padding(5)
                     .foregroundColor(Color.red)
@@ -54,7 +54,7 @@ struct TalkCardTopicsView: View {
                     .onTapGesture {
                         let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
                         if let statusType = status?.statusType, statusType != .topicTimeline, topic != status?.topic {
-                            gtalk.addStatusToCurrentScene(after: status!, statusType: .topicTimeline, title: topic.title, icon: "tag.fill", topic: topic)
+                            gtalk.addStatusToCurrentScene(after: status!, statusType: .topicTimeline, title: topic.title ?? "nil", icon: "tag.fill", topic: topic)
                         }
                     }
                 Spacer()
@@ -65,7 +65,7 @@ struct TalkCardTopicsView: View {
 }
 
 struct TalkCardBottomView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     let talkCard: TalkCard
     @EnvironmentObject var gtalk: GCoresTalk
 //    var curTalkCard: TalkCard?
@@ -99,7 +99,7 @@ struct TalkCardBottomView: View {
                 HStack {
                     Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
                         .onTapGesture {
-                            newWindowForComment(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, _status: _status, gtalk: gtalk))
+                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, _status: _status, gtalk: gtalk))
 //                            gtalk.sendComment(talkId: talkCard.id, commentId: nil, _status: _status, comment: "233333")
                         }
                 }
@@ -114,7 +114,7 @@ struct TalkCardBottomView: View {
 // MARK: - CardView
 struct TalkCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-    let _status: TalkStatus
+    let _status: ViewStatus
     let card: TalkCard
     let isSelected: Bool
     var body: some View {
@@ -145,7 +145,7 @@ struct TalkCardView: View {
                     }
                     
                     if let related = card.related {
-                        Text(related.title)
+                        Text(related.title!)
                     }
                     if let topics = card.topics {
                         TalkCardTopicsView(topics: topics)

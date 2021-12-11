@@ -11,47 +11,13 @@ enum LoadingBarPosition {
     case top
     case bottom
 }
-//
-//struct TopLoadingBarView: View {
-//    @EnvironmentObject var gtalk: GCoresTalk
-//    let status: TalkModelStatus
-//    @State var triggerLoading: Bool
-//    let action: (_ earlier: Bool) -> Void
-//
-//    var body: some View {
-//        VStack { // LoadingBar
-//            switch status.loadingLatest {
-//            case .loading:
-//                ProgressView()
-//            default:
-//                if triggerLoading {
-//                    HStack {
-//                        Spacer()
-//                        Label("点击加载更多", systemImage: "arrow.up.arrow.down")
-//                        Spacer()
-//                    }
-//                    .contentShape(Rectangle())
-//                    .onTapGesture {
-//                        action(false)
-////                        gtalk.getComments(for: status.selectedCard!.id, fromStart: )
-//                    }
-//                    .onAppear {
-//                        action(false)
-////                        gtalk.getComments(for: status.selectedCard!.id, fromStart: true)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 struct LoadingBarView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-    @State  var status: TalkStatus
+    @State  var status: ViewStatus
     @State  var barPosition: LoadingBarPosition
     @Binding  var offset: CGPoint
-//    @Binding var height: CGFloat
-//    @State var triggerLoading: Bool
+
     var  action: () -> Void
 
     var body: some View {
@@ -104,17 +70,38 @@ struct TitleBarView: View {
                     Label(status.title, systemImage: status.icon)
                         .frame(maxWidth: .infinity)
                         .foregroundColor(Color(NSColor.windowFrameTextColor))
+                        .padding(.bottom, 8)
+                        .font(.title3)
                 }
                 if gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count > 1 {
-                    Label("后退", systemImage: "arrow.backward.circle.fill")
-                        .foregroundColor(Color(NSColor.windowFrameTextColor))
-                        .background(Color(NSColor.windowBackgroundColor))
-                        .padding(.leading)
-                        .onTapGesture {
-//                            withAnimation(.linear){
-                                gtalk.back()
-//                            }
-                        }
+                    Button { gtalk.back()  } label: {
+                        Label("后退", systemImage: "arrow.backward.circle.fill")
+                            .labelStyle(.iconOnly)
+                            .font(.title)
+                            .foregroundColor(Color(NSColor.windowFrameTextColor))
+                            .background(Color(NSColor.windowBackgroundColor))
+                            .padding([.bottom], 8)
+                            .padding(.leading, 15)
+                    }.buttonStyle(.plain)
+                    
+                    
+                }
+                HStack {
+                    Spacer()
+                    Button {
+                        let windowId = UUID().uuidString
+                        gtalk.NSWindowStatus[windowId] = gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!
+                        newNSWindow(view: NewTalkView(windowId: windowId, gtalk: gtalk))
+//                        newNSWindow(view: NewTalkView(windowId: UUID().uuidString, _status: gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!, gtalk: gtalk))
+//                        print("new talk")
+                    } label: {
+                        NewTalkButtonView()
+                            .padding([.trailing,])
+                            .foregroundColor(Color(NSColor.windowFrameTextColor))
+                            .background(Color(NSColor.windowBackgroundColor))
+                            .font(.title)
+                            .padding(.bottom, 8)
+                    }.buttonStyle(.plain)
                 }
             }
             .padding(.top, -20)
@@ -132,21 +119,17 @@ struct NewTalkButtonView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-        Label("推!", systemImage: "square.and.pencil")
+        Label("推!", systemImage: "pencil.circle.fill")
             .labelStyle(.iconOnly)
-            .font(.title)
-            .padding(.top, 10)
-            .padding(.bottom, 5)
     }
 }
 
 struct NaviSideBarView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-//    @Binding var sidebarItem: SidebarItemTag
     
     var body: some View {
         VStack{
-            NewTalkButtonView()
+//            NewTalkButtonView()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
                     ForEach(gtalk.talkScenes) {item in
@@ -177,7 +160,6 @@ struct SidebarItemView: View {
         .onTapGesture {
             gtalk.select(sidebarItem: sidebarItem)
         }
-//        Divider().frame(width: 70, height: 0)
     }
 }
 
@@ -197,7 +179,6 @@ struct HeaderView: View {
         }
         .foregroundColor(.white)
         .background(RoundedRectangle(cornerRadius: 5).fill(Color(red: 1, green: 0, blue: 0, opacity: 0.6)))
-//        .background(RoundedRectangle(cornerRadius: 5).fill(Color(hue: 1.0, saturation: 0.268, brightness: 0.435)))
     }
 }
 

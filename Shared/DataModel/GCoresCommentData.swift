@@ -51,7 +51,7 @@ struct GCoresTalkCommentData: Decodable {
     }
     
     let id: String
-    let type: GCoresType
+    let type: GCoresRelatedType
     let attributes: Attributes
     let relationships: Relationships
     let meta: Meta
@@ -140,7 +140,7 @@ struct GCoresTalkCommentIncluded: Decodable {
         }
     }
     let id: String
-    let type: GCoresType
+    let type: GCoresRelatedType
     let attributes: Attributes
     let relationships: Relationships
     let meta: Meta
@@ -164,11 +164,10 @@ struct GCcoresTalkCommentResponse: Decodable {
         let nickname = data.attributes.nickname ?? "nil"
         var src: String
         if let thumb = data.attributes.thumb {
-            src = "https://image.gcores.com/" + thumb + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
+            src = GCORES_IMAGE_HOST + thumb + GCORES_IMAGE_SCALE_SETTING
         } else {
-            src = DEFAULT_PROFILE_URL
+            src = GCORES_DEFAULT_PROFILE_URL
         }
-//        let src = "https://image.gcores.com/" + data.attributes.thumb! + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
         let profile = TalkImage(src: src, isSpoiler: false, width: 60, height: 60, downloadable: true)
         return TalkUser(
             id: id,
@@ -328,7 +327,7 @@ struct GCcoresTalkReplyResponse: Codable {
             let root: Root
             struct Commentable: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: Data
@@ -339,7 +338,7 @@ struct GCcoresTalkReplyResponse: Codable {
             let subcommentable: Subcommentable
             struct Parent: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: Data?
@@ -350,7 +349,7 @@ struct GCcoresTalkReplyResponse: Codable {
             let children: Children
             struct Descendants: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: [Data]?
@@ -381,14 +380,14 @@ struct GCcoresTalkReplyResponse: Codable {
             }
         }
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         let attributes: Attributes
         let relationships: Relationships
         let meta: Meta
     }
     struct Included: Codable {
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         struct Attributes: Codable {
             let body: String?
             let depth: Int?
@@ -453,7 +452,7 @@ struct GCcoresTalkReplyResponse: Codable {
         struct Relationships: Codable {
             struct User: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: Data?
@@ -470,7 +469,7 @@ struct GCcoresTalkReplyResponse: Codable {
             let subcommentable: Subcommentable?
             struct Parent: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: Data?
@@ -481,7 +480,7 @@ struct GCcoresTalkReplyResponse: Codable {
             let children: Children?
             struct Descendants: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: [Data]?
@@ -656,11 +655,10 @@ struct GCcoresTalkReplyResponse: Codable {
         let nickname = data.attributes.nickname ?? "nil"
         var src: String
         if let thumb = data.attributes.thumb {
-            src = "https://image.gcores.com/" + thumb + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
+            src = GCORES_IMAGE_HOST + thumb + GCORES_IMAGE_SCALE_SETTING
         } else {
-            src = DEFAULT_PROFILE_URL
+            src = GCORES_DEFAULT_PROFILE_URL
         }
-//        let src = "https://image.gcores.com/" + data.attributes.thumb! + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
         let profile = TalkImage(src: src, isSpoiler: false, width: 60, height: 60, downloadable: true)
         return TalkUser(
             id: id,
@@ -773,7 +771,7 @@ struct GCcoresTalkReplyResponse: Codable {
 struct NewCommentResponse: Codable {
     struct Data: Codable {
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         struct Attributes: Codable {
             let body: String
             let depth: Int
@@ -828,7 +826,7 @@ struct NewCommentResponse: Codable {
             let children: Children
             struct Descendants: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: [Data]?
@@ -864,7 +862,7 @@ struct NewCommentResponse: Codable {
 
     struct Included: Codable {
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         struct Attributes: Codable {
             let body: String?
             let depth: Int?
@@ -962,7 +960,7 @@ struct NewCommentResponse: Codable {
             let children: Children?
             struct Descendants: Codable {
                 struct Data: Codable {
-                    let type: GCoresType
+                    let type: GCoresRelatedType
                     let id: String
                 }
                 let data: [Data]?
@@ -1211,11 +1209,10 @@ struct NewCommentResponse: Codable {
         let nickname = data.attributes.nickname ?? "nil"
         var src: String
         if let thumb = data.attributes.thumb {
-            src = "https://image.gcores.com/" + thumb + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
+            src = GCORES_IMAGE_HOST + thumb + GCORES_IMAGE_SCALE_SETTING
         } else {
-            src = DEFAULT_PROFILE_URL
+            src = GCORES_DEFAULT_PROFILE_URL
         }
-//        let src = "https://image.gcores.com/" + data.attributes.thumb! + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
         let profile = TalkImage(src: src, isSpoiler: false, width: 60, height: 60, downloadable: true)
         return TalkUser(
             id: id,

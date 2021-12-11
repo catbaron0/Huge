@@ -120,9 +120,9 @@ struct GCoresUserResponse: Codable {
         
         var profile_src: String
         if let src = data.attributes.thumb {
-            profile_src = "https://image.gcores.com/" + src + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
+            profile_src = GCORES_IMAGE_HOST + src + GCORES_IMAGE_SCALE_SETTING
         } else {
-            profile_src = DEFAULT_PROFILE_URL
+            profile_src = GCORES_DEFAULT_PROFILE_URL
         }
         return TalkUser(
             id: data.id,

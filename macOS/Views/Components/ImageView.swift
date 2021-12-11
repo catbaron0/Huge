@@ -97,7 +97,9 @@ struct TalkCardImageView: View {
                 if talkImages.count > 1 {
                     HStack {
                         Spacer()
-                        Label("1/\(talkImages.count)", systemImage: "ellipsis").font(.title2).labelStyle(.titleOnly).frame(minHeight: 20)
+                        Label("1 of \(talkImages.count)", systemImage: "ellipsis")
+                            .font(.title2).labelStyle(.titleOnly).frame(minHeight: 20)
+                            .foregroundColor(.white)
                         Spacer()
                     }.background(Color.gray).opacity(0.7)
                 }
@@ -224,7 +226,7 @@ struct ImageSlidesView: View {
                     }
                     .overlay(alignment: .bottom){
                         HStack{
-                            Text("\(idx+1)/\(images.count)").font(.title2)
+                            Text("\(idx+1) of \(images.count)").font(.title2).foregroundColor(.white)
                             if image.downloadable {
                                 Label("Download", systemImage: "arrow.down.circle.fill")
                                     .labelStyle(.iconOnly)

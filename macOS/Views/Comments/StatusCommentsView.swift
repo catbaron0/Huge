@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TalkCommentBottomView: View {
     let comment: TalkCommentCard
-    let _status: TalkStatus
+    let _status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
@@ -48,7 +48,7 @@ struct TalkCommentBottomView: View {
                 }
                 Spacer()
                 Button{
-                    newWindowForComment(view: NewCommentView(targetUser: comment.user, targetTalkId: _status.targetTalk!.id, targetCommentId: comment.id, _status: _status, gtalk: gtalk))
+                    newNSWindow(view: NewCommentView(targetUser: comment.user, targetTalkId: _status.targetTalk!.id, targetCommentId: comment.id, _status: _status, gtalk: gtalk))
                 } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
             }.font(.title3.bold())
@@ -58,7 +58,7 @@ struct TalkCommentBottomView: View {
 }
 
 struct ReplyCardView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     let reply: TalkCommentCard
     @EnvironmentObject var gtalk: GCoresTalk
     
@@ -83,7 +83,7 @@ struct ReplyCardView: View {
 }
 
 struct CommentCardView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     let comment: TalkCommentCard
     let withReply: Bool
     @EnvironmentObject var gtalk: GCoresTalk
@@ -135,7 +135,7 @@ struct CommentCardView: View {
 }
 
 struct StatusCommentsView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     @State var scrollerOffset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
@@ -202,7 +202,7 @@ struct StatusCommentsView: View {
                     case .loading:
                         ProgressView()
                     case .loaded:
-                        if proxy.size.height - scrollerOffset.y > -30 {
+                        if proxy.size.height - scrollerOffset.y > -50 {
                             Divider()
                                 .contentShape(Rectangle())
                                 .onAppear {
@@ -224,7 +224,7 @@ struct StatusCommentsView: View {
 
 
 struct StatusRepliesView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     @State var scrollerOffset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {

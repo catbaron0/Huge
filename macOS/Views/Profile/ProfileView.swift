@@ -9,13 +9,13 @@ import SwiftUI
 
 struct ProfileImageView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-    let _status: TalkStatus
+    let _status: ViewStatus
     
     var body: some View {
         let sceneType = _status.sceneType
         if let idx = gtalk.indexOf(status: _status) {
             let status = gtalk.statusForScene[sceneType]![idx]
-            let profileUrl = status.user?.profile.src ?? DEFAULT_PROFILE_URL
+            let profileUrl = status.user?.profile.src ?? GCORES_DEFAULT_PROFILE_URL
             AsyncImage(url: URL(string: profileUrl)) { image in
                 image
                     .resizable()
@@ -33,7 +33,7 @@ struct ProfileImageView: View {
 }
 
 struct StatusProfilePageView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
 
     

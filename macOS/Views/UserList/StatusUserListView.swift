@@ -34,7 +34,7 @@ struct FollowshipCard: View {
 }
 
 struct StatusUserListView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     @State var scrollerOffset: CGPoint = .zero
     let topOffsetTrigger = TopOffsetTrigger.userList

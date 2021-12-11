@@ -32,8 +32,7 @@ struct ScenesView: View {
                             StatusTopicTimelineView(_status: status)
                         case .topics:
 //                            Text("tags")
-                            StatusTopicsView(_status: status)
-//                            StatusUserListView(_status: status)
+                            StatusTopicsView(_status: status, windowId: "toipcs")
                         case .followers, .followees:
 //                            Text("profile")
                             StatusUserListView(_status: status)
@@ -44,17 +43,17 @@ struct ScenesView: View {
                     .frame(width: proxy.size.width)
                     .onAppear{
                         withAnimation(.easeInOut(duration: 0.5)) {
-                            offset = offset - proxy.size.width
+                            offset = offset - proxy.size.width - 8
                         }
                     }
                     .onDisappear {
                         withAnimation {
-                        offset = offset + proxy.size.width
+                        offset = offset + proxy.size.width + 8
                         }
                     }
                 }
             }.onAppear {
-                offset = proxy.size.width
+                offset = proxy.size.width + 8
             }
 //            .offset(x: (-proxy.size.width - 8) * ( CGFloat(gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count) - 1))
             .offset(x: offset)

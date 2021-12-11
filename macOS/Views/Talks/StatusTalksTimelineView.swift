@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct StatusTalksTimelineView: View {
-    let _status: TalkStatus
+    let _status: ViewStatus
     let headerView: HeaderView?
     let topOffsetTrigger: TopOffsetTrigger
     @State private var offset: CGPoint = .zero

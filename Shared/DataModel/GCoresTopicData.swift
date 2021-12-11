@@ -35,7 +35,7 @@ struct GCoresTopicCategoryResponse: Codable {
             let createdAt: String
             let updatedAt: String
             let subscriptionCount: Int?
-            let scope: GCoresType
+            let scope: String
             
             enum CodingKeys: String, CodingKey {
                 case name, desc, logo, background, scope
@@ -46,7 +46,7 @@ struct GCoresTopicCategoryResponse: Codable {
         }
         
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         let attributes: Attributes
         let meta: Meta
     }
@@ -102,7 +102,7 @@ struct GCoresTopicResponse: Codable {
                 let title: String
             }
             struct Preview: Codable {
-                let type: GCoresType
+                let type: String?
                 let src: String?
             }
             let title: String
@@ -116,7 +116,7 @@ struct GCoresTopicResponse: Codable {
             let banner: String?
             let latestContributedAt: String
             let customSection: [Section]
-            let preview: [Preview]
+            let preview: [Preview]?
             let isTreated: Bool
             let hasGiveaway: Bool
             
@@ -134,7 +134,7 @@ struct GCoresTopicResponse: Codable {
             }
         }
         let id: String
-        let type: GCoresType
+        let type: GCoresRelatedType
         let attributes: Attributes
         let meta: Meta
     }
@@ -142,16 +142,19 @@ struct GCoresTopicResponse: Codable {
     let data: [Data]
     let meta: Meta
     
-    func formalize() -> [Topic] {
-        var topics = [Topic]()
+    func formalize() -> [TalkRelated] {
+        var topics = [TalkRelated]()
         data.forEach { _topic in
             topics.append(
-                Topic(
+                TalkRelated(
                     id: _topic.id,
+                    type: .topics,
                     title: _topic.attributes.title,
                     desc: _topic.attributes.desc,
                     cover: _topic.attributes.cover,
-                    banner: _topic.attributes.banner)
+                    banner: _topic.attributes.banner,
+                    contentString: nil
+                )
             )
         }
         return topics

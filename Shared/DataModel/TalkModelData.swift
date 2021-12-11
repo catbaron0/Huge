@@ -16,6 +16,7 @@ enum RequestState: String {
     case succeed
     case failed
     case sending
+    case empty
 }
 enum Commentable: String {
     case talks
@@ -38,8 +39,6 @@ enum TopOffsetTrigger: Int {
     case userList = 70
 }
 
-let DEFAULT_PROFILE_URL = "https://alioss.gcores.com/page_resources/misc/avatar-default.png"
-
 
 enum LoginState: String {
     case succeed
@@ -60,8 +59,18 @@ enum LoadingStatus: String {
     case loaded
 }
 
+struct SearchStatus {
+    var searchResults = [TalkRelated]()
+    var requestEarlier: RequestState = .succeed
+    var requestLatest: RequestState = .succeed
+}
+
 // MARK: Status of the talk model to decide data and views to display
-struct TalkStatus: Identifiable, Equatable {
+struct ViewStatus: Identifiable, Equatable {
+    static func == (lhs: ViewStatus, rhs: ViewStatus) -> Bool {
+        lhs.id == rhs.id
+    }
+    
     init(id: String, sceneType: TalkSceneType, statusType: TalkStatusType, title: String, icon: String, userId: String? = nil) {
         self.id = id
         self.statusType = statusType
@@ -69,6 +78,7 @@ struct TalkStatus: Identifiable, Equatable {
         self.icon = icon
         self.userId = userId
         self.sceneType = sceneType
+//        self.searchId = searchId
     }
     // Common properties
     let id: String
@@ -78,11 +88,15 @@ struct TalkStatus: Identifiable, Equatable {
     var icon: String
     var loadingLatest: LoadingStatus = .loaded
     var loadingEarlier: LoadingStatus = .loaded
+    var requestState: RequestState? = nil
+    var searchSuggestion = [String]()
+    //["suggestion1", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2"]
+//    var searchResults = [TalkRelated]()
 //    var sendState: SendState? = nil
     
     // For Timeline
     var talks = [TalkCard]()
-    var topic: Topic?
+    var topic: TalkRelated?
     //    var selectedCardIndex: Int?
     //    var selectedCard: TalkCard?
     
@@ -100,8 +114,13 @@ struct TalkStatus: Identifiable, Equatable {
     var followees = [TalkUser]()
     var triggerUpdate = ""
     
-    // For tag
-    var resentHotSearch: [String]? = ["test"]
+    // For Topic
+    var selectedTopicCategory: TalkTopicCategory?
+    // For search
+//    let searchId: String?
+    var searchResults = [TalkRelated]()
+    var requestEarlier: RequestState = .succeed
+    var requestLatest: RequestState = .succeed
     
     mutating func updateVotes(targetId: String, targetType: VoteTargetType, isVoting: Bool) {
         switch targetType {
@@ -318,13 +337,22 @@ struct TalkUser: Identifiable, Equatable {
     }
 }
 
-struct TalkRelated {
-    let id: Int
-    let type: String
-    let title: String
-    let contentString: String
+struct TalkRelated: Identifiable, Equatable {
+    let id: String
+    let type: GCoresRelatedType
+    let title: String?
+    let desc: String?
+    let cover: String?
+    let banner: String?
+    let contentString: String?
 }
-
+//struct SearchResult: Identifiable, Equatable {
+//    let id: String
+//    let type: String
+//    let title: String
+//    let desc: String?
+//    let cover: String?
+//}
 struct TalkTopicCategory: Equatable, Identifiable {
     let id: String
     let name: String
@@ -334,13 +362,13 @@ struct TalkTopicCategory: Equatable, Identifiable {
     //    var tags: [TalkTag]
 }
 
-struct Topic: Equatable, Identifiable{
-    let id: String
-    let title: String
-    let desc: String?
-    let cover: String?
-    let banner: String?
-}
+//struct Topic: Equatable, Identifiable{
+//    let id: String
+//    let title: String
+//    let desc: String?
+//    let cover: String?
+//    let banner: String?
+//}
 
 struct TalkText: Identifiable {
     let id: String
@@ -362,7 +390,7 @@ struct TalkCard: Identifiable, Equatable {
     let texts: [TalkText]
     let images: [TalkImage]?
     let caption: String?
-    let topics: [Topic]?
+    let topics: [TalkRelated]?
     var likesCount: Int?
     var voteFlag: Bool?
     var voteId: String?
@@ -402,7 +430,7 @@ struct TalkCommentCard: Identifiable, Equatable {
     let text: String
     let images: [TalkImage]?
     let caption: String?
-    let topics: [Topic]?
+    let topics: [TalkRelated]?
     var isVoting: Bool? = false
     var likesCount: Int?
     var voteFlag: Bool?

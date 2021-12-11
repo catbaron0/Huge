@@ -193,9 +193,9 @@ struct GCoresFollowshipResponse: Codable {
             let nickname = dt.attributes?.nickname ?? "nil"
             var src: String
             if let thumb = dt.attributes?.thumb {
-                src = "https://image.gcores.com/" + thumb + "?x-oss-process=image/resize,limit_1,m_fill,w_150,h_150"
+                src = GCORES_IMAGE_HOST + thumb + GCORES_IMAGE_SCALE_SETTING
             } else {
-                src = DEFAULT_PROFILE_URL
+                src = GCORES_DEFAULT_PROFILE_URL
             }
             
             var _createdAt: Date?

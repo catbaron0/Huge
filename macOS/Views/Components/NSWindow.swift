@@ -28,11 +28,10 @@ func newWindowForImageSlides(with images: [TalkImage])
 }
 
 
-func newWindowForComment(view: NewCommentView)
+func newNSWindow<T>(view: T) where T: View
 {
     @State var winRef: NSWindow
     @State var winCtrl: NSWindowController
-
     winRef = NSWindow(
         contentRect: NSRect(x: 100, y: 100, width: 300, height: 200),
         styleMask: [.titled, .closable, .fullSizeContentView, .miniaturizable, .resizable],
