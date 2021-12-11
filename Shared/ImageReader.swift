@@ -31,18 +31,23 @@ class ImageReader: ObservableObject {
     
     @Published var isLoading: Bool = false
     @Published var image: NSImage? = nil
+    let forceLoad: Bool
     // TODO: Add error message
     
     let url: String?
 
-    init(url: String?) {
+    init(url: String?, forceLoad: Bool = false) {
         self.url = url
+        self.forceLoad = forceLoad
     }
     func fetch(downLoad: Bool = false) {
         
-        guard self.image == nil, !(self.isLoading) else {
-            return
+        if !forceLoad {
+            guard self.image == nil, !(self.isLoading) else {
+                return
+            }
         }
+        
         print("I'm fetching from \(url!)")
         guard let url = url, let fetchURL = URL(string: url) else {
             // TODO: ivalid url

@@ -114,7 +114,7 @@ struct GCoresTopicResponse: Codable {
             let updatedAt: String
             let participantsCount: Int
             let banner: String?
-            let latestContributedAt: String
+            let latestContributedAt: String?
             let customSection: [Section]
             let preview: [Preview]?
             let isTreated: Bool

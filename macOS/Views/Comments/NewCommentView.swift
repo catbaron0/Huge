@@ -11,7 +11,7 @@ struct NewCommentView: View {
     let targetUser: TalkUser?
     let targetTalkId: String
     let targetCommentId: String?
-    let _status: ViewStatus
+    @ObservedObject var status: ViewStatus
     @ObservedObject var gtalk: GCoresTalk
     @State var comment: String = ""
     @State var checkInfo: String = ""
@@ -19,7 +19,7 @@ struct NewCommentView: View {
     
 
     var body: some View {
-        let sendState = gtalk.NSWindowRequestStates[uuid]
+        let sendState = status.requestState
         let opacity = (sendState != nil && sendState! == .sending) ? 0.5 : 1.0
         VStack{
             TextEditor(text: $comment)
@@ -51,7 +51,7 @@ struct NewCommentView: View {
                         checkInfo = ""
                     }
                     if sendState == nil || sendState! == .failed {
-                        gtalk.sendComment(talkId: targetTalkId, commentId: targetCommentId, _status: _status, comment: comment, uuid: uuid)
+                        gtalk.sendComment(talkId: targetTalkId, commentId: targetCommentId, status: status, comment: comment)
                     }
                 } label: {
                     Label("发送", systemImage: "paperplane.fill").frame(width: 60, height: 30)
@@ -60,9 +60,10 @@ struct NewCommentView: View {
 
                 }.padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
             }
-        }.onDisappear {
-            gtalk.NSWindowRequestStates.removeValue(forKey: uuid)
         }
+//        .onDisappear {
+//            gtalk.NSWindowRequestStates.removeValue(forKey: uuid)
+//        }
 //
 
         

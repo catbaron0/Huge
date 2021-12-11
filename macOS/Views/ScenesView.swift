@@ -20,22 +20,22 @@ struct ScenesView: View {
                         switch status.statusType {
                         case .profile:
 //                            Text("profile")
-                            StatusProfilePageView(_status: status)
+                            StatusProfilePageView(status: status)
                         case .comments, .replies:
 //                            Text("profile")
-                            StatusCommentsView(_status: status)
+                            StatusCommentsView(status: status)
                         case .followeeTimeline, .recommendTimeline:
 //                            Text("profile")
-                            StatusTalksTimelineView(_status: status, headerView: nil, topOffsetTrigger: .timeline)
+                            StatusTalksTimelineView(status: status, headerView: nil, topOffsetTrigger: .timeline)
                         case .topicTimeline:
 //                            Text("profile")
-                            StatusTopicTimelineView(_status: status)
+                            StatusTopicTimelineView(status: status)
                         case .topics:
 //                            Text("tags")
-                            StatusTopicsView(_status: status, windowId: "toipcs")
+                            StatusTopicsView(status: status)
                         case .followers, .followees:
 //                            Text("profile")
-                            StatusUserListView(_status: status)
+                            StatusUserListView(status: status)
                         default:
                             Text("Unknown scene").onAppear{print(status.statusType)}
                         }

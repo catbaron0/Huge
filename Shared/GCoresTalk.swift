@@ -17,12 +17,12 @@ class GCoresTalk: ObservableObject{
     @Published var user: TalkUser? = nil
     @Published var loginInfo: LoginInfo
     
-    @Published var topicCategories = [TalkTopicCategory]()
-    @Published var selectedTopics = [TalkRelated]()
-    @Published var selectedTopicCategory: TalkTopicCategory?
+    //    @Published var topicCategories = [TalkTopicCategory]()
+    //    @Published var selectedTopics = [TalkRelated]()
+    //    @Published var selectedTopicCategory: TalkTopicCategory?
     
-    @Published var NSWindowRequestStates = [String: RequestState]()
-    @Published var NSWindowStatus = [String: ViewStatus]()
+    //    @Published var NSWindowRequestStates = [String: RequestState]()
+    //    @Published var NSWindowStatus = [String: ViewStatus]()
     let uds = UserDefaults.standard
     
     
@@ -51,15 +51,15 @@ class GCoresTalk: ObservableObject{
     
     @Published var selectedTalkSceneType: TalkSceneType = .followee
     @Published var statusForScene: [TalkSceneType: [ViewStatus]]
-//    = TalkSceneType.allCases.reduce(into: [TalkSceneType: [TalkModelStatus]]()) {
-//        $0[$1] = [initStatus(for: $1)]
-//    }
+    //    = TalkSceneType.allCases.reduce(into: [TalkSceneType: [TalkModelStatus]]()) {
+    //        $0[$1] = [initStatus(for: $1)]
+    //    }
     
-//    static
+    //    static
     func initStatus(for sceneType: TalkSceneType) -> ViewStatus {
         switch sceneType {
         case .recommend:
-            var status = ViewStatus(
+            let status = ViewStatus(
                 id: "\(sceneType)-\(TalkStatusType.recommendTimeline)-0", sceneType: sceneType,
                 statusType: .recommendTimeline, title: "推荐", icon: "bubble.left.fill")
             status.talks = [TalkCard]()
@@ -70,7 +70,7 @@ class GCoresTalk: ObservableObject{
                 statusType: .topics, title: "话题", icon: "tag.fill"
             )
         case .followee:
-            var status = ViewStatus(
+            let status = ViewStatus(
                 id: "\(sceneType)-\(TalkStatusType.followeeTimeline)-0", sceneType: sceneType,
                 statusType: .followeeTimeline, title: "关注", icon: "star.bubble.fill")
             status.talks = [TalkCard]()
@@ -79,10 +79,14 @@ class GCoresTalk: ObservableObject{
             return ViewStatus(
                 id: "\(sceneType)-\(TalkStatusType.profile)-0", sceneType: sceneType,
                 statusType: .profile, title: "用户", icon: "person.fill", userId: loginInfo.userId)
+        case .newWindow:
+            return ViewStatus(
+                id: "\(sceneType)-\(TalkStatusType.newTalk)-0", sceneType: sceneType,
+                statusType: .profile, title: "核态", icon: "pencil.and.outline")
         }
     }
     
-
+    
     init() {
         
         // Initialize variables
@@ -123,13 +127,13 @@ class GCoresTalk: ObservableObject{
             loginInfo.cookie = udsLoginInfo["cookie"]
             loginInfo.loginState = .succeed
             if let userId = loginInfo.userId {
-                readUserInfo(userId: userId, _status: nil)
+                readUserInfo(userId: userId, status: nil)
             }
         }
         
-        topicCategories = [TalkTopicCategory]()
-        selectedTopics = [TalkRelated]()
-        selectedTopicCategory = nil
+        //        topicCategories = [TalkTopicCategory]()
+        //        selectedTopics = [TalkRelated]()
+        //        selectedTopicCategory = nil
         
         // Initialize all initial status
         TalkSceneType.allCases.forEach {
@@ -139,57 +143,62 @@ class GCoresTalk: ObservableObject{
     
     private let session = URLSession.shared
     let mainQueue = DispatchQueue.main
-//    func readCurrentStatus() -> TalkModelStatus {
-//        return statusForScene[selectedTalkSceneType]!.last!
-//    }
+    //    func readCurrentStatus() -> TalkModelStatus {
+    //        return statusForScene[selectedTalkSceneType]!.last!
+    //    }
     
     func readStatusOf(sceneType: TalkSceneType, of id: String) -> ViewStatus? {
         return statusForScene[sceneType]!.first { $0.id == id}
     }
     
-    // TODO: rename from to after
     func addStatusToCurrentScene(
-            after curStatus: ViewStatus, statusType: TalkStatusType, title: String,
-            icon: String, targetTalk: TalkCard? = nil, topic: TalkRelated? = nil,
-            userId: String? = nil, targetComment: TalkCommentCard? = nil) {
-        let sceneType = curStatus.sceneType
-        let statusId = "\(sceneType)-\(statusType)-\(statusForScene[sceneType]!.count)"
-        var status = ViewStatus(id: statusId, sceneType: sceneType, statusType: statusType, title: title, icon: icon, userId: userId)
-        status.targetTalk = targetTalk
-        status.topic = topic
-        status.targetComment = targetComment
-        // stop from jumping to itself
-        // * From comments page to the same page
-        if curStatus.statusType == .comments && statusType == .comments && curStatus.targetTalk == targetTalk {
-            return
+        after curStatus: ViewStatus, statusType: TalkStatusType, title: String,
+        icon: String, targetTalk: TalkCard? = nil, topic: TalkRelated? = nil,
+        userId: String? = nil, targetComment: TalkCommentCard? = nil) {
+            let sceneType = curStatus.sceneType
+            let statusId = "\(sceneType)-\(statusType)-\(statusForScene[sceneType]!.count)"
+            let status = ViewStatus(id: statusId, sceneType: sceneType, statusType: statusType, title: title, icon: icon, userId: userId)
+            status.targetTalk = targetTalk
+            status.topic = topic
+            status.targetComment = targetComment
+            // stop from jumping to itself
+            // * From comments page to the same page
+            if curStatus.statusType == .comments && statusType == .comments && curStatus.targetTalk == targetTalk {
+                return
+            }
+            // * From user profile page
+            //        if lastStatus.statusType == .profile && .profile == statusType && lastStatus.userId == status.userId {
+            //            return
+            //        }
+            
+            statusForScene[sceneType]!.append(status)
         }
-        // * From user profile page
-//        if lastStatus.statusType == .profile && .profile == statusType && lastStatus.userId == status.userId {
-//            return
-//        }
-        
-        statusForScene[sceneType]!.append(status)
-        print("stack depth: \(statusForScene[sceneType]!.count)")
-    }
     
-    func indexOf(status: ViewStatus) -> Int? {
-
-        return statusForScene[status.sceneType]?.firstIndex(where: {$0.id == status.id} )
-    }
+    //    func indexOf(status: ViewStatus) -> Int? {
+    //
+    //        return statusForScene[status.sceneType]?.firstIndex(where: {$0.id == status.id} )
+    //    }
     
     func isSelected(sidebarItem: TalkScene) -> Bool {
         return selectedTalkSceneType == sidebarItem.sceneType
     }
     
     
-    func gcoresRequest(url: URL, httpMethod: String, body: Data? = nil) -> URLRequest {
+    func gcoresRequest(url: URL, httpMethod: String, body: Data? = nil, image: Bool = false, boundary: String? = nil) -> URLRequest {
         var request = URLRequest(url: url)
         request.httpMethod = httpMethod
         request.setValue("application/vnd.api+json", forHTTPHeaderField: "Accept")
         request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
         request.setValue("GcoresMobile/602 CFNetwork/1325.0.1 Darwin/21.1.0", forHTTPHeaderField: "User-Agent")
         request.setValue("keep-alive", forHTTPHeaderField: "Connection")
-        request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
+        if image {
+            //            let boundary = UUID().uuidString
+            request.setValue("multipart/form-data; boundary=\(boundary!)", forHTTPHeaderField: "Content-Type")
+        } else {
+            
+            request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
+        }
+        
         if loginInfo.loginState == .succeed {
             request.setValue("Token " + loginInfo.token!, forHTTPHeaderField: "Authorization")
             request.setValue(loginInfo.cookie, forHTTPHeaderField: "Cookie")
@@ -220,7 +229,7 @@ class GCoresTalk: ObservableObject{
             else if let mime = response.mimeType, mime != "application/json", mime != "application/vnd.api+json", mime != "text/plain" {
                 message = "Error: Unexpected MIME Type: \(String(describing: response.mimeType))!"
             }
-
+            
         } else {
             message = "Error: Response is nil!"
         }
@@ -228,16 +237,172 @@ class GCoresTalk: ObservableObject{
     }
     
     
-    func readTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
-        let idx = indexOf(status: status)!
-        let sceneType = status.sceneType
-        if earlier {
-            statusForScene[sceneType]![idx].loadingEarlier = .loading
+    func talkContent(text: String, imgStr: String?) -> String {
+        var content = ""
+        if let imgStr = imgStr {
+            content = "{\"blocks\":[{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[{\"key\":0,\"length\":1,\"offset\":0}],\"inlineStyleRanges\":[],\"key\":\"57tge\",\"text\":\"-\",\"type\":\"atomic\"},{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[],\"inlineStyleRanges\":[],\"key\":\"ikdgu\",\"text\":\"\(text)\",\"type\":\"unstyled\"}],\"entityMap\":{\"0\":{\"data\":{\"caption\":\"\",\"images\":[\(imgStr)]},\"mutability\":\"IMMUTABLE\",\"type\":\"GALLERY\"}}}"
         } else {
-            statusForScene[sceneType]![idx].talks.removeAll()
-            statusForScene[sceneType]![idx].loadingLatest = .loading
+            content = "{\"blocks\":[{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[],\"inlineStyleRanges\":[],\"key\":\"30c8n\",\"text\":\"\(text)\",\"type\":\"unstyled\"}],\"entityMap\":{}}"
         }
+        return content
+    }
+    
+    func newTalk(content: String, topic: TalkRelated, related: TalkRelated?, status: ViewStatus) {
+        status.requestState = .sending
+        let jsonData = [
+            "data": [
+                "type": "talks",
+                "attributes": [
+                    "content": content
+                ],
+                "relationships": [
+                    "topic": [
+                        "data": [
+                            "type": "topics",
+                            "id": topic.id
+                        ]
+                    ],
+                    "user": [
+                        "data": [
+                            "id": loginInfo.userId,
+                            "type": "users"
+                        ]
+                    ],
+                    "articles": [
+                        "data": related?.type == .articles ? [["id": related!.id, "type": "articles"]] : [[String: String]]()
+                    ],
+                    "radios": [
+                        "data": related?.type == .radios ? [["id": related!.id, "type": "radios"]] : [[String: String]]()
+                    ],
+                    "videos": [
+                        "data": related?.type == .videos ? [["id": related!.id, "type": "videos"]] : [[String: String]]()
+                    ],
+                    "games": [
+                        "data": related?.type == .games ? [["id": related!.id, "type": "games"]] : [[String: String]]()
+                    ]
+                ]
+            ]
+        ]
+        
+        let body = try! JSONSerialization.data(withJSONObject: jsonData, options: .prettyPrinted)
+        let url = URL(
+            string: "https://www.gcores.com/gapi/v1/talks?include=user%2Ctopic%2Cgames%2Carticles%2Cradios%2Cvideos&from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: "POST", body: body)
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                status.requestState = .failed
+                return
+            }
+            self.mainQueue.async {
+                status.requestState = .succeed
+                NSApplication.shared.keyWindow?.close()
 
+            }
+            //            guard let data = data else{ return }
+        }.resume()
+    }
+    
+    func newTalk(text: String, imageUrls: [URL]?, topic: TalkRelated, related: TalkRelated?, status: ViewStatus) {
+        // upload image
+        
+        var uploadedImages = [String: String]()
+        
+        //
+        let dispatchGroup = DispatchGroup()
+        if let urls = imageUrls, !urls.isEmpty {
+            urls.forEach{url in
+                dispatchGroup.enter()
+                print("Uploading image: \(url)")
+                uploadImage(url: url)
+            }
+            dispatchGroup.notify(queue: .global()) {
+                // Generate Content
+                var imgStr = [String]()
+                imageUrls?.forEach { url in
+                    let img = NSImage(contentsOf: url)!
+                    let src = uploadedImages[url.absoluteString]!
+                    let width = img.size.width
+                    let height = img.size.height
+                    imgStr.append("{\"path\":\"\(src)\",\"width\":\(width),\"height\":\(height)}")
+                }
+                let content = self.talkContent(text: text, imgStr: imgStr.joined(separator: ","))
+                self.newTalk(content: content, topic: topic, related: related, status: status)
+            }
+        }
+        else {
+            let content = self.talkContent(text: text, imgStr: nil)
+            self.newTalk(content: content, topic: topic, related: related, status: status)
+        }
+        
+        
+        func uploadImage(url: URL) {
+            let endPoint = URL(string: "https://www.gcores.com/gapi/v1/images")!
+            let data = try? Data(contentsOf: url)
+            let boundary = UUID().uuidString
+            let body = createHttpBody(binaryData: data!, boundary: boundary, parameters: ["file": UUID().uuidString])
+            let request = gcoresRequest(url: endPoint, httpMethod: "POST", body: body, image: true, boundary: boundary)
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let errMessage = self.checkResponse(data, response, error) {
+                    print(errMessage)
+                    return
+                }
+                guard let data = data else{ return }
+                
+                let resp = try! JSONSerialization.jsonObject(with: data) as! [String: String]
+                print(resp)
+                uploadedImages[url.absoluteString] = resp["path"]
+                dispatchGroup.leave()
+            }
+            task.resume()
+        }
+    }
+    
+    
+    
+    
+    func createHttpBody(binaryData: Data, boundary: String, parameters: [String: String]?) -> Data {
+        var postContent = "--\(boundary)\r\n"
+        let fileName = "\(UUID().uuidString).jpeg"
+        postContent += "Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n"
+        postContent += "Content-Type: \(binaryData.mimeType!)\r\n\r\n"
+        
+        var data = Data()
+        guard let postData = postContent.data(using: .utf8) else { return data }
+        data.append(postData)
+        data.append(binaryData)
+        
+        
+        //?         その他パラメータがあれば追加
+        //          if let parameters = parameters {
+        //              var content = ""
+        //              parameters.forEach {
+        //                  content += "\r\n--\(boundary)\r\n"
+        //                  content += "Content-Disposition: form-data; name=\"\($0.key)\"\r\n\r\n"
+        //                  content += "\($0.value)"
+        //              }
+        //              if let postData = content.data(using: .utf8) { data.append(postData) }
+        //          }
+        
+        // HTTPBodyの終了を設定
+        guard let endData = "\r\n--\(boundary)--\r\n".data(using: .utf8) else { return data }
+        data.append(endData)
+        return data
+    }
+    
+    
+    func readTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
+        //        let idx = indexOf(status: status)!
+        //        let sceneType = status.sceneType
+        if earlier {
+            //            statusForScene[sceneType]![idx].loadingEarlier = .loading
+            status.loadingEarlier = .loading
+        } else {
+//            status.talks.removeAll()
+            status.loadingLatest = .loading
+            //            statusForScene[sceneType]![idx].talks.removeAll()
+            //            statusForScene[sceneType]![idx].loadingLatest = .loading
+        }
         
         var before = ""
         var pageOffset = 0
@@ -277,34 +442,33 @@ class GCoresTalk: ObservableObject{
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
                 // the status is still alive
-                guard self.statusForScene[status.sceneType]!.contains(where: {$0.id == status.id}) else { return }
+                //                guard self.statusForScene[status.sceneType]!.contains(where: {$0.id == status.id}) else { return }
                 if earlier {
-                    self.statusForScene[sceneType]![idx].loadingEarlier = .loaded
+                    status.loadingEarlier = .loaded
                 } else {
-                    self.statusForScene[sceneType]![idx].loadingEarlier = .loaded
-                    self.statusForScene[sceneType]![idx].loadingLatest = .loaded
+                    status.loadingEarlier = .loaded
+                    status.loadingLatest = .loaded
                 }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print(errMessage)
                     return
                 }
                 if let data = data {
-                    print("Decoding talks ...")
                     let resp = try! JSONDecoder().decode(GCcoresTalkResponse.self, from: data)
                     let talks = resp.formalize()
                     if talks.isEmpty {
                         if earlier {
-                            self.statusForScene[sceneType]![idx].loadingEarlier = .empty
+                            status.loadingEarlier = .empty
                         } else {
-                            self.statusForScene[sceneType]![idx].loadingLatest = .empty
+                            status.loadingLatest = .empty
                         }
                     }
-                    self.statusForScene[sceneType]![idx].talks += talks
-//                    if earlier {
-//                        self.statusForScene[sceneType]![idx].talks += talks
-//                    } else {
-//                        self.statusForScene[sceneType]![idx].talks = talks
-//                    }
+                    status.talks += talks
+                    //                    if earlier {
+                    //                        self.statusForScene[sceneType]![idx].talks += talks
+                    //                    } else {
+                    //                        self.statusForScene[sceneType]![idx].talks = talks
+                    //                    }
                 }
                 self.publisherTrigger = "Read Talks" // Force to trigger the publisher
             }
@@ -312,57 +476,56 @@ class GCoresTalk: ObservableObject{
         task.resume()
     }
     
-    func readTopics(categoryId: String, append: Bool = false, windowId: String? = nil) {
-//        if let windowId = windowId {
-//            <#body#>
-//        }
-        if !append { selectedTopics.removeAll() }
+    func readTopics(status: ViewStatus, categoryId: String, append: Bool = false, windowId: String? = nil) {
+        status.requestState = .sending
+        if !append { status.selectedTopics.removeAll() }
         var urlString: String
         if categoryId == "popular" {
             urlString = [
                 "https://www.gcores.com/gapi/v1/popular-topics?",
-                "page%5Boffset%5D=\(selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         } else if let userId = loginInfo.userId, categoryId == "subscribed" {
             urlString = [
                 "https://www.gcores.com/gapi/v1/users/\(userId)/subscribed-topics?",
-                "page%5Boffset%5D=\(selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         } else {
             urlString = [
                 "https://www.gcores.com/gapi/v1/categories/\(categoryId)/topics?",
-                "page%5Boffset%5D=\(selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         }
         let url = URL( string: urlString)!
         let request = gcoresRequest(url: url, httpMethod: "GET")
         let task = session.dataTask(with: request) { data, response, error in
-            
             if let errMessage = self.checkResponse(data, response, error) {
                 print(errMessage)
+                status.requestState = .failed
                 return
             }
             guard let data = data else{ return }
             let resp = try! JSONDecoder().decode(GCoresTopicResponse.self, from: data)
             let topics = resp.formalize()
             self.mainQueue.async {
-                self.selectedTopics += topics
-                if let recordCount = resp.meta.recordCount, self.selectedTopics.count < recordCount {
+                status.selectedTopics += topics
+                if let recordCount = resp.meta.recordCount, status.selectedTopics.count < recordCount {
                     // There are more tags
-                    self.readTopics(categoryId: categoryId, append: true)
+                    self.readTopics(status: status, categoryId: categoryId, append: true)
                 }
+                status.requestState = .succeed
             }
         }
         task.resume()
     }
     
     
-    func readTopicsCategories() {
+    func readTopicsCategories(status: ViewStatus) {
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/categories?",
                 "filter%5Bscope%5D=topic&page%5Blimit%5D=100",
-                "&page%5Boffset%5D=\(topicCategories.count)&from-app=1"
+                "&page%5Boffset%5D=\(status.topicCategories.count)&from-app=1"
             ].reduce("", +)
         )!
         let request = gcoresRequest(url: url, httpMethod: "GET")
@@ -377,32 +540,32 @@ class GCoresTalk: ObservableObject{
             let resp = try! JSONDecoder().decode(GCoresTopicCategoryResponse.self, from: data)
             let categories = resp.formalize()
             self.mainQueue.async {
-                if self.topicCategories.isEmpty {
-                    self.topicCategories.append(TalkTopicCategory(id: "popular", name: "热门", desc: nil, logo: nil, background: nil))
-                    self.topicCategories.append(TalkTopicCategory(id: "subscribed", name: "收藏", desc: nil, logo: nil, background: nil))
+                if status.topicCategories.isEmpty {
+                    status.topicCategories.append(TalkTopicCategory(id: "popular", name: "热门", desc: nil, logo: nil, background: nil))
+                    status.topicCategories.append(TalkTopicCategory(id: "subscribed", name: "收藏", desc: nil, logo: nil, background: nil))
                 }
-                self.topicCategories += categories
-                if let recordCount = resp.meta.recordCount, self.topicCategories.count < recordCount {
+                status.topicCategories += categories
+                if let recordCount = resp.meta.recordCount, status.topicCategories.count < recordCount {
                     // There are more categories
-                    self.readTopicsCategories()
+                    self.readTopicsCategories(status: status)
                 }
-//                else {
-//                    // We have all categories
-//                    // Get tags for each
-//                    for categoryId in self.tags.keys {
-//                        self.getTags(for: categoryId)
-//                    }
-//                }
+                //                else {
+                //                    // We have all categories
+                //                    // Get tags for each
+                //                    for categoryId in self.tags.keys {
+                //                        self.getTags(for: categoryId)
+                //                    }
+                //                }
             }
         }
         task.resume()
     }
     
-    func readReplies(commentId: String, _status: ViewStatus) {
-        let sceneType = _status.sceneType
-        guard let idx = indexOf(status: _status) else {
-            return
-        }
+    func readReplies(commentId: String, status: ViewStatus) {
+        //        let sceneType = _status.sceneType
+        //        guard let idx = indexOf(status: _status) else {
+        //            return
+        //        }
         
         let url = URL(
             string: "https://www.gcores.com/gapi/v1/comments/\(commentId)?include=commentable%2Cuser%2Cparent.user%2Cdescendants.user%2Cdescendants.parent&from-app=1"
@@ -411,104 +574,104 @@ class GCoresTalk: ObservableObject{
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
-                self.statusForScene[sceneType]![idx].loadingEarlier = .loaded
+                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
+                status.loadingEarlier = .loaded
                 if let errMessage = self.checkResponse(data, response, error) {
                     print("Failed to read replies!")
                     print(errMessage)
                     return
                 }
                 guard let data = data else{ return }
-
+                
                 let resp = try! JSONDecoder().decode(GCcoresTalkReplyResponse.self, from: data)
                 let respCards = resp.formalize()
                 let comment = respCards[0][0]
                 let replies = respCards[1]
-//                if replies.isEmpty {
-//                    self.statusForScene[sceneType]![idx].targetComment = comment
-//                    self.statusForScene[sceneType]![idx].loadingEarlier = .empty
-//                } else {
-                self.statusForScene[sceneType]![idx].loadingEarlier = .empty
-                self.statusForScene[sceneType]![idx].targetComment = comment
-                self.statusForScene[sceneType]![idx].replies += replies
-//                }
+                //                if replies.isEmpty {
+                //                    self.statusForScene[sceneType]![idx].targetComment = comment
+                //                    self.statusForScene[sceneType]![idx].loadingEarlier = .empty
+                //                } else {
+                status.loadingEarlier = .empty
+                status.targetComment = comment
+                status.replies += replies
+                //                }
                 
-                self.publisherTrigger = "Read Comment!"
+                //                self.publisherTrigger = "Read Comment!"
             }
         }
         task.resume()
     }
-
-    func readComments(talkId: String, _status: ViewStatus, earlier: Bool) {
-        let sceneType = _status.sceneType
-        guard let idx = indexOf(status: _status) else {
-            return
-        }
-        let pageOffset = statusForScene[sceneType]![idx].comments.count
-        if earlier { statusForScene[sceneType]![idx].loadingEarlier = .loading } else { statusForScene[sceneType]![idx].loadingLatest = .loading }
+    
+    func readComments(talkId: String, status: ViewStatus, earlier: Bool) {
+        //        let sceneType = _status.sceneType
+        //        guard let idx = indexOf(status: _status) else {
+        //            return
+        //        }
+        let pageOffset = status.comments.count
+        if earlier { status.loadingEarlier = .loading } else { status.loadingLatest = .loading }
         
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/talks/\(talkId)/comments?",
                 "include=user%2Cparent.user%2Coldest-descendants.user%2Coldest-descendants.parent&sort=-created-at",
                 "&page%5Boffset%5D=\(pageOffset)&page%5Blimit%5D=20&from-app=1"].reduce("", +)
-            )!
+        )!
         let request = gcoresRequest(url: url, httpMethod: "GET", body: nil)
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
-                if earlier { self.statusForScene[sceneType]![idx].loadingEarlier = .loaded } else { self.statusForScene[sceneType]![idx].loadingLatest = .loaded }
+                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
+                if earlier { status.loadingEarlier = .loaded } else { status.loadingLatest = .loaded }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print("Failed to read comments!")
                     print(errMessage)
                     return
                 }
                 guard let data = data else{ return }
-
+                
                 let resp = try! JSONDecoder().decode(GCcoresTalkCommentResponse.self, from: data)
                 let respCards = resp.formalize()
                 let comments = respCards[0]
                 let replies = respCards[1]
                 if comments.isEmpty {
                     if earlier {
-                        self.statusForScene[sceneType]![idx].loadingEarlier = .empty
+                        status.loadingEarlier = .empty
                     } else {
-                        self.statusForScene[sceneType]![idx].loadingLatest = .empty
+                        status.loadingLatest = .empty
                     }
                 } else if earlier{
-                    self.statusForScene[sceneType]![idx].comments += comments
-                    self.statusForScene[sceneType]![idx].replies += replies
+                    status.comments += comments
+                    status.replies += replies
                 } else {
-                    self.statusForScene[sceneType]![idx].comments = comments
-                    self.statusForScene[sceneType]![idx].replies = replies
+                    status.comments = comments
+                    status.replies = replies
                 }
                 
-                self.publisherTrigger = "Read Comment!"
+                //                self.publisherTrigger = "Read Comment!"
             }
         }
         task.resume()
     }
     
-
-    func readFollowship(_status: ViewStatus, earlier: Bool) {
-        let sceneType = _status.sceneType
-        guard let idx = indexOf(status: _status) else {
-            return
-        }
-        guard let userId = _status.userId else { return }
-        if earlier { self.statusForScene[sceneType]![idx].loadingEarlier = .loading } else { self.statusForScene[sceneType]![idx].loadingLatest = .loading }
+    
+    func readFollowship(status: ViewStatus, earlier: Bool) {
+        //        let sceneType = _status.sceneType
+        //        guard let idx = indexOf(status: _status) else {
+        //            return
+        //        }
+        guard let userId = status.userId else { return }
+        if earlier { status.loadingEarlier = .loading } else { status.loadingLatest = .loading }
         
-        var pageOffset = self.statusForScene[sceneType]![idx].followers.count
+        var pageOffset = status.followers.count
         var url: URL?
-        if self.statusForScene[sceneType]![idx].statusType == .followees {
-            pageOffset = self.statusForScene[sceneType]![idx].followees.count
+        if status.statusType == .followees {
+            pageOffset = status.followees.count
             url = URL(string: [
                 "https://www.gcores.com/gapi/v1/users/" + userId + "/followees?",
                 "page%5Blimit%5D=40&page%5Boffset%5D=\(pageOffset)&from-app=1"
             ].reduce("", +))
         } else {
-            pageOffset = self.statusForScene[sceneType]![idx].followers.count
+            //            status.followers.count
             url = URL(string: [
                 "https://www.gcores.com/gapi/v1/users/" + userId + "/followers?",
                 "page%5Blimit%5D=40&page%5Boffset%5D=\(pageOffset)&from-app=1"
@@ -520,45 +683,45 @@ class GCoresTalk: ObservableObject{
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
                 // The status can be alreaded popped out
-                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
-                if earlier { self.statusForScene[sceneType]![idx].loadingEarlier = .loaded } else { self.statusForScene[sceneType]![idx].loadingLatest = .loaded }
+                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
+                if earlier { status.loadingEarlier = .loaded } else { status.loadingLatest = .loaded }
                 if let errMessage = self.checkResponse(data, response, error) {
-                    print("Failed to read users of \(_status.statusType)!")
+                    print("Failed to read users of \(status.statusType)!")
                     print(errMessage)
                     return
                 }
                 guard let data = data else{ return }
-
+                
                 let resp = try! JSONDecoder().decode(GCoresFollowshipResponse.self, from: data)
                 let users = resp.formalize()
                 if users.isEmpty {
                     if earlier {
-                        self.statusForScene[sceneType]![idx].loadingEarlier = .empty
+                        status.loadingEarlier = .empty
                     } else {
-                        self.statusForScene[sceneType]![idx].loadingLatest = .empty
+                        status.loadingLatest = .empty
                     }
                 } else if earlier{
-                    if self.statusForScene[sceneType]![idx].statusType == .followers {
-                        self.statusForScene[sceneType]![idx].followers += users
+                    if status.statusType == .followers {
+                        status.followers += users
                     } else {
-                        self.statusForScene[sceneType]![idx].followees += users
+                        status.followees += users
                     }
                 } else {
-                    if self.statusForScene[sceneType]![idx].statusType == .followers {
-                        self.statusForScene[sceneType]![idx].followers = users
+                    if status.statusType == .followers {
+                        status.followers = users
                     } else {
-                        self.statusForScene[sceneType]![idx].followees = users
+                        status.followees = users
                     }
                 }
                 
-                self.publisherTrigger = "Read users!"
+                //                self.publisherTrigger = "Read users!"
             }
         }
         task.resume()
     }
     
-
-    func readUserInfo(userId: String, _status: ViewStatus?) {
+    
+    func readUserInfo(userId: String, status: ViewStatus?) {
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/users/\(userId)?",
@@ -586,15 +749,12 @@ class GCoresTalk: ObservableObject{
                 return
             }
             guard let data = data else{ return }
-
+            
             let resp = try! JSONDecoder().decode(GCoresUserResponse.self, from: data)
             let user = resp.formalize()
             self.mainQueue.async {
-                if let status = _status {
-                    let sceneType = status.sceneType
-                    let idx = self.indexOf(status: status)!
-                    self.statusForScene[sceneType]![idx].user = user
-                    self.publisherTrigger = "profile"
+                if let status = status {
+                    status.user = user
                 }
                 if let me = self.user {
                     if me.id == user.id {
@@ -613,61 +773,61 @@ class GCoresTalk: ObservableObject{
     
     // MARK: Intends
     func cancelVote(targetId: String, targetType: VoteTargetType, voteId: String, status: ViewStatus) {
-        let sceneType = status.sceneType
-        let idx = indexOf(status: status)!
-        self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, isVoting: true)
+        //        let sceneType = status.sceneType
+        //        let idx = indexOf(status: status)!
+        status.updateVotes(targetId: targetId, targetType: targetType, isVoting: true)
         objectWillChange.send()
         let url = URL(string: "https://www.gcores.com/gapi/v1/votes/\(voteId)?from-app=1")!
         let request = gcoresRequest(url: url, httpMethod: "DELETE")
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                guard let _ = self.readStatusOf(sceneType: status.sceneType, of: status.id) else {return}
+                //                guard let _ = self.readStatusOf(sceneType: status.sceneType, of: status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to vote to \(targetType)(\(targetId))!")
                     print(errorMessage)
-                    self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, isVoting: false)
+                    status.updateVotes(targetId: targetId, targetType: targetType, isVoting: false)
                     return
                 }
-                self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, voteFlag: nil, voteId: nil)
-
+                status.updateVotes(targetId: targetId, targetType: targetType, voteFlag: nil, voteId: nil)
+                
             }
         }
         .resume()
         
     }
-    func voteTo(targetId: String, targetType: VoteTargetType, voteFlag: Bool, _status: ViewStatus) {
-//        {
-//          "data": {
-//            "attributes": {
-//              "vote-flag": true
-//            },
-//            "relationships": {
-//              "votable": {
-//                "data": {
-//                  "id": "144942",
-//                  "type": "talks"
-//                }
-//              },
-//              "voter": {
-//                "data": {
-//                  "id": "17551",
-//                  "type": "users"
-//                }
-//              }
-//            },
-//            "type": "votes"
-//          }
-//        }
-//        let status = readCurrentStatus()
+    func voteTo(targetId: String, targetType: VoteTargetType, voteFlag: Bool, status: ViewStatus) {
+        //        {
+        //          "data": {
+        //            "attributes": {
+        //              "vote-flag": true
+        //            },
+        //            "relationships": {
+        //              "votable": {
+        //                "data": {
+        //                  "id": "144942",
+        //                  "type": "talks"
+        //                }
+        //              },
+        //              "voter": {
+        //                "data": {
+        //                  "id": "17551",
+        //                  "type": "users"
+        //                }
+        //              }
+        //            },
+        //            "type": "votes"
+        //          }
+        //        }
+        //        let status = readCurrentStatus()
         // set the vote flag of a card to success/failed/progress
-        let sceneType = _status.sceneType
-        guard let idx = indexOf(status: _status) else {
-            return
-        }
+        //        let sceneType = _status.sceneType
+        //        guard let idx = indexOf(status: _status) else {
+        //            return
+        //        }
         let userId = loginInfo.userId
-        self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, isVoting: true)
-        publisherTrigger = "voting"
-         
+        status.updateVotes(targetId: targetId, targetType: targetType, isVoting: true)
+        //        publisherTrigger = "voting"
+        
         // send the request
         let parameters: [String: Any] = [
             "data": [
@@ -696,41 +856,40 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "POST", body: voteData)
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
+                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to vote to \(targetType)(\(targetId))!")
                     print(errorMessage)
-                    self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, isVoting: false)
-                    self.publisherTrigger = "voting"
+                    status.updateVotes(targetId: targetId, targetType: targetType, isVoting: false)
+                    //                    self.publisherTrigger = "voting"
                     return
                 }
                 
                 guard let res = response as? HTTPURLResponse, res.statusCode == 201, let data = data else {
                     switch targetType {
                     case .comments:
-                        let idx = self.statusForScene[sceneType]![idx].comments.firstIndex(where: {$0.id == targetId})!
-                        self.statusForScene[sceneType]![idx].comments[idx].isVoting = false
+                        let idx = status.comments.firstIndex(where: {$0.id == targetId})!
+                        status.comments[idx].isVoting = false
                     case .talks:
-                        let idx = self.statusForScene[sceneType]![idx].talks.firstIndex(where: {$0.id == targetId})!
-                        self.statusForScene[sceneType]![idx].talks[idx].isVoting = false
+                        let idx = status.talks.firstIndex(where: {$0.id == targetId})!
+                        status.talks[idx].isVoting = false
                     }
                     return
                 }
                 let voteRes = try! JSONDecoder().decode(GCoresVoteResponse.self, from: data)
-                self.statusForScene[sceneType]![idx].updateVotes(targetId: targetId, targetType: targetType, voteFlag: voteRes.data.attributes.voteFlag, voteId: voteRes.data.id)
+                status.updateVotes(targetId: targetId, targetType: targetType, voteFlag: voteRes.data.attributes.voteFlag, voteId: voteRes.data.id)
             }
         }
         .resume()
     }
     
-    func sendComment(talkId: String, commentId: String?, _status: ViewStatus, comment: String, uuid: String) {
-        let sceneType = _status.sceneType
-        guard let idx = indexOf(status: _status) else {
-            return
-        }
+    func sendComment(talkId: String, commentId: String?, status: ViewStatus, comment: String) {
+        //        let sceneType = _status.sceneType
+        //        guard let idx = indexOf(status: _status) else { return }
         let userId = loginInfo.userId
-        NSWindowRequestStates[uuid] = .sending
-//        self.statusForScene[sceneType]![idx].sendState = .sending
+        //        NSWindowRequestStates[uuid] = .sending
+        status.requestLatest = .sending
+        //        self.statusForScene[sceneType]![idx].sendState = .sending
         var data: [String: String]? = nil
         if let commentId = commentId {
             data = [
@@ -771,58 +930,60 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "POST", body: commentData)
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
+                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to comment to \(talkId)-(\(String(describing: commentId)))!")
                     print(errorMessage)
-                    self.NSWindowRequestStates[uuid] = .failed
+                    //                    self.NSWindowRequestStates[uuid] = .failed
+                    status.requestLatest = .failed
                     return
                 }
-
+                
                 guard let res = response as? HTTPURLResponse, res.statusCode == 201, let data = data else {
-                    self.NSWindowRequestStates[uuid] = .failed
+                    //                    self.NSWindowRequestStates[uuid] = .failed
+                    status.requestLatest = .failed
                     return
                 }
                 let commentRes = try! JSONDecoder().decode(NewCommentResponse.self, from: data)
                 let comment = commentRes.formalize()
-//                let comment = testComment
+                //                let comment = testComment
                 // Got response from the server about the sent comment
                 // Insert the comment to the list maintained by current status
                 // * For talkTimeLine status:
                 // The comment is to a talk.
                 //  Update the number of comments to the target talk.
-                if let targetTalkIndex = self.statusForScene[sceneType]![idx].talks.firstIndex(where: {$0.id == talkId}) {
-                    let count = self.statusForScene[sceneType]![idx].talks[targetTalkIndex].commentsCount ?? 0
-                    self.statusForScene[sceneType]![idx].talks[targetTalkIndex].commentsCount = count + 1
+                if let targetTalkIndex = status.talks.firstIndex(where: {$0.id == talkId}) {
+                    let count = status.talks[targetTalkIndex].commentsCount ?? 0
+                    status.talks[targetTalkIndex].commentsCount = count + 1
                 }
                 // * For commentsList status, update the comment count of target Talk
-                if let _ = self.statusForScene[sceneType]![idx].targetTalk {
-                    let count = self.statusForScene[sceneType]![idx].targetTalk!.commentsCount ?? 0
-                    self.statusForScene[sceneType]![idx].targetTalk!.commentsCount = count + 1
+                if let _ = status.targetTalk {
+                    let count = status.targetTalk!.commentsCount ?? 0
+                    status.targetTalk!.commentsCount = count + 1
                 }
                 
                 if commentId == nil {
                     //  And
                     //      * If the comment is replied to the target talk, add the comment to the commentList
-                    self.statusForScene[sceneType]![idx].comments.insert(comment, at: 0)
+                    status.comments.insert(comment, at: 0)
                 } else {
                     //      * If the comment is replied to a comment or a reply, append the new comment to the replies list,
-                    self.statusForScene[sceneType]![idx].replies.append(comment)
+                    status.replies.append(comment)
                     //      * If the comment is replied to a comment ,locate the targetComment and nsert the new commentId to its oldestDecendant list
-                    if let index = self.statusForScene[sceneType]![idx].comments.firstIndex(where: {$0.id == commentId}) {
-                        self.statusForScene[sceneType]![idx].comments[index].oldestDescendants.append(comment.id)
+                    if let index = status.comments.firstIndex(where: {$0.id == commentId}) {
+                        status.comments[index].oldestDescendants.append(comment.id)
                     }
                     //      * If the comment is replied to a reply, locate the targetComment by its parentId
-                    else if let commendIndex = self.statusForScene[sceneType]![idx].comments.firstIndex(where: { element in
+                    else if let commendIndex = status.comments.firstIndex(where: { element in
                         if element.oldestDescendants.contains(where: {$0 == comment.replyTo}) {
                             return true
                         } else {
                             return false
                         }
                     }){
-                        self.statusForScene[sceneType]![idx].comments[commendIndex].oldestDescendants.append(comment.id)
+                        status.comments[commendIndex].oldestDescendants.append(comment.id)
                     }
-
+                    
                 }
                 NSApplication.shared.keyWindow?.close()
             }
@@ -852,12 +1013,12 @@ class GCoresTalk: ObservableObject{
             ]
         ]
         
-
+        
         let loginData = try? JSONSerialization.data(withJSONObject: parameters)
         
         let url = URL(string: "https://www.gcores.com/gapi/v1/tokens/refresh?from-app=1")!
         let request = gcoresRequest(url: url, httpMethod: "POST", body: loginData)
-
+        
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let errorMessage = self.checkResponse(data,  response, error) {
                 print("Failed to login with errors!")
@@ -878,14 +1039,13 @@ class GCoresTalk: ObservableObject{
                     self.loginInfo.token = token
                     self.loginInfo.userId = userId
                     self.loginInfo.cookie = cookie
-
-//                    self.readUserInfo(userId: userId, statusId: self.statusForScene[.profile]!.first!.id)
-                    self.readUserInfo(userId: userId, _status: self.statusForScene[.profile]?.first)
+                    
+                    self.readUserInfo(userId: userId, status: self.statusForScene[.profile]?.first)
                     
                     let loginData = ["userId": userId, "token": token, "cookie": cookie]
                     self.uds.set(loginData, forKey: "loginInfo")
                     self.uds.synchronize()
-
+                    
                     print("Login sucessed!")
                     print("userId: \(userId)")
                     print("token: \(token)")
@@ -905,7 +1065,7 @@ class GCoresTalk: ObservableObject{
         }
     }
     
-//    func readRelated(_status: ViewStatus, )
+    //    func readRelated(_status: ViewStatus, )
     
     func readTimeline(status: ViewStatus, earlier: Bool, userId: String? = nil) {
         var endpoint: TimelineEndPoint
@@ -926,33 +1086,32 @@ class GCoresTalk: ObservableObject{
         
     }
     
-
+    
     func select(sidebarItem: TalkScene) {
         selectedTalkSceneType = sidebarItem.sceneType
         print(selectedTalkSceneType)
     }
-
-//    func select(topicCategory: TalkTopicCategory, ) {
-//        selectedTopicCategory = topicCategory
-//    }
     
-    func search(endponit: GCoresRelatedType, query: String, searchId: String, earlier: Bool, recommend: Bool) {
-        guard NSWindowStatus[searchId] != nil else {
-            return
-        }
+    //    func select(topicCategory: TalkTopicCategory, ) {
+    //        selectedTopicCategory = topicCategory
+    //    }
+    
+    func search(status: ViewStatus, endponit: GCoresRelatedType, query: String, earlier: Bool, recommend: Bool) {
+        //        guard NSWindowStatus[searchId] != nil else { return }
         if query == "" && !recommend {
             return
         }
         if earlier {
-            NSWindowStatus[searchId]!.requestEarlier = .sending
-            
+            status.requestLatest = .succeed
+            status.requestEarlier = .sending
         } else {
-            NSWindowStatus[searchId]!.requestLatest = .sending
-            NSWindowStatus[searchId]!.searchResults.removeAll()
+            status.requestEarlier = .succeed
+            status.requestLatest = .sending
+            status.searchResults.removeAll()
         }
         var pageOffset = 0
         if earlier {
-            pageOffset = NSWindowStatus[searchId]!.searchResults.count
+            pageOffset = status.searchResults.count
         }
         var urlStr: String
         if recommend {
@@ -964,7 +1123,7 @@ class GCoresTalk: ObservableObject{
                 ].reduce("", +)
             case .articles, .videos, .radios:
                 urlStr = [
-                    "https://www.gcores.com/gapi/v1/articles?sort=-published-at",
+                    "https://www.gcores.com/gapi/v1/\(endponit)?sort=-published-at",
                     "&filter%5Blist-all%5D=0&page%5Boffset%5D=\(pageOffset)&page%5Blimit%5D=20",
                     "&fields%5Bradios%5D=albums%2Ccategory%2Cuser%2Cdjs%2Cpublished-albums%2Ccollections%2Ccomments%2Cdjs%2Centities%2C",
                     "entries%2Clatest-collection%2Cmedia%2Csimilarities%2Cskus%2Ctags%2Capp-cover%2Cbookmarks-count%2Ccomments-count%2C",
@@ -995,7 +1154,7 @@ class GCoresTalk: ObservableObject{
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
                 // the status is still alive
-                guard self.NSWindowStatus[searchId] != nil else { return }
+                //                guard self.NSWindowStatus[searchId] != nil else { return }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print(errMessage)
                     return
@@ -1003,36 +1162,35 @@ class GCoresTalk: ObservableObject{
                 if let data = data {
                     let resp = try! JSONDecoder().decode(GCoresSearchResponse.self, from: data)
                     let searchResults = resp.formalize()
-                    if searchResults.isEmpty || self.NSWindowStatus[searchId]!.searchResults.count >= resp.meta.recordCount {
+                    if searchResults.isEmpty || status.searchResults.count >= resp.meta.recordCount {
                         if earlier {
-                            self.NSWindowStatus[searchId]!.requestEarlier = .empty
+                            status.requestEarlier = .empty
                         } else {
-                            self.NSWindowStatus[searchId]!.requestLatest = .empty
+                            status.requestLatest = .empty
                         }
                         return
                     }
                     
                     
-                    if let newLast = searchResults.last, let oldLast = self.NSWindowStatus[searchId]!.searchResults.last, newLast == oldLast {
+                    if let newLast = searchResults.last, let oldLast = status.searchResults.last, newLast == oldLast {
                         if earlier {
-                            self.NSWindowStatus[searchId]!.requestEarlier = .succeed
+                            status.requestEarlier = .succeed
                         } else {
-                            self.NSWindowStatus[searchId]!.requestLatest = .succeed
+                            status.requestLatest = .succeed
                         }
                         return
                     }
                     if earlier {
-                        self.NSWindowStatus[searchId]!.searchResults += searchResults
+                        status.searchResults += searchResults
                     } else {
-                        self.NSWindowStatus[searchId]!.searchResults = searchResults
+                        status.searchResults = searchResults
                     }
-                    let count = self.NSWindowStatus[searchId]!.searchResults.count
                     if earlier {
-                        self.NSWindowStatus[searchId]!.requestEarlier = .succeed
+                        status.requestEarlier = .succeed
                     } else {
-                        self.NSWindowStatus[searchId]!.requestLatest = .succeed
+                        status.requestLatest = .succeed
                     }
-                    print("count: \(count)")
+                    //                    print("count: \(count)")
                 }
             }
         }

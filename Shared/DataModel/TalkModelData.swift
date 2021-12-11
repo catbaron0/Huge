@@ -66,7 +66,7 @@ struct SearchStatus {
 }
 
 // MARK: Status of the talk model to decide data and views to display
-struct ViewStatus: Identifiable, Equatable {
+class ViewStatus: Identifiable, Equatable, ObservableObject {
     static func == (lhs: ViewStatus, rhs: ViewStatus) -> Bool {
         lhs.id == rhs.id
     }
@@ -86,43 +86,44 @@ struct ViewStatus: Identifiable, Equatable {
     let statusType: TalkStatusType
     var title: String
     var icon: String
-    var loadingLatest: LoadingStatus = .loaded
-    var loadingEarlier: LoadingStatus = .loaded
-    var requestState: RequestState? = nil
-    var searchSuggestion = [String]()
+    @Published var loadingLatest: LoadingStatus = .loaded
+    @Published var loadingEarlier: LoadingStatus = .loaded
+    @Published var requestState: RequestState? = nil
+    @Published var searchSuggestion = [String]()
     //["suggestion1", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2"]
 //    var searchResults = [TalkRelated]()
 //    var sendState: SendState? = nil
     
     // For Timeline
-    var talks = [TalkCard]()
-    var topic: TalkRelated?
+    @Published var talks = [TalkCard]()
+    @Published var topic: TalkRelated?
     //    var selectedCardIndex: Int?
     //    var selectedCard: TalkCard?
     
     // For Comments
-    var comments = [TalkCommentCard]()
-    var targetTalk: TalkCard?
+    @Published var comments = [TalkCommentCard]()
+    @Published var targetTalk: TalkCard?
     
     // For replies
-    var targetComment: TalkCommentCard?
-    var replies = [TalkCommentCard]()
-    // For User
+    @Published var targetComment: TalkCommentCard?
+    @Published var replies = [TalkCommentCard]()
+    // For profile
     let userId: String?
-    var user: TalkUser?
-    var followers = [TalkUser]()
-    var followees = [TalkUser]()
-    var triggerUpdate = ""
+    @Published var user: TalkUser?
+    @Published var followers = [TalkUser]()
+    @Published var followees = [TalkUser]()
     
     // For Topic
-    var selectedTopicCategory: TalkTopicCategory?
+    @Published var selectedTopicCategory: TalkTopicCategory? = nil
+    @Published var topicCategories = [TalkTopicCategory]()
+    @Published var selectedTopics = [TalkRelated]()
     // For search
 //    let searchId: String?
-    var searchResults = [TalkRelated]()
-    var requestEarlier: RequestState = .succeed
-    var requestLatest: RequestState = .succeed
+    @Published var searchResults = [TalkRelated]()
+    @Published var requestEarlier: RequestState = .succeed
+    @Published var requestLatest: RequestState = .succeed
     
-    mutating func updateVotes(targetId: String, targetType: VoteTargetType, isVoting: Bool) {
+    func updateVotes(targetId: String, targetType: VoteTargetType, isVoting: Bool) {
         switch targetType {
         case .comments:
             if let idx = comments.firstIndex(where: {$0.id == targetId}) {
@@ -148,9 +149,9 @@ struct ViewStatus: Identifiable, Equatable {
                 targetTalk!.isVoting = isVoting
             }
         }
-        triggerUpdate = "updateVotes!"
+        objectWillChange.send()
     }
-    mutating func updateVotes(targetId: String, targetType: VoteTargetType, voteFlag: Bool?,  voteId: String?) {
+    func updateVotes(targetId: String, targetType: VoteTargetType, voteFlag: Bool?,  voteId: String?) {
         // targetId: The ID to a comment or a talk
         // voteTargetType: .comments or .talks
         // voteFlag: Bool? (good/bad/cancel)
@@ -224,11 +225,12 @@ struct ViewStatus: Identifiable, Equatable {
                 }
             }
         }
-        triggerUpdate = "updateVoteFlags!"
+        objectWillChange.send()
     }
 }
 
 enum TalkStatusType {
+    case newTalk
     case recommendTimeline
     case followeeTimeline
     case topicTimeline
@@ -242,7 +244,7 @@ enum TalkStatusType {
 }
 
 
-enum LoadingState{
+enum LoadingState {
     case loaded
     case loading
     case empty
@@ -254,6 +256,7 @@ enum TalkSceneType: String, CaseIterable {
     case followee
     case topics
     case profile
+    case newWindow
 }
 
 struct TalkScene: Identifiable, Equatable {
@@ -494,3 +497,4 @@ struct TalkCommentCard: Identifiable, Equatable {
 //        }
 //    }
 //}
+

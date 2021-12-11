@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ProfileImageView: View {
+    @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
-    let _status: ViewStatus
     
     var body: some View {
-        let sceneType = _status.sceneType
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        let sceneType = _status.sceneType
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
             let profileUrl = status.user?.profile.src ?? GCORES_DEFAULT_PROFILE_URL
             AsyncImage(url: URL(string: profileUrl)) { image in
                 image
@@ -28,26 +28,26 @@ struct ProfileImageView: View {
                 ProgressView()
                     .frame(width: 45, height: 45)
             }
-        }
+//        }
     }
 }
 
 struct StatusProfilePageView: View {
-    let _status: ViewStatus
+    @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
 
     
     var body: some View {
-        let sceneType = _status.sceneType
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        let sceneType = _status.sceneType
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
             let user = status.user
             if user == nil {
                 VStack {
                     Spacer()
                     ProgressView()
                         .onAppear {
-                            gtalk.readUserInfo(userId: status.userId!, _status: status)
+                            gtalk.readUserInfo(userId: status.userId!, status: status)
                         }
                     Spacer()
                 }
@@ -56,7 +56,7 @@ struct StatusProfilePageView: View {
                 VStack{
                     HStack(alignment: .bottom) {
                         // Image, nickname, sex, follower/followee,
-                        ProfileImageView(_status: status)
+                        ProfileImageView(status: status)
                         VStack(alignment: .leading) {
                             HStack{
                                 // TODO: Add gender info before/after the username
@@ -91,14 +91,14 @@ struct StatusProfilePageView: View {
                         Spacer()
                     }.padding()
                     if let intro = user?.intro {
-                        StatusTalksTimelineView(_status: status, headerView: HeaderView(desc: intro), topOffsetTrigger: .profile)
+                        StatusTalksTimelineView(status: status, headerView: HeaderView(desc: intro), topOffsetTrigger: .profile)
 
                     } else {
-                        StatusTalksTimelineView(_status: status, headerView: nil, topOffsetTrigger: .profile)
+                        StatusTalksTimelineView(status: status, headerView: nil, topOffsetTrigger: .profile)
 
                     }
                 }
             }
-        }
+//        }
     }
 }

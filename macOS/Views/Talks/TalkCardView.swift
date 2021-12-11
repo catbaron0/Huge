@@ -39,6 +39,7 @@ struct TalkCardHeadView: View {
 }
 
 struct TalkCardTopicsView: View {
+    @StateObject var status: ViewStatus
     let topics: [TalkRelated]
     @EnvironmentObject var gtalk: GCoresTalk
     
@@ -52,9 +53,9 @@ struct TalkCardTopicsView: View {
                     .background(Color(hue: 1.0, saturation: 0.368, brightness: 0.235))
                     .cornerRadius(30)
                     .onTapGesture {
-                        let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
-                        if let statusType = status?.statusType, statusType != .topicTimeline, topic != status?.topic {
-                            gtalk.addStatusToCurrentScene(after: status!, statusType: .topicTimeline, title: topic.title ?? "nil", icon: "tag.fill", topic: topic)
+//                        let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
+                        if status.statusType != .topicTimeline, topic != status.topic {
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title ?? "nil", icon: "tag.fill", topic: topic)
                         }
                     }
                 Spacer()
@@ -65,18 +66,19 @@ struct TalkCardTopicsView: View {
 }
 
 struct TalkCardBottomView: View {
-    let _status: ViewStatus
+    @StateObject var status: ViewStatus
     let talkCard: TalkCard
     @EnvironmentObject var gtalk: GCoresTalk
 //    var curTalkCard: TalkCard?
 
     var body: some View {
-        let sceneType = _status.sceneType
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        let sceneType = status.sceneType
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
             HStack{
                 // the card can be updated by voting
                 // need to read it directly from environmengObject
+                let talks = status.talks
                 let curTalkCard = (status.statusType == .comments) ? status.targetTalk! : (status.talks.first {$0.id == talkCard.id })!
                 let likesCount = curTalkCard.likesCount ?? 0
                 HStack {
@@ -90,7 +92,7 @@ struct TalkCardBottomView: View {
                     } else {
                         Label(String(likesCount), systemImage: "heart").foregroundColor(.red)
                             .onTapGesture { withAnimation {
-                                gtalk.voteTo(targetId: curTalkCard.id, targetType: .talks, voteFlag: true, _status: status)
+                                gtalk.voteTo(targetId: curTalkCard.id, targetType: .talks, voteFlag: true, status: status)
                             }}
                     }
                 }
@@ -99,13 +101,13 @@ struct TalkCardBottomView: View {
                 HStack {
                     Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
                         .onTapGesture {
-                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, _status: _status, gtalk: gtalk))
+                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status, gtalk: gtalk))
 //                            gtalk.sendComment(talkId: talkCard.id, commentId: nil, _status: _status, comment: "233333")
                         }
                 }
                 Spacer()
             }.font(.title3.bold())
-        }
+//        }
 
     }
 }
@@ -114,13 +116,13 @@ struct TalkCardBottomView: View {
 // MARK: - CardView
 struct TalkCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-    let _status: ViewStatus
+    @ObservedObject var status: ViewStatus
     let card: TalkCard
     let isSelected: Bool
     var body: some View {
-        let sceneType = _status.sceneType
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        let sceneType = _status.sceneType
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
             HStack(alignment: .top) {
                 TalkCardProfileView(user: card.user)
                     .onTapGesture {
@@ -148,16 +150,16 @@ struct TalkCardView: View {
                         Text(related.title!)
                     }
                     if let topics = card.topics {
-                        TalkCardTopicsView(topics: topics)
+                        TalkCardTopicsView(status: status, topics: topics)
                     }
-                    TalkCardBottomView(_status: status, talkCard: card)
+                    TalkCardBottomView(status: status, talkCard: card)
                 }
                 Spacer()
             }
             .padding(5)
             .contentShape(Rectangle())
 
-        }
+//        }
         
     }
 }

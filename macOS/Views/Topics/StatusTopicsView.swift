@@ -25,11 +25,11 @@ struct TopicCategoryCardView: View {
 }
 
 struct TopicCategoriesView: View {
-    let _status: ViewStatus
-    let windowId: String?
+    @StateObject var status: ViewStatus
+//    let windowId: String?
     @State private var offset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
-    @State var selectedTopicCategory: TalkTopicCategory? = nil
+//    @State var selectedTopicCategory: TalkTopicCategory? = nil
     var body: some View {
 //        let sceneType = _status.sceneType
 //        if let idx = gtalk.indexOf(status: _status) {
@@ -37,10 +37,10 @@ struct TopicCategoriesView: View {
 //        let status = windowId == nil ? gtalk.statusForScene[_status.sceneType]!.first { $0.id == _status.id} : gtalk.NSWindowStatus[windowId!]!
         ScrollView(showsIndicators: false) {
             VStack {
-                ForEach(gtalk.topicCategories) { category in
+                ForEach(status.topicCategories) { category in
                     Group {
 //                        if category == gtalk.selectedTopicCategory {
-                        if category == selectedTopicCategory {
+                        if category == status.selectedTopicCategory {
                             TopicCategoryCardView(topicCategory: category)
                                 .background(Rectangle().fill(.red).opacity(0.8))
                                 .font(.body.bold())
@@ -51,9 +51,9 @@ struct TopicCategoriesView: View {
                     }
                         .onTapGesture{
 //                            gtalk.select(topicCategory: category)
-                            selectedTopicCategory = category
+                            status.selectedTopicCategory = category
                             withAnimation {
-                                gtalk.readTopics(categoryId: category.id, windowId: windowId)
+                                gtalk.readTopics(status: status, categoryId: category.id)
                             }
                         }
                 }
@@ -82,17 +82,22 @@ struct topicsView: View {
     @State var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     @Binding var related: TalkRelated?
+    let newStatus: Bool
+    
     var body: some View {
         ScrollView {
             VStack {
-                ForEach(gtalk.selectedTopics) { topic in
+                ForEach(status.selectedTopics) { topic in
                     TopicCardView(topic: topic)
                         .onTapGesture {
                             related = TalkRelated(id: topic.id, type: .topics, title: topic.title, desc: nil, cover: nil, banner: nil, contentString: nil)
-                            gtalk.addStatusToCurrentScene(
-                                after: status, statusType: .topicTimeline, title: topic.title!,
-                                icon: "tag.fill", targetTalk: nil, topic: topic
-                            )
+                            if newStatus {
+                                gtalk.addStatusToCurrentScene(
+                                    after: status, statusType: .topicTimeline, title: topic.title!,
+                                    icon: "tag.fill", targetTalk: nil, topic: topic
+                                )
+
+                            }
                         }
                 }
                 Spacer()
@@ -102,8 +107,7 @@ struct topicsView: View {
 }
 
 struct StatusTopicsView: View {
-    @State var _status: ViewStatus
-    let windowId: String
+    @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
 
     @State private var sending = false
@@ -117,16 +121,11 @@ struct StatusTopicsView: View {
     @FocusState private var bindIsFocused: Bool
     
     var body: some View {
-        let sceneType = _status.sceneType
-        let idx = gtalk.indexOf(status: _status)
-        let status = idx == nil ? _status : gtalk.statusForScene[sceneType]![idx!]
-//        let searchId = status.searchId!
         let sendState = status.requestState
         let opacity = sendState != nil && sendState! == .sending ? 0.5 : 1.0
-
         VStack{
             HStack {
-                TextField("话题", text: $query, prompt: Text("话题"))
+                TextField("话题", text: $query, prompt: Text("搜索话题"))
                     .onChange(of: query) { text in
                         if query == "" {
                             searchMode = false
@@ -136,36 +135,31 @@ struct StatusTopicsView: View {
                     .cornerRadius(5)
                     .padding(.bottom, 8)
                     .onSubmit {
-                        submit(searchId: windowId)
+                        submit()
                     }
 
                 Button {
-                    submit(searchId: windowId)
+                    submit()
                 } label: {
-                    Label("搜索", systemImage: "magnifyingglass").frame(width: 30, height: 20)
+                    Label("搜索", systemImage: "magnifyingglass").frame(width: 30, height: 30)
                         .labelStyle(.iconOnly).frame(width: 50)
                         .background(RoundedRectangle(cornerRadius: 5).fill(.red).opacity(0.85))
                         .foregroundColor(.white)
                         .font(.body.bold())
-                }.padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
+                }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
             }
             .padding()
-            .onAppear {
-                gtalk.NSWindowStatus[windowId] = _status
-            }
-            .onDisappear {
-                gtalk.NSWindowStatus[windowId] = nil
-            }
+
             if searchMode {
                 // Activated by focus in the search input box
                 // Display the UI for search of tags
                 if checkInfo != "" { Text(checkInfo) }
-                SearchRersultsView(windowId: windowId, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchMode: $searchMode, searchType: .topics)
+                SearchRersultsView(status: status, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchMode: $searchMode, searchType: .topics)
                     .onChange(of: triggerSensor) { _ in
                         if let result = searchResult, result.type == .topics {
                             // Create a new TopicTimeline status
                             let topic = TalkRelated(id: result.id, type: .topics, title: result.title, desc: result.desc, cover: result.cover, banner: nil,contentString: nil)
-                            gtalk.addStatusToCurrentScene(after: _status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", targetTalk: nil, topic: topic)
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", targetTalk: nil, topic: topic)
                         }
 
                     }
@@ -187,25 +181,40 @@ struct StatusTopicsView: View {
             }
 
             if !searchMode {
-                HStack {
-                    TopicCategoriesView(_status: status, windowId: nil)
-                        .frame(width: 100)
-                        .onAppear { gtalk.readTopicsCategories()}
-                    topicsView(status: status, related: $_related)
-                    Spacer()
+                if status.topicCategories.isEmpty {
+                    VStack{
+                        Spacer()
+                        ProgressView()
+                            .onAppear { gtalk.readTopicsCategories(status: status)}
+                        Spacer()
+                    }
+                } else {
+                    HStack {
+                        TopicCategoriesView(status: status)
+                            .frame(width: 100)
+                        if status.requestState == .sending {
+                            Spacer()
+                            ProgressView()
+                        } else {
+                            topicsView(status: status, related: $_related, newStatus: true)
+                        }
+                        
+                        Spacer()
+                    }
+
                 }
             }
         }
     }
     
-    func submit(searchId: String) {
+    func submit() {
         if query.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 {
             return
         }
         // Set to searchMode
         searchMode = true
         // gtalk.searchTopic
-        gtalk.search(endponit: .topics, query: query, searchId: searchId, earlier: false, recommend: false)
+        gtalk.search(status: status, endponit: .topics, query: query, earlier: false, recommend: false)
     }
 }
 

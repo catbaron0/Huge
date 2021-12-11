@@ -34,14 +34,14 @@ struct FollowshipCard: View {
 }
 
 struct StatusUserListView: View {
-    let _status: ViewStatus
+    @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     @State var scrollerOffset: CGPoint = .zero
     let topOffsetTrigger = TopOffsetTrigger.userList
     var body: some View {
-        let sceneType = _status.sceneType
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        let sceneType = _status.sceneType
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
             let users = (status.statusType == .followers) ? status.followers : status.followees
             GeometryReader { proxy in
                 VStack {
@@ -73,7 +73,7 @@ struct StatusUserListView: View {
                                         .onAppear {
                                             let off = scrollerOffset.x
                                             print("off \(off)")
-                                            gtalk.readFollowship(_status: status, earlier: false)
+                                            gtalk.readFollowship(status: status, earlier: false)
                                         }
                                 }
                             }
@@ -88,7 +88,7 @@ struct StatusUserListView: View {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        gtalk.readFollowship(_status: status, earlier: true)
+                                        gtalk.readFollowship(status: status, earlier: true)
                                     }
                             }
                         default:
@@ -97,6 +97,6 @@ struct StatusUserListView: View {
                     }.padding(.bottom)
                 }
             }
-        }
+//        }
     }
 }

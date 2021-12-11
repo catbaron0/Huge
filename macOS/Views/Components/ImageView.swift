@@ -10,30 +10,34 @@ import SwiftUI
 
 struct ImageReaderView: View {
 
-    @StateObject var imageReader: ImageReader
+//    @StateObject var imageReader: ImageReader
+    @ObservedObject var imageReader: ImageReader
     private var width: Int
     private var height: Int
 //    private let displayWidth = 200
     private var largeSize: Int?
 
-    init(url: String, width: Int, height: Int) {
-        self._imageReader = StateObject(wrappedValue: ImageReader(url: url))
+    init(url: String, width: Int, height: Int, forceLoad: Bool = false) {
+        self._imageReader = ObservedObject(wrappedValue: ImageReader(url: url, forceLoad: forceLoad))
         self.width = width
         self.height = height
+        imageReader.fetch(downLoad: false)
     }
 
     
-    init(talkImage: TalkImage) {
-        self._imageReader = StateObject(wrappedValue: ImageReader(url: talkImage.src))
+    init(talkImage: TalkImage, forceLoad: Bool = false) {
+        self._imageReader = ObservedObject(wrappedValue: ImageReader(url: talkImage.src, forceLoad: forceLoad))
         self.width = talkImage.width
         self.height = talkImage.height
+        imageReader.fetch(downLoad: false)
     }
     
-    init(talkImage: TalkImage, largeSize: Int) {
-        self._imageReader = StateObject(wrappedValue: ImageReader(url: talkImage.src))
+    init(talkImage: TalkImage, largeSize: Int, forceLoad: Bool = false) {
+        self._imageReader = ObservedObject(wrappedValue: ImageReader(url: talkImage.src, forceLoad: forceLoad))
         self.width = talkImage.width
         self.height = talkImage.height
         self.largeSize = largeSize
+        imageReader.fetch(downLoad: false)
     }
     
     var body: some View {
@@ -79,9 +83,9 @@ struct ImageReaderView: View {
 
                 }
             }
-            .onAppear {
-                imageReader.fetch(downLoad: false)
-            }
+//            .onAppear {
+//                imageReader.fetch(downLoad: false)
+//            }
     }
 }
 

@@ -89,11 +89,9 @@ struct TitleBarView: View {
                 HStack {
                     Spacer()
                     Button {
-                        let windowId = UUID().uuidString
-                        gtalk.NSWindowStatus[windowId] = gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!
-                        newNSWindow(view: NewTalkView(windowId: windowId, gtalk: gtalk))
-//                        newNSWindow(view: NewTalkView(windowId: UUID().uuidString, _status: gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!, gtalk: gtalk))
-//                        print("new talk")
+                        let newStatus = ViewStatus(id: UUID().uuidString, sceneType: .newWindow, statusType: .newTalk, title: "新 Talk", icon: "pencil.and.outline")
+//                        newStatus.topic = status.topic
+                        newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.topic))
                     } label: {
                         NewTalkButtonView()
                             .padding([.trailing,])
@@ -119,7 +117,7 @@ struct NewTalkButtonView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-        Label("推!", systemImage: "pencil.circle.fill")
+        Label("推!", systemImage: "pencil.and.outline")
             .labelStyle(.iconOnly)
     }
 }
@@ -130,12 +128,24 @@ struct NaviSideBarView: View {
     var body: some View {
         VStack{
 //            NewTalkButtonView()
+            
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
+                    HStack {
+                        if let src = gtalk.user?.profile.src {
+                            ImageReaderView(url: src, width: 60, height: 60)
+                        } else {
+                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
+                        }
+                    }
+                    .frame(width:50, height: 50)
+                    .clipShape(Circle())
+                    .padding(.bottom)
                     ForEach(gtalk.talkScenes) {item in
                         SidebarItemView(sidebarItem: item)
                     }
                 }
+                .padding(.top, 20)
                 Spacer()
             }
         }.background(Color.init(red: 55/255, green: 55/255, blue: 55/255))

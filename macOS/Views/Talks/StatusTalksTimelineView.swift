@@ -7,17 +7,17 @@
 import SwiftUI
 
 struct StatusTalksTimelineView: View {
-    let _status: ViewStatus
+    @ObservedObject var status: ViewStatus
     let headerView: HeaderView?
     let topOffsetTrigger: TopOffsetTrigger
     @State private var offset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-        let sceneType = _status.sceneType
+//        let sceneType = _status.sceneType
 //        let idx = gtalk.indexOf(status: _status)
-        if let idx = gtalk.indexOf(status: _status) {
-            let status = gtalk.statusForScene[sceneType]![idx]
+//        if let idx = gtalk.indexOf(status: _status) {
+//            let status = gtalk.statusForScene[sceneType]![idx]
 //                    let status = (idx == nil) ? _status : gtalk.statusForScene[sceneType]![idx!]
             GeometryReader { proxy in
                 VStack {
@@ -29,10 +29,11 @@ struct StatusTalksTimelineView: View {
                             }
                             ForEach(status.talks){ card in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
-                                TalkCardView(_status: status, card: card, isSelected: card.id == status.targetTalk?.id)
+                                TalkCardView(status: status, card: card, isSelected: card.id == status.targetTalk?.id)
                                     .onTapGesture(count: 2) {
                                         gtalk.addStatusToCurrentScene(after: status, statusType: .comments, title: "评论", icon: "bubble.right.fill", targetTalk: card)
                                     }
+                                Divider()
                             }
                             if status.loadingEarlier == .empty {
                                 Text("这就是一切了。").padding()
@@ -77,6 +78,6 @@ struct StatusTalksTimelineView: View {
                     }.padding(.bottom)
                 }
             }
-        }
+//        }
     }
 }
