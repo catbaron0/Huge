@@ -133,7 +133,7 @@ struct ImageSlidesView: View {
             AsyncImage(url: URL(string: talkImage.src)){ image in
                 image
                 .resizable()
-                .scaledToFit()
+                .scaledToFill()
                 .ignoresSafeArea()
                 .onAppear{
                     self.isLoading.toggle()
@@ -151,7 +151,7 @@ struct ImageSlidesView: View {
                         frameHeight = maxSize
                         frameWidth = Int(Float(frameHeight) * Float(imgWidth) / Float(imgHeight))
                     }
-                        window?.setFrame(NSRect(origin: (window?.frame.origin)!, size: CGSize(width: frameWidth, height: frameHeight)), display: true, animate: true)
+//                        window?.setFrame(NSRect(origin: (window?.frame.origin)!, size: CGSize(width: frameWidth, height: frameHeight)), display: true, animate: true)
                 }
             } placeholder: {
                     let imgWidth = talkImage.width
@@ -185,10 +185,8 @@ struct ImageSlidesView: View {
                 HStack(alignment: .center){
                     if cur > 0 {
                         Rectangle()
-//                        Text("pre")
                             .opacity(0.001)
                             .frame(width: proxy.size.width / 2, height: proxy.size.height)
-//                            .foregroundColor(.red)
                             .overlay(alignment: .leading) {
                                 Label("Pre", systemImage: "arrow.left.circle.fill")
                                     .labelStyle(.iconOnly)
@@ -201,9 +199,7 @@ struct ImageSlidesView: View {
                         }
                     if cur < imageCount - 1 {
                         Rectangle()
-//                        Text("next")
                             .opacity(0.001)
-//                            .foregroundColor(.blue)
                             .frame(width: proxy.size.width / 2, height: proxy.size.height)
                             .overlay(alignment: .trailing) {
                                 Label("Next", systemImage: "arrow.right.circle.fill")
@@ -220,7 +216,7 @@ struct ImageSlidesView: View {
             }.font(.largeTitle)
         }
     }
-    // TODO: Load all of the images at onece instead repeat loading everytime we switch between images
+
     var body: some View {
         ForEach(images) { image in
             if let idx = images.firstIndex{$0 == image}, idx == cur {
