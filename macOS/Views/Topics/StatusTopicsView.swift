@@ -78,8 +78,8 @@ struct TopicCardView: View {
     }
 }
 
-struct topicsView: View {
-    @State var status: ViewStatus
+struct TopicsView: View {
+    @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     @Binding var related: TalkRelated?
     let newStatus: Bool
@@ -196,7 +196,7 @@ struct StatusTopicsView: View {
                             Spacer()
                             ProgressView()
                         } else {
-                            topicsView(status: status, related: $_related, newStatus: true)
+                            TopicsView(status: status, related: $_related, newStatus: true)
                         }
                         
                         Spacer()

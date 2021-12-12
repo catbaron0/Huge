@@ -133,9 +133,19 @@ struct NaviSideBarView: View {
                 VStack(alignment: .center) {
                     HStack {
                         if let src = gtalk.user?.profile.src {
-                            ImageReaderView(url: src, width: 60, height: 60)
+                            AsyncImage(url: URL(string: src)!) { image in
+                                image.resizable().scaledToFit()
+                            } placeholder: {
+                                ProgressView()
+                            }
+//                            ImageReaderView(url: src, width: 60, height: 60)
                         } else {
-                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
+                            AsyncImage(url: URL(string: GCORES_DEFAULT_PROFILE_URL)!) { image in
+                                image.resizable().scaledToFit()
+                            } placeholder: {
+                                ProgressView()
+                            }
+//                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
                         }
                     }
                     .frame(width:50, height: 50)

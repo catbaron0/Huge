@@ -110,7 +110,12 @@ struct NewTalkView: View {
 
                     }.buttonStyle(PlainButtonStyle()).opacity(opacity)
                 }.padding([.leading, .trailing], 10)
-                
+
+                // Related content
+                if let related = related {
+                    RelatedCardView(searchResult: related)
+                        .padding([.leading, .trailing])
+                }
 
                 Divider().padding()
                 // Buttons of related contents
@@ -164,10 +169,6 @@ struct NewTalkView: View {
                 }
 
 
-                // Related content
-                if let related = related {
-                    RelatedCardView(searchResult: related)
-                }
                 // Search input box
                 HStack {
                     TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
@@ -258,7 +259,7 @@ struct NewTalkView: View {
                                     Spacer()
                                     ProgressView()
                                 } else {
-                                    topicsView(status: status, related: $topic, newStatus: false).environmentObject(gtalk)
+                                    TopicsView(status: status, related: $topic, newStatus: false).environmentObject(gtalk)
                                 }
                                 
                                 Spacer()

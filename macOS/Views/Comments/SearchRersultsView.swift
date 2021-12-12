@@ -14,11 +14,18 @@ struct RelatedCardView: View {
             // Cover image if exists
             let size = CGFloat(60)
             if let cover = searchResult.cover {
-                let image = TalkImage(src: cover, isSpoiler: false, width: 30, height: 30, downloadable: true)
-                ImageReaderView(talkImage: image, largeSize: 30, forceLoad: true)
+//                let image = TalkImage(src: cover, isSpoiler: false, width: 30, height: 30, downloadable: true)
+//                ImageReaderView(talkImage: image, largeSize: 30, forceLoad: true)
+                AsyncImage(url: URL(string: cover+GCORES_IMAGE_SCALE_SETTING)!) { image in
+                    image
+                    .resizable()
                     .scaledToFill()
+                } placeholder: {
+                    ProgressView()
+                }
+                    
                     .frame(width: size, height: size)
-                    .background(.red)
+                    .background(.gray)
                     .clipShape(RoundedRectangle(cornerRadius: 5))
                 
             } else {

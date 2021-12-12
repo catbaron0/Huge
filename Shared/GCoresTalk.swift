@@ -476,7 +476,7 @@ class GCoresTalk: ObservableObject{
         task.resume()
     }
     
-    func readTopics(status: ViewStatus, categoryId: String, append: Bool = false, windowId: String? = nil) {
+    func readTopics(status: ViewStatus, categoryId: String, append: Bool = false) {
         status.requestState = .sending
         if !append { status.selectedTopics.removeAll() }
         var urlString: String
@@ -497,7 +497,9 @@ class GCoresTalk: ObservableObject{
             ].reduce("", +)
         }
         let url = URL( string: urlString)!
-        let request = gcoresRequest(url: url, httpMethod: "GET")
+        print("Reading topics from \(url)")
+        var request = gcoresRequest(url: url, httpMethod: "GET")
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let task = session.dataTask(with: request) { data, response, error in
             if let errMessage = self.checkResponse(data, response, error) {
                 print(errMessage)
@@ -507,13 +509,17 @@ class GCoresTalk: ObservableObject{
             guard let data = data else{ return }
             let resp = try! JSONDecoder().decode(GCoresTopicResponse.self, from: data)
             let topics = resp.formalize()
+            print("Got \(topics.count) topics")
             self.mainQueue.async {
                 status.selectedTopics += topics
+                print("update \(status.selectedTopics.count) topics")
+                status.requestState = .succeed
+                status.objectWillChange.send()
                 if let recordCount = resp.meta.recordCount, status.selectedTopics.count < recordCount {
                     // There are more tags
                     self.readTopics(status: status, categoryId: categoryId, append: true)
                 }
-                status.requestState = .succeed
+                
             }
         }
         task.resume()
