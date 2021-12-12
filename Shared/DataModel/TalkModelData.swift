@@ -7,6 +7,11 @@
 
 import Foundation
 import Combine
+import SwiftUI
+
+struct GCoresFont {
+    static let body = Font.system(size: 15)
+}
 
 enum AppSize: CGFloat {
     case width = 380
@@ -38,6 +43,7 @@ enum TopOffsetTrigger: Int {
     case profile = 180
     case userList = 70
 }
+
 
 enum TimelineTopPadding: CGFloat {
     case titleBar = 10

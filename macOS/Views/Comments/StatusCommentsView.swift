@@ -13,9 +13,6 @@ struct TalkCommentBottomView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
             HStack{
                 // thumb up
                 let likesCount = comment.likesCount ?? 0
@@ -48,7 +45,6 @@ struct TalkCommentBottomView: View {
                 }
                 Spacer()
                 Button{
-//                    newNSWindow(view: NewCommentView(targetUser: comment.user, targetTalkId: status.targetTalk!.id, targetCommentId: comment.id, status: status, gtalk: gtalk))
                     print("New window for comment")
                 } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
@@ -64,9 +60,6 @@ struct ReplyCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
             HStack(alignment: .top) {
                 TalkCardProfileView(user: reply.user)
                     .onTapGesture {
@@ -76,10 +69,10 @@ struct ReplyCardView: View {
                     TalkCardHeadView(user: reply.user, created: reply.createdAt)
                     Text(reply.text)
                         .fixedSize(horizontal: false, vertical: true)
+                        .font(GCoresFont.body)
                     TalkCommentBottomView(comment: reply, status: status)
                 }
             }.padding(.leading, 40)
-//        }
     }
 }
 
@@ -90,9 +83,7 @@ struct CommentCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
+
             VStack {
                 HStack(alignment: .top) {
                     TalkCardProfileView(user: comment.user).padding(.trailing)
@@ -106,6 +97,7 @@ struct CommentCardView: View {
                         TalkCardHeadView(user: comment.user, created: comment.createdAt)
                         Text(comment.text)
                             .fixedSize(horizontal: false, vertical: true)
+                            .font(GCoresFont.body)
                         TalkCommentBottomView(comment: comment, status: status)
                     }
                 }
@@ -132,7 +124,6 @@ struct CommentCardView: View {
                     }
                 }
             }
-//        }
     }
 }
 
@@ -141,10 +132,6 @@ struct StatusCommentsView: View {
     @State var scrollerOffset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
-//        let sceneType = _status.sceneType
-//        let idx = gtalk.indexOf(status: _status)
-//        let status = (idx == nil) ? _status : gtalk.statusForScene[sceneType]![idx!]
-
         GeometryReader { proxy in
             VStack {
                 let topOffset = scrollerOffset.x

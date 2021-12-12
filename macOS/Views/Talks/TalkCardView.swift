@@ -47,7 +47,6 @@ struct TalkCardTopicsView: View {
         ForEach(topics) { topic in
             HStack{
                 Text(topic.title!)
-                //                    .font(.caption.bold())
                     .padding(5)
                     .foregroundColor(Color.red)
                     .background(Color(hue: 1.0, saturation: 0.368, brightness: 0.235))
@@ -97,7 +96,6 @@ struct TalkCardBottomView: View {
                         newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status, gtalk: gtalk))
                     }
             }
-//            Spacer()
         }.font(.title3.bold())
     }
 }
@@ -131,6 +129,7 @@ struct TalkCardView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(EdgeInsets(top: 0, leading: 0, bottom: 3, trailing: 0))
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(GCoresFont.body)
                 }
             }
             

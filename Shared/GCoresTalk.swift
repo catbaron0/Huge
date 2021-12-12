@@ -577,7 +577,6 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "GET", body: nil)
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
                 if earlier { status.loadingEarlier = .loaded } else { status.loadingLatest = .loaded }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print("Failed to read comments!")

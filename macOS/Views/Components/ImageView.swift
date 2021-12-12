@@ -99,16 +99,18 @@ struct TalkCardImageView: View {
             .scaledToFit()
             .overlay(alignment: .bottom){
                 if talkImages.count > 1 {
-                    HStack {
-                        Spacer()
-                        Label("1 of \(talkImages.count)", systemImage: "ellipsis")
-                            .font(.title2).labelStyle(.titleOnly).frame(minHeight: 20)
-                            .foregroundColor(.white)
-                        Spacer()
-                    }.background(Color.gray).opacity(0.7)
+//                    HStack {
+//                        Spacer()
+                    Label("1 of \(talkImages.count)", systemImage: "ellipsis")
+                        .font(.title2).labelStyle(.titleOnly).padding(5)
+                        .background(Color.gray.opacity(0.8))
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+//                        Spacer()
+//                    }.background(Color.gray).opacity(0.7)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
 
             .contentShape(Rectangle())
             .onTapGesture {

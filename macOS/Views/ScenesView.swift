@@ -40,18 +40,25 @@ struct ScenesView: View {
                     }
                     .frame(width: proxy.size.width)
                     .onAppear{
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            offset = offset - proxy.size.width - 8
+                        withAnimation {
+                            
+
+                            if statuses.count > 1 {
+                                offset = offset - proxy.size.width - 8
+                                print(statuses.count)
+                                print("offset: \(offset)")
+                            }
                         }
                     }
                     .onDisappear {
                         withAnimation {
-                        offset = offset + proxy.size.width + 8
+                            if statuses.count > 1 {
+                                offset = offset + proxy.size.width + 8
+                            }
+                        
                         }
                     }
                 }
-            }.onAppear {
-                offset = proxy.size.width + 8
             }
 //            .offset(x: (-proxy.size.width - 8) * ( CGFloat(gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count) - 1))
             .offset(x: offset)
