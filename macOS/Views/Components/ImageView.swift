@@ -10,11 +10,9 @@ import SwiftUI
 
 struct ImageReaderView: View {
 
-//    @StateObject var imageReader: ImageReader
     @ObservedObject var imageReader: ImageReader
     private var width: Int
     private var height: Int
-//    private let displayWidth = 200
     private var largeSize: Int?
 
     init(url: String, width: Int, height: Int, forceLoad: Bool = false) {
@@ -51,8 +49,7 @@ struct ImageReaderView: View {
                         Image(nsImage: image)
                             .resizable()
                             .scaledToFill()
-//                            .frame(width: CGFloat(displayWidth))
-                            .frame(maxWidth:200, maxHeight: 300)
+                            .frame(maxWidth:300, maxHeight: 300)
                     }
                 }
                 else {
@@ -76,9 +73,12 @@ struct ImageReaderView: View {
                     }
                     else {
                         Rectangle()
-                            .background(.red)
+                            .background(.gray)
                             .opacity(0.5)
                             .frame(maxWidth:200, maxHeight: 300)
+                            .overlay {
+                                ProgressView()
+                            }
                     }
 
                 }

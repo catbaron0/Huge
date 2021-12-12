@@ -17,9 +17,9 @@ struct LoadingBarView: View {
     @State  var status: ViewStatus
     @State  var barPosition: LoadingBarPosition
     @Binding  var offset: CGPoint
-
+    
     var  action: () -> Void
-
+    
     var body: some View {
         VStack { // LoadingBar
             switch status.loadingEarlier {
@@ -32,13 +32,13 @@ struct LoadingBarView: View {
             case .loaded:
                 if barPosition == .top && offset.x > 10 {
                     Divider()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        action()
-                    }
-                    .onAppear {
-                        action()
-                    }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            action()
+                        }
+                        .onAppear {
+                            action()
+                        }
                 } else if barPosition == .top && offset.x > 10 {
                     HStack {
                         Spacer()
@@ -61,52 +61,48 @@ struct LoadingBarView: View {
 
 struct TitleBarView: View {
     @EnvironmentObject var gtalk: GCoresTalk
-//    @State var status: TalkModelStatus
+    //    @State var status: TalkModelStatus
     var body: some View {
         // title and icon
         if let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last {
             ZStack(alignment: .leading) {
-                HStack {
+                HStack{
+                    Spacer()
                     Label(status.title, systemImage: status.icon)
-                        .frame(maxWidth: .infinity)
-                        .foregroundColor(Color(NSColor.windowFrameTextColor))
-                        .padding(.bottom, 8)
                         .font(.title3)
-                }
-                if gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count > 1 {
-                    Button { gtalk.back()  } label: {
-                        Label("后退", systemImage: "arrow.backward.circle.fill")
-                            .labelStyle(.iconOnly)
-                            .font(.title)
-                            .foregroundColor(Color(NSColor.windowFrameTextColor))
-                            .background(Color(NSColor.windowBackgroundColor))
-                            .padding([.bottom], 8)
-                            .padding(.leading, 15)
-                    }.buttonStyle(.plain)
-                    
-                    
+                        .padding()
+                        .frame(height: TimelineTopPadding.titleBar.rawValue + 40)
+                    Spacer()
                 }
                 HStack {
+                    if gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count > 1 {
+                        Button { gtalk.back()  } label: {
+                            Label("后退", systemImage: "arrow.backward.circle.fill")
+                                .labelStyle(.iconOnly)
+                                .font(.title)
+                                .foregroundColor(Color(NSColor.windowFrameTextColor))
+                                .padding(.leading, 15)
+                                .padding(.top, 3)
+                        }.buttonStyle(.plain)
+                    }
                     Spacer()
                     Button {
                         let newStatus = ViewStatus(id: UUID().uuidString, sceneType: .newWindow, statusType: .newTalk, title: "新 Talk", icon: "pencil.and.outline")
-//                        newStatus.topic = status.topic
                         newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.topic))
                     } label: {
                         NewTalkButtonView()
-                            .padding([.trailing,])
+                            .padding(.top, 3)
+                            .padding(.trailing)
                             .foregroundColor(Color(NSColor.windowFrameTextColor))
-                            .background(Color(NSColor.windowBackgroundColor))
                             .font(.title)
-                            .padding(.bottom, 8)
                     }.buttonStyle(.plain)
+                    
                 }
+                .frame(height: TimelineTopPadding.titleBar.rawValue)
             }
-            .padding(.top, -20)
-            .frame(height: 20)
-            .background(Color(NSColor.windowBackgroundColor))
-        }
-        else {
+            .foregroundColor(Color(NSColor.windowFrameTextColor))
+
+        } else {
             EmptyView()
         }
     }
@@ -127,7 +123,7 @@ struct NaviSideBarView: View {
     
     var body: some View {
         VStack{
-//            NewTalkButtonView()
+            //            NewTalkButtonView()
             
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
@@ -138,14 +134,14 @@ struct NaviSideBarView: View {
                             } placeholder: {
                                 ProgressView()
                             }
-//                            ImageReaderView(url: src, width: 60, height: 60)
+                            //                            ImageReaderView(url: src, width: 60, height: 60)
                         } else {
                             AsyncImage(url: URL(string: GCORES_DEFAULT_PROFILE_URL)!) { image in
                                 image.resizable().scaledToFit()
                             } placeholder: {
                                 ProgressView()
                             }
-//                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
+                            //                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
                         }
                     }
                     .frame(width:50, height: 50)

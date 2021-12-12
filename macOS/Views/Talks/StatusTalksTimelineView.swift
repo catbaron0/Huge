@@ -7,7 +7,8 @@
 import SwiftUI
 
 struct StatusTalksTimelineView: View {
-    @ObservedObject var status: ViewStatus
+    @StateObject var status: ViewStatus
+    let scrollTopPadding: CGFloat
     let headerView: HeaderView?
     let topOffsetTrigger: TopOffsetTrigger
     @State private var offset: CGPoint = .zero
@@ -24,6 +25,7 @@ struct StatusTalksTimelineView: View {
                     List {// ForEach
                         LazyVStack{ // ForEach(cards)
                             // LazyVstack to avoid refresh of cards
+                            Text("").padding(.top, scrollTopPadding)
                             if let headerView = headerView {
                                 headerView
                             }

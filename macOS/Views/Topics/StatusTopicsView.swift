@@ -96,7 +96,6 @@ struct TopicsView: View {
                                     after: status, statusType: .topicTimeline, title: topic.title!,
                                     icon: "tag.fill", targetTalk: nil, topic: topic
                                 )
-
                             }
                         }
                 }
@@ -124,6 +123,7 @@ struct StatusTopicsView: View {
         let sendState = status.requestState
         let opacity = sendState != nil && sendState! == .sending ? 0.5 : 1.0
         VStack{
+            Text("").padding(.top, TimelineTopPadding.titleBar.rawValue)
             HStack {
                 TextField("话题", text: $query, prompt: Text("搜索话题"))
                     .onChange(of: query) { text in

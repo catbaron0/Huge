@@ -16,16 +16,17 @@ struct ContentView: View {
         if gtalk.loginInfo.loginState == .succeed {
             HSplitView{
                 NaviSideBarView()
-                VStack{
-                    TitleBarView().padding(.bottom, -8)
+                ZStack(alignment: .top){
                     ScenesView()
+                    TitleBarView()
+                        .background(.ultraThinMaterial, in: Rectangle())
+                        .padding(.top, -30)
                 }
-                .frame(width: AppSize.width.rawValue)
+                .frame(minWidth: 200, idealWidth: 380, maxWidth: .infinity, minHeight: 300, idealHeight: 600, maxHeight: .infinity, alignment: .center)
             }
         } else {
             LoginView()
         }
-//        Text("content")
     }
 }
 

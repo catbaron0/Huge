@@ -108,7 +108,8 @@ struct CommentCardView: View {
                             .fixedSize(horizontal: false, vertical: true)
                         TalkCommentBottomView(comment: comment, status: status)
                     }
-                }.padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 10))
+                }
+                .padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 10))
                 if let oldestDecendants = comment.oldestDescendants, withReply {
                     VStack {
                         ForEach(oldestDecendants, id: \.self) { replyId in
@@ -152,6 +153,7 @@ struct StatusCommentsView: View {
                         // LazyVstack to avoid refresh of cards
                         if status.statusType == .comments {
                             TalkCardView(status: status, card: status.targetTalk!, isSelected: false)
+                                .padding(.top, TimelineTopPadding.titleBar.rawValue).padding(.top, 5)
                             Divider().padding(.bottom, 10)
                             ForEach(status.comments){ comment in
                                 // We need foreach to avoid reloading images everytime the talkcards appear

@@ -299,7 +299,6 @@ class GCoresTalk: ObservableObject{
                 NSApplication.shared.keyWindow?.close()
 
             }
-            //            guard let data = data else{ return }
         }.resume()
     }
     
@@ -308,7 +307,6 @@ class GCoresTalk: ObservableObject{
         
         var uploadedImages = [String: String]()
         
-        //
         let dispatchGroup = DispatchGroup()
         if let urls = imageUrls, !urls.isEmpty {
             urls.forEach{url in
@@ -372,19 +370,6 @@ class GCoresTalk: ObservableObject{
         data.append(postData)
         data.append(binaryData)
         
-        
-        //?         その他パラメータがあれば追加
-        //          if let parameters = parameters {
-        //              var content = ""
-        //              parameters.forEach {
-        //                  content += "\r\n--\(boundary)\r\n"
-        //                  content += "Content-Disposition: form-data; name=\"\($0.key)\"\r\n\r\n"
-        //                  content += "\($0.value)"
-        //              }
-        //              if let postData = content.data(using: .utf8) { data.append(postData) }
-        //          }
-        
-        // HTTPBodyの終了を設定
         guard let endData = "\r\n--\(boundary)--\r\n".data(using: .utf8) else { return data }
         data.append(endData)
         return data
@@ -392,16 +377,10 @@ class GCoresTalk: ObservableObject{
     
     
     func readTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
-        //        let idx = indexOf(status: status)!
-        //        let sceneType = status.sceneType
         if earlier {
-            //            statusForScene[sceneType]![idx].loadingEarlier = .loading
             status.loadingEarlier = .loading
         } else {
-//            status.talks.removeAll()
             status.loadingLatest = .loading
-            //            statusForScene[sceneType]![idx].talks.removeAll()
-            //            statusForScene[sceneType]![idx].loadingLatest = .loading
         }
         
         var before = ""
@@ -464,13 +443,7 @@ class GCoresTalk: ObservableObject{
                         }
                     }
                     status.talks += talks
-                    //                    if earlier {
-                    //                        self.statusForScene[sceneType]![idx].talks += talks
-                    //                    } else {
-                    //                        self.statusForScene[sceneType]![idx].talks = talks
-                    //                    }
                 }
-                self.publisherTrigger = "Read Talks" // Force to trigger the publisher
             }
         }
         task.resume()
@@ -555,23 +528,12 @@ class GCoresTalk: ObservableObject{
                     // There are more categories
                     self.readTopicsCategories(status: status)
                 }
-                //                else {
-                //                    // We have all categories
-                //                    // Get tags for each
-                //                    for categoryId in self.tags.keys {
-                //                        self.getTags(for: categoryId)
-                //                    }
-                //                }
             }
         }
         task.resume()
     }
     
     func readReplies(commentId: String, status: ViewStatus) {
-        //        let sceneType = _status.sceneType
-        //        guard let idx = indexOf(status: _status) else {
-        //            return
-        //        }
         
         let url = URL(
             string: "https://www.gcores.com/gapi/v1/comments/\(commentId)?include=commentable%2Cuser%2Cparent.user%2Cdescendants.user%2Cdescendants.parent&from-app=1"
@@ -593,26 +555,16 @@ class GCoresTalk: ObservableObject{
                 let respCards = resp.formalize()
                 let comment = respCards[0][0]
                 let replies = respCards[1]
-                //                if replies.isEmpty {
-                //                    self.statusForScene[sceneType]![idx].targetComment = comment
-                //                    self.statusForScene[sceneType]![idx].loadingEarlier = .empty
-                //                } else {
+
                 status.loadingEarlier = .empty
                 status.targetComment = comment
                 status.replies += replies
-                //                }
-                
-                //                self.publisherTrigger = "Read Comment!"
             }
         }
         task.resume()
     }
     
     func readComments(talkId: String, status: ViewStatus, earlier: Bool) {
-        //        let sceneType = _status.sceneType
-        //        guard let idx = indexOf(status: _status) else {
-        //            return
-        //        }
         let pageOffset = status.comments.count
         if earlier { status.loadingEarlier = .loading } else { status.loadingLatest = .loading }
         
@@ -623,7 +575,6 @@ class GCoresTalk: ObservableObject{
                 "&page%5Boffset%5D=\(pageOffset)&page%5Blimit%5D=20&from-app=1"].reduce("", +)
         )!
         let request = gcoresRequest(url: url, httpMethod: "GET", body: nil)
-        
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
                 //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
@@ -652,8 +603,6 @@ class GCoresTalk: ObservableObject{
                     status.comments = comments
                     status.replies = replies
                 }
-                
-                //                self.publisherTrigger = "Read Comment!"
             }
         }
         task.resume()

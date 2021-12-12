@@ -113,7 +113,7 @@ struct NewTalkView: View {
 
                 // Related content
                 if let related = related {
-                    RelatedCardView(searchResult: related)
+                    RelatedCardView(related: related)
                         .padding([.leading, .trailing])
                 }
 

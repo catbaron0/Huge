@@ -8,14 +8,11 @@
 import SwiftUI
 
 struct RelatedCardView: View {
-    let searchResult: TalkRelated
+    let related: TalkRelated
     var body: some View {
         HStack {
-            // Cover image if exists
-            let size = CGFloat(60)
-            if let cover = searchResult.cover {
-//                let image = TalkImage(src: cover, isSpoiler: false, width: 30, height: 30, downloadable: true)
-//                ImageReaderView(talkImage: image, largeSize: 30, forceLoad: true)
+            let size = CGFloat(70)
+            if let cover = related.cover {
                 AsyncImage(url: URL(string: cover+GCORES_IMAGE_SCALE_SETTING)!) { image in
                     image
                     .resizable()
@@ -39,11 +36,11 @@ struct RelatedCardView: View {
             }
             VStack(alignment: .leading) {
                 // Title
-                Text(searchResult.title!).font(.title3.bold()).lineLimit(2)
-                Spacer()
+                Text(related.title!).font(.title3.bold()).lineLimit(2)
+//                Spacer()
                 // Desc if exists
-                if let desc = searchResult.desc {
-                    Text(desc).lineLimit(2).font(.body)
+                if let desc = related.desc {
+                    Text(desc).lineLimit(2).font(.body.italic())
                 }
                 Spacer()
             }
@@ -73,7 +70,7 @@ struct SearchRersultsView: View {
                         // LazyVstack to avoid refresh of cards
                         ForEach(status.searchResults){ result in
                             // We need foreach to avoid reloading images everytime the talkcards appear
-                            RelatedCardView(searchResult: result)
+                            RelatedCardView(related: result)
 //                                .padding([.top, .leading])
                                 .onTapGesture {
                                     selectResult = result

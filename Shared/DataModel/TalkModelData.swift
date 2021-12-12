@@ -39,6 +39,11 @@ enum TopOffsetTrigger: Int {
     case userList = 70
 }
 
+enum TimelineTopPadding: CGFloat {
+    case titleBar = 10
+    case profile = 80
+    case userList = 70
+}
 
 enum LoginState: String {
     case succeed
@@ -348,6 +353,9 @@ struct TalkRelated: Identifiable, Equatable {
     let cover: String?
     let banner: String?
     let contentString: String?
+    var shareUrl: String {
+        return GCORES_HOST + "\(type)/\(id)"
+    }
 }
 //struct SearchResult: Identifiable, Equatable {
 //    let id: String

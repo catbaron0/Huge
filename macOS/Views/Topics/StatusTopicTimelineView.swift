@@ -18,7 +18,11 @@ struct StatusTopicTimelineView: View {
 //        if let idx = gtalk.indexOf(status: _status) {
 //            let status = gtalk.statusForScene[sceneType]![idx]
             let descView = HeaderView(desc: status.topic!.desc!)
-            StatusTalksTimelineView(status: status, headerView: descView, topOffsetTrigger: .timeline)
+            StatusTalksTimelineView(
+                status: status,
+                scrollTopPadding: TimelineTopPadding.titleBar.rawValue,
+                headerView: descView,
+                topOffsetTrigger: .timeline)
 
 //        }
     }

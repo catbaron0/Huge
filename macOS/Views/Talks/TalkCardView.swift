@@ -53,7 +53,7 @@ struct TalkCardTopicsView: View {
                     .background(Color(hue: 1.0, saturation: 0.368, brightness: 0.235))
                     .cornerRadius(30)
                     .onTapGesture {
-//                        let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
+                        //                        let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]?.last
                         if status.statusType != .topicTimeline, topic != status.topic {
                             gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title ?? "nil", icon: "tag.fill", topic: topic)
                         }
@@ -69,46 +69,36 @@ struct TalkCardBottomView: View {
     @StateObject var status: ViewStatus
     let talkCard: TalkCard
     @EnvironmentObject var gtalk: GCoresTalk
-//    var curTalkCard: TalkCard?
-
+    
     var body: some View {
-//        let sceneType = status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
-            HStack{
-                // the card can be updated by voting
-                // need to read it directly from environmengObject
-                let talks = status.talks
-                let curTalkCard = (status.statusType == .comments) ? status.targetTalk! : (status.talks.first {$0.id == talkCard.id })!
-                let likesCount = curTalkCard.likesCount ?? 0
-                HStack {
-                    if let isVoting = curTalkCard.isVoting, isVoting {
-                        Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.gray).font(.caption)
-                    } else if let voteFlag = curTalkCard.voteFlag, voteFlag {
-                        Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.red)
-                            .onTapGesture { withAnimation {
-                                gtalk.cancelVote(targetId: curTalkCard.id, targetType: .talks, voteId: curTalkCard.voteId!, status: status)
-                            }}
-                    } else {
-                        Label(String(likesCount), systemImage: "heart").foregroundColor(.red)
-                            .onTapGesture { withAnimation {
-                                gtalk.voteTo(targetId: curTalkCard.id, targetType: .talks, voteFlag: true, status: status)
-                            }}
+        HStack{
+            let curTalkCard = (status.statusType == .comments) ? status.targetTalk! : (status.talks.first {$0.id == talkCard.id })!
+            let likesCount = curTalkCard.likesCount ?? 0
+            HStack {
+                if let isVoting = curTalkCard.isVoting, isVoting {
+                    Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.gray).font(.caption)
+                } else if let voteFlag = curTalkCard.voteFlag, voteFlag {
+                    Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.red)
+                        .onTapGesture { withAnimation {
+                            gtalk.cancelVote(targetId: curTalkCard.id, targetType: .talks, voteId: curTalkCard.voteId!, status: status)
+                        }}
+                } else {
+                    Label(String(likesCount), systemImage: "heart").foregroundColor(.red)
+                        .onTapGesture { withAnimation {
+                            gtalk.voteTo(targetId: curTalkCard.id, targetType: .talks, voteFlag: true, status: status)
+                        }}
+                }
+            }
+            
+            let commentsCount = curTalkCard.commentsCount ?? 0
+            HStack {
+                Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
+                    .onTapGesture {
+                        newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status, gtalk: gtalk))
                     }
-                }
-                    
-                let commentsCount = curTalkCard.commentsCount ?? 0
-                HStack {
-                    Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
-                        .onTapGesture {
-                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status, gtalk: gtalk))
-//                            gtalk.sendComment(talkId: talkCard.id, commentId: nil, _status: _status, comment: "233333")
-                        }
-                }
-                Spacer()
-            }.font(.title3.bold())
-//        }
-
+            }
+//            Spacer()
+        }.font(.title3.bold())
     }
 }
 
@@ -120,47 +110,50 @@ struct TalkCardView: View {
     let card: TalkCard
     let isSelected: Bool
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
+        VStack(alignment: .leading){
             HStack(alignment: .top) {
                 TalkCardProfileView(user: card.user)
                     .onTapGesture {
-//                        withAnimation{
-                            gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", targetTalk: card, topic: nil, userId: card.user.id)
-//                        }
+                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", targetTalk: card, topic: nil, userId: card.user.id)
                     }
-                
-                VStack(alignment: .leading){
-                    TalkCardHeadView(user: card.user, created: card.createdAt)
-                    if let images = card.images, !images.isEmpty {
-                        TalkCardImageView(talkImages: images)
-                            .scaledToFit()
-                    }
-                    VStack{
-                        ForEach(card.texts){ text in
-                            Text(text.content)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(EdgeInsets(top: 0, leading: 0, bottom: 3, trailing: 0))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    
-                    if let related = card.related {
-                        Text(related.title!)
-                    }
-                    if let topics = card.topics {
-                        TalkCardTopicsView(status: status, topics: topics)
-                    }
-                    TalkCardBottomView(status: status, talkCard: card)
+
+                TalkCardHeadView(user: card.user, created: card.createdAt)
+                Spacer()
+            }.padding(.bottom, 5)
+            if let images = card.images, !images.isEmpty {
+                TalkCardImageView(talkImages: images)
+                    .scaledToFit()
+                    .padding(.leading)
+            }
+            VStack{
+                ForEach(card.texts){ text in
+                    Text(text.content)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 3, trailing: 0))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            
+            if let related = card.related {
+                Link(destination: URL(string: related.shareUrl)!) {
+                    RelatedCardView(related: related)
+                        .frame(height: 70)
+                        .padding(5)
+                        .background(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                }.foregroundColor(.white)
+            }
+            HStack {
+                if let topics = card.topics {
+                    TalkCardTopicsView(status: status, topics: topics)
                 }
                 Spacer()
+                TalkCardBottomView(status: status, talkCard: card)
+                    .padding(.trailing)
             }
-            .padding(5)
-            .contentShape(Rectangle())
-
-//        }
-        
+        }
+        .padding(5)
+        .contentShape(Rectangle())
     }
 }
 
