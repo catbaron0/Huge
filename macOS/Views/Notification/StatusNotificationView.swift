@@ -14,28 +14,40 @@ struct NotificationCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
         VStack {
-            Text(notification.desc)
-            
+            HStack {
+                Text(notification.desc)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(4)
+                    .padding(3)
+                Spacer()
+            }
             if notification.actors.count > 1 {
                 HStack {
                     Spacer()
-                    Text("所有参与用户")
+                    Label("查看所有参与者", systemImage: "chevron.down.circle.fill")
+                        .padding(3)
+                        .foregroundColor(.blue)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            listActors.toggle()
+                        }
                     Spacer()
                 }
-                .background(.gray)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    listActors.toggle()
-                }
                 if listActors {
-                    VStack{
-                        ForEach(notification.actors) { actor in
-                            Text(actor.nickname)
+                    HStack {
+                        Spacer()
+                        VStack(alignment: .leading) {
+                            ForEach(notification.actors) { actor in
+                                Text(actor.nickname).foregroundColor(.red)
+                            }
                         }
+                        Spacer()
                     }
                 }
             }
         }
+        .padding(5)
+        .background(RoundedRectangle(cornerRadius: 10).fill(.red).opacity(notification.unRead ? 0.4 : 0.0))
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
             print("double click")

@@ -117,36 +117,44 @@ struct Notification: Identifiable, Equatable {
         }
     }
     
-    var objectStr: String {
+    var objectStr: [String] {
         let objType = object[0].type
         switch objType {
         case .videos:
-            return "你发布的视频: " + object[0].title!
+            return ["视频: ", object[0].title!]
         case .radios:
-            return "你参与的电台: " + object[0].title!
+            return ["电台: ", object[0].title!]
         case .articles:
-            return "你发布的文章: " + object[0].title!
+            return ["文章: ", object[0].title!]
         case .talks:
-            return "你的动态: " + object[0].contentString!
+            return ["动态: ", object[0].contentString!]
         case .comments:
             if let target = target {
                 switch target.type {
                 case .talks:
-                    return "你的动态: " + object[0].contentString!
+                    return ["动态: ", object[0].contentString!]
                 case .comments:
-                    return "你的评论: " + object[0].contentString!
+                    return ["评论: ", object[0].contentString!]
                 default:
-                    return "你发布的内容"
+                    return ["内容", ""]
                 }
             }
-            return "你的评论: " + object[0].contentString!
+            return ["评论: ", object[0].contentString!]
         default:
-            return "你发布的内容"
+            return ["内容", ""]
         }
     }
-    var desc: String {
-        actorNames + verb + objectStr
+    var desc: AttributedString {
+        var styledActorName = AttributedString(actorNames)
+        styledActorName.foregroundColor = .red
+        styledActorName.font = .body.bold()
+        var styledVerb = AttributedString(verb + "你发布的" + objectStr[0])
+        styledVerb.font = .body.weight(.light)
+        var styledObject = AttributedString(objectStr[1])
+        styledObject.font = .body.bold()
+        return styledActorName + styledVerb + styledObject
     }
+    
 }
 
 // MARK: Status of the talk model to decide data and views to display

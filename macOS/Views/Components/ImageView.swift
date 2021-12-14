@@ -213,7 +213,6 @@ struct ImageSlidesView: View {
                     }
                 }
             }
-//            .font(.largeTitle)
             .font(Font.system(size: 36))
         }
     }
