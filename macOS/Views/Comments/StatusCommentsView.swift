@@ -49,8 +49,6 @@ struct TalkCommentBottomView: View {
                 } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
             }.font(.title3.bold())
-//        }
-        
     }
 }
 
@@ -63,7 +61,7 @@ struct ReplyCardView: View {
             HStack(alignment: .top) {
                 TalkCardProfileView(user: reply.user)
                     .onTapGesture {
-                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", targetTalk: nil, topic: nil, userId: reply.user.id)
+                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", userId: reply.user.id)
                     }
                 VStack(alignment: .leading) {
                     TalkCardHeadView(user: reply.user, created: reply.createdAt)
@@ -89,8 +87,7 @@ struct CommentCardView: View {
                     TalkCardProfileView(user: comment.user).padding(.trailing)
                         .onTapGesture {
                             gtalk.addStatusToCurrentScene(
-                                after: status, statusType: .profile, title: comment.user.nickname,
-                                icon: "person.fill", targetTalk: nil, topic: nil, userId: comment.user.id
+                                after: status, statusType: .profile, title: comment.user.nickname, icon: "person.fill", userId: comment.user.id
                             )
                         }
                     VStack(alignment: .leading) {
@@ -118,7 +115,7 @@ struct CommentCardView: View {
                             }
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetTalk: status.targetTalk, topic: nil, userId: nil, targetComment: comment)
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetCommentId: comment.id)
                             }
                         }
                     }
@@ -139,9 +136,16 @@ struct StatusCommentsView: View {
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
                         if status.statusType == .comments {
-                            TalkCardView(status: status, card: status.targetTalk!, isSelected: false)
-                                .padding(.top, TimelineTopPadding.titleBar.rawValue).padding(.top, 5)
-                            Divider().padding(.bottom, 10)
+                            if let targetTalk = status.targetTalk {
+                                TalkCardView(status: status, card: targetTalk, isSelected: false)
+                                    .padding(.top, TimelineTopPadding.titleBar.rawValue).padding(.top, 5)
+                                Divider().padding(.bottom, 10)
+                            } else if let talkId = status.targetTalkId {
+                                ProgressView()
+                                    .onAppear {
+                                        gtalk.loadTalk(status: status, talkId: talkId)
+                                    }
+                            }
                             ForEach(status.comments){ comment in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
                                 CommentCardView(status: status, comment: comment, withReply: true)
@@ -151,8 +155,29 @@ struct StatusCommentsView: View {
                                 Text("这就是一切了。").padding()
                             }
                         } else if status.statusType == .replies {
-                            CommentCardView(status: status, comment: status.targetComment!, withReply: false)
-                            Divider().padding(.bottom, 10)
+                            if let targetTalkId = status.targetTalkId {
+                                HStack {
+                                    Spacer()
+                                    Text("查看原文")
+                                    Spacer()
+                                }.background(.gray)
+                                .onTapGesture {
+                                    gtalk.addStatusToCurrentScene(after: status, statusType: .comments, title: "评论", icon: "bubble.right.fill", targetTalkId: targetTalkId)
+                                }
+                            } else if let url = status.targetRelated?.shareUrl {
+                                HStack {
+                                    Spacer()
+                                    Text("查看原文")
+                                    Spacer()
+                                }.background(.gray)
+                                .onTapGesture {
+                                    NSWorkspace.shared.open(URL(string: url)!)
+                                }
+                            }
+                            if let targetComment = status.targetComment {
+                                CommentCardView(status: status, comment: targetComment, withReply: false)
+                                Divider().padding(.bottom, 10)
+                            }
                             ForEach(status.replies){ reply in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
                                 ReplyCardView(status: status, reply: reply)
@@ -178,7 +203,7 @@ struct StatusCommentsView: View {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        gtalk.readComments(talkId: status.targetTalk!.id, status: status, earlier: false)
+                                        gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: false)
                                     }
 
                             }
@@ -196,10 +221,10 @@ struct StatusCommentsView: View {
                             Divider()
                                 .contentShape(Rectangle())
                                 .onAppear {
-                                    if status.statusType == .comments {
-                                        gtalk.readComments(talkId: status.targetTalk!.id, status: status, earlier: true)
-                                    } else if status.statusType == .replies {
-                                        gtalk.readReplies(commentId: status.targetComment!.id, status: status)
+                                    if status.statusType == .comments, let talkId = status.targetTalkId {
+                                        gtalk.loadComments(talkId: talkId, status: status, earlier: true)
+                                    } else if status.statusType == .replies, let commentId = status.targetCommentId {
+                                        gtalk.loadReplies(commentId: commentId, status: status)
                                     }
                                 }
                         }
@@ -249,7 +274,7 @@ struct StatusRepliesView: View {
                                     Divider()
                                         .contentShape(Rectangle())
                                         .onAppear {
-                                            gtalk.readComments(talkId: status.targetTalk!.id, status: status, earlier: false)
+                                            gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: false)
                                         }
                                     
                                 }
@@ -265,7 +290,7 @@ struct StatusRepliesView: View {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        gtalk.readComments(talkId: status.targetTalk!.id, status: status, earlier: true)
+                                        gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: true)
                                     }
                             }
                         }

@@ -34,6 +34,12 @@ struct ScenesView: View {
                             StatusTopicsView(status: status)
                         case .followers, .followees:
                             StatusUserListView(status: status)
+                        case .notification:
+                            StatusNotificationView(
+                                status: status,
+                                scrollTopPadding: TimelineTopPadding.titleBar.rawValue,
+                                topOffsetTrigger: .timeline
+                            )
                         default:
                             Text("Unknown scene").onAppear{print(status.statusType)}
                         }
@@ -41,12 +47,8 @@ struct ScenesView: View {
                     .frame(width: proxy.size.width)
                     .onAppear{
                         withAnimation {
-                            
-
                             if statuses.count > 1 {
                                 offset = offset - proxy.size.width - 8
-                                print(statuses.count)
-                                print("offset: \(offset)")
                             }
                         }
                     }

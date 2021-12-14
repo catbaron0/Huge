@@ -71,9 +71,7 @@ struct StatusUserListView: View {
                                     Divider()
                                         .contentShape(Rectangle())
                                         .onAppear {
-                                            let off = scrollerOffset.x
-                                            print("off \(off)")
-                                            gtalk.readFollowship(status: status, earlier: false)
+                                            gtalk.loadFollowship(status: status, earlier: false)
                                         }
                                 }
                             }
@@ -88,7 +86,7 @@ struct StatusUserListView: View {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        gtalk.readFollowship(status: status, earlier: true)
+                                        gtalk.loadFollowship(status: status, earlier: true)
                                     }
                             }
                         default:

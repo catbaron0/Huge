@@ -40,7 +40,7 @@ struct StatusProfilePageView: View {
                 Spacer()
                 ProgressView()
                     .onAppear {
-                        gtalk.readUserInfo(userId: status.userId!, status: status)
+                        gtalk.loadUserInfo(userId: status.userId!, status: status)
                     }
                 Spacer()
             }
@@ -66,7 +66,7 @@ struct StatusProfilePageView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", targetTalk: nil, topic: nil, userId: status.userId!)
+                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", userId: status.userId!)
                                 }
                                 VStack{
                                     Text("被关注").font(.callout.weight(.light)).opacity(0.6)
@@ -75,7 +75,7 @@ struct StatusProfilePageView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", targetTalk: nil, topic: nil, userId: status.userId!)
+                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", userId: status.userId!)
                                 }
                             }.font(.title2)
                         }

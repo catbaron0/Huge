@@ -22,7 +22,7 @@ struct ContentView: View {
                         .background(.ultraThinMaterial, in: Rectangle())
                         .padding(.top, -30)
                 }
-                .frame(minWidth: 200, idealWidth: 380, maxWidth: .infinity, minHeight: 300, idealHeight: 600, maxHeight: .infinity, alignment: .center)
+                .frame(minWidth: 200, idealWidth: 380, maxWidth: 380, minHeight: 600, idealHeight: 800, maxHeight: .infinity, alignment: .center)
             }
         } else {
             LoginView()

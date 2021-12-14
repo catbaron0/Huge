@@ -16,44 +16,14 @@ class GCoresTalk: ObservableObject{
     @Published var publisherTrigger = ""
     @Published var user: TalkUser? = nil
     @Published var loginInfo: LoginInfo
-    
-    //    @Published var topicCategories = [TalkTopicCategory]()
-    //    @Published var selectedTopics = [TalkRelated]()
-    //    @Published var selectedTopicCategory: TalkTopicCategory?
-    
-    //    @Published var NSWindowRequestStates = [String: RequestState]()
-    //    @Published var NSWindowStatus = [String: ViewStatus]()
+
     let uds = UserDefaults.standard
     
     
-    @Published var talkScenes: [TalkScene] = [
-        TalkScene(
-            sceneType: .followee,
-            label: "Followee",
-            selectedIcon: "star.bubble.fill",
-            unselectedIcon: "star.bubble"),
-        TalkScene(
-            sceneType: .recommend,
-            label: "Recommend",
-            selectedIcon: "bubble.left.fill",
-            unselectedIcon: "bubble.left"),
-        TalkScene(
-            sceneType: .topics,
-            label: "Topic",
-            selectedIcon: "tag.fill",
-            unselectedIcon: "tag"),
-        TalkScene(
-            sceneType: .profile,
-            label: "Profile",
-            selectedIcon: "person.fill",
-            unselectedIcon: "person")
-    ]
+    @Published var talkScenes: [TalkScene]
     
     @Published var selectedTalkSceneType: TalkSceneType = .followee
     @Published var statusForScene: [TalkSceneType: [ViewStatus]]
-    //    = TalkSceneType.allCases.reduce(into: [TalkSceneType: [TalkModelStatus]]()) {
-    //        $0[$1] = [initStatus(for: $1)]
-    //    }
     
     //    static
     func initStatus(for sceneType: TalkSceneType) -> ViewStatus {
@@ -76,13 +46,19 @@ class GCoresTalk: ObservableObject{
             status.talks = [TalkCard]()
             return status
         case .profile:
-            return ViewStatus(
+            let status = ViewStatus(
                 id: "\(sceneType)-\(TalkStatusType.profile)-0", sceneType: sceneType,
-                statusType: .profile, title: "用户", icon: "person.fill", userId: loginInfo.userId)
+                statusType: .profile, title: "用户", icon: "person.fill")
+            status.userId = loginInfo.userId
+            return status
         case .newWindow:
             return ViewStatus(
                 id: "\(sceneType)-\(TalkStatusType.newTalk)-0", sceneType: sceneType,
                 statusType: .profile, title: "核态", icon: "pencil.and.outline")
+        case.notification:
+            return ViewStatus(
+                id: "\(sceneType)-\(TalkStatusType.notification)", sceneType: sceneType,
+                statusType: .notification, title: "消息", icon: "bell.fill")
         }
     }
     
@@ -97,23 +73,43 @@ class GCoresTalk: ObservableObject{
             TalkScene(
                 sceneType: .followee,
                 label: "Followee",
-                selectedIcon: "star.bubble.fill",
-                unselectedIcon: "star.bubble"),
+                selectedIcon: "star.bubble",
+                unselectedIcon: "star.bubble",
+                selectedBadgeIcon: "star.bubble.fill",
+                unselectedBadgeIcon: "star.bubble.fill"
+            ),
             TalkScene(
                 sceneType: .recommend,
                 label: "Recommend",
-                selectedIcon: "bubble.left.fill",
-                unselectedIcon: "bubble.left"),
+                selectedIcon: "text.bubble",
+                unselectedIcon: "text.bubble",
+                selectedBadgeIcon: "text.bubble.fill",
+                unselectedBadgeIcon: "text.bubble.fill"
+            ),
             TalkScene(
                 sceneType: .topics,
                 label: "Topic",
-                selectedIcon: "tag.fill",
-                unselectedIcon: "tag"),
+                selectedIcon: "tag",
+                unselectedIcon: "tag",
+                selectedBadgeIcon: "tag.fill",
+                unselectedBadgeIcon: "tag.fill"
+            ),
+            TalkScene(
+                sceneType: .notification,
+                label: "Notification",
+                selectedIcon: "bell",
+                unselectedIcon: "bell",
+                selectedBadgeIcon: "bell.fill",
+                unselectedBadgeIcon: "bell.fill"
+            ),
             TalkScene(
                 sceneType: .profile,
                 label: "Profile",
-                selectedIcon: "person.fill",
-                unselectedIcon: "person")
+                selectedIcon: "person",
+                unselectedIcon: "person",
+                selectedBadgeIcon: "person.fill",
+                unselectedBadgeIcon: "person.fill"
+            )
         ]
         
         selectedTalkSceneType = .topics
@@ -127,57 +123,59 @@ class GCoresTalk: ObservableObject{
             loginInfo.cookie = udsLoginInfo["cookie"]
             loginInfo.loginState = .succeed
             if let userId = loginInfo.userId {
-                readUserInfo(userId: userId, status: nil)
+                loadUserInfo(userId: userId, status: nil)
             }
         }
-        
-        //        topicCategories = [TalkTopicCategory]()
-        //        selectedTopics = [TalkRelated]()
-        //        selectedTopicCategory = nil
         
         // Initialize all initial status
         TalkSceneType.allCases.forEach {
             self.statusForScene[$0] = [self.initStatus(for: $0)]
         }
+        
+        // Timer tasks
+        Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+            self.scheduleQueue.async {
+                // check notifications
+                var status = self.statusForScene[.notification]![0]
+                if status.loadingLatest != .loading {
+                    self.checkUnreadNotifications(status: status)
+                }
+                // check followee timeline
+                status = self.statusForScene[.followee]![0]
+                self.checkUnreadTalks(status: status, endpoint: .followee)
+                status = self.statusForScene[.recommend]![0]
+                self.checkUnreadTalks(status: status, endpoint: .recommend)
+            }
+        }
     }
     
     private let session = URLSession.shared
     let mainQueue = DispatchQueue.main
-    //    func readCurrentStatus() -> TalkModelStatus {
-    //        return statusForScene[selectedTalkSceneType]!.last!
-    //    }
+    let scheduleQueue = DispatchQueue(label: "scheduleTask")
     
     func readStatusOf(sceneType: TalkSceneType, of id: String) -> ViewStatus? {
         return statusForScene[sceneType]!.first { $0.id == id}
     }
     
     func addStatusToCurrentScene(
-        after curStatus: ViewStatus, statusType: TalkStatusType, title: String,
-        icon: String, targetTalk: TalkCard? = nil, topic: TalkRelated? = nil,
-        userId: String? = nil, targetComment: TalkCommentCard? = nil) {
+        after curStatus: ViewStatus, statusType: TalkStatusType, title: String, icon: String,
+        topic: TalkRelated? = nil, targetTalkId: String? = nil, targetCommentId: String? = nil, userId: String? = nil) {
             let sceneType = curStatus.sceneType
             let statusId = "\(sceneType)-\(statusType)-\(statusForScene[sceneType]!.count)"
-            let status = ViewStatus(id: statusId, sceneType: sceneType, statusType: statusType, title: title, icon: icon, userId: userId)
-            status.targetTalk = targetTalk
+            let status = ViewStatus(id: statusId, sceneType: sceneType, statusType: statusType, title: title, icon: icon)
+            status.targetTalkId = targetTalkId
             status.topic = topic
-            status.targetComment = targetComment
+            status.targetCommentId = targetCommentId
+            status.userId = userId
+
             // stop from jumping to itself
             // * From comments page to the same page
-            if curStatus.statusType == .comments && statusType == .comments && curStatus.targetTalk == targetTalk {
+            if curStatus.statusType == .comments && statusType == .comments && curStatus.targetTalkId == targetTalkId {
                 return
             }
-            // * From user profile page
-            //        if lastStatus.statusType == .profile && .profile == statusType && lastStatus.userId == status.userId {
-            //            return
-            //        }
-            
+
             statusForScene[sceneType]!.append(status)
         }
-    
-    //    func indexOf(status: ViewStatus) -> Int? {
-    //
-    //        return statusForScene[status.sceneType]?.firstIndex(where: {$0.id == status.id} )
-    //    }
     
     func isSelected(sidebarItem: TalkScene) -> Bool {
         return selectedTalkSceneType == sidebarItem.sceneType
@@ -235,8 +233,7 @@ class GCoresTalk: ObservableObject{
         }
         return message
     }
-    
-    
+
     func talkContent(text: String, imgStr: String?) -> String {
         var content = ""
         if let imgStr = imgStr {
@@ -311,7 +308,6 @@ class GCoresTalk: ObservableObject{
         if let urls = imageUrls, !urls.isEmpty {
             urls.forEach{url in
                 dispatchGroup.enter()
-                print("Uploading image: \(url)")
                 uploadImage(url: url)
             }
             dispatchGroup.notify(queue: .global()) {
@@ -348,16 +344,12 @@ class GCoresTalk: ObservableObject{
                 guard let data = data else{ return }
                 
                 let resp = try! JSONSerialization.jsonObject(with: data) as! [String: String]
-                print(resp)
                 uploadedImages[url.absoluteString] = resp["path"]
                 dispatchGroup.leave()
             }
             task.resume()
         }
     }
-    
-    
-    
     
     func createHttpBody(binaryData: Data, boundary: String, parameters: [String: String]?) -> Data {
         var postContent = "--\(boundary)\r\n"
@@ -375,8 +367,82 @@ class GCoresTalk: ObservableObject{
         return data
     }
     
+    func loadTalk(status: ViewStatus, talkId: String) {
+        let url = URL(string: "https://www.gcores.com/gapi/v1/talks/\(talkId)/?include=user%2Ctopic%2Cradios%2Cvideos%2Cgames%2Carticles")!
+        let request = gcoresRequest(url: url, httpMethod: "GET")
+        session.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                status.requestState = .failed
+                return
+            }
+            guard let data = data else{ return }
+            let talk = try! JSONDecoder().decode(GCoresTalkResponse.self, from: data)
+            self.mainQueue.async {
+                status.targetTalk = talk.formalize()
+            }
+        }.resume()
+    }
     
-    func readTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
+    func checkUnreadTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint) {
+        var url: URL
+        switch endponit {
+        case .recommend:
+            url = URL(
+                string: [
+                    "https://www.gcores.com/gapi/v1/topics/recommend?",
+                    "talk-include=user%2Ctopic%2Cradios%2Cvideos%2Cgames%2Carticles",
+                    "&order-by=time&limit%5D=40&from-app=1"
+                ].reduce("", +)
+            )!
+        case .topic:
+            let topicId = status.topic!.id
+            url = URL(
+                string: [
+                    "https://www.gcores.com/gapi/v1/topics/\(topicId)/recommend?",
+                    "talk-include=user%2Ctopic%2Cradios%2Cvideos%2Cgames%2Carticles",
+                    "&original-include=user%2Cdjs%2Ccategory&order-by=time&from-app=1"
+                ].reduce("", +)
+            )!
+        case .followee:
+            url = URL(string: "https://www.gcores.com/gapi/v1/topics/recommend?talk-include=user%2Ctopic%2Cradios%2Cvideos%2Cgames%2Carticles&order-by=followee&from-app=1")!
+        case .user:
+            let userId = status.userId!
+            url = URL(string: "https://www.gcores.com/gapi/v1/users/\(userId)/talks?include=topic,user,radios,videos,articles,games&sort=-created-at&page%5Blimit%5D=40&page%5Boffset%5D=0&from-app=1")!
+        }
+        let request = gcoresRequest(url: url, httpMethod: "GET")
+        
+        let task = session.dataTask(with: request) { data, response, error in
+            self.mainQueue.async {
+                if let errMessage = self.checkResponse(data, response, error) {
+                    print(errMessage)
+                    return
+                }
+                if let data = data {
+                    let resp = try! JSONDecoder().decode(GCoresTalksResponse.self, from: data)
+                    let talks = resp.formalize()
+                    if !talks.isEmpty && (status.talks.isEmpty || status.talks[0] != (talks[0])) {
+                        status.unreadCount = 1
+                    } else {
+                        status.unreadCount = 0
+                    }
+                    self.syncUnreadWith(status: status)
+                }
+            }
+        }
+        task.resume()    
+    }
+    
+    func syncUnreadWith(status: ViewStatus) {
+        let index = self.talkScenes.firstIndex(where: {$0.sceneType == status.sceneType})
+        if status.unreadCount > 0 {
+            self.talkScenes[index!].unread = true
+        } else {
+            self.talkScenes[index!].unread = false
+        }
+    }
+
+    func loadTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
         if earlier {
             status.loadingEarlier = .loading
         } else {
@@ -415,25 +481,28 @@ class GCoresTalk: ObservableObject{
             let userId = status.userId!
             url = URL(string: "https://www.gcores.com/gapi/v1/users/\(userId)/talks?include=topic,user,radios,videos,articles,games&sort=-created-at&page%5Blimit%5D=40&page%5Boffset%5D=\(pageOffset)&from-app=1")!
         }
-        print(url)
         let request = gcoresRequest(url: url, httpMethod: "GET")
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                // the status is still alive
-                //                guard self.statusForScene[status.sceneType]!.contains(where: {$0.id == status.id}) else { return }
                 if earlier {
+                    if status.talks.isEmpty {
+                        status.unreadCount = 0
+                        self.syncUnreadWith(status: status)
+                    }
                     status.loadingEarlier = .loaded
                 } else {
                     status.loadingEarlier = .loaded
                     status.loadingLatest = .loaded
+                    status.unreadCount = 0
+                    self.syncUnreadWith(status: status)
                 }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print(errMessage)
                     return
                 }
                 if let data = data {
-                    let resp = try! JSONDecoder().decode(GCcoresTalkResponse.self, from: data)
+                    let resp = try! JSONDecoder().decode(GCoresTalksResponse.self, from: data)
                     let talks = resp.formalize()
                     if talks.isEmpty {
                         if earlier {
@@ -441,15 +510,18 @@ class GCoresTalk: ObservableObject{
                         } else {
                             status.loadingLatest = .empty
                         }
+                    } else if earlier {
+                        status.talks += talks
+                    } else {
+                        status.talks = talks
                     }
-                    status.talks += talks
                 }
             }
         }
         task.resume()
     }
     
-    func readTopics(status: ViewStatus, categoryId: String, append: Bool = false) {
+    func loadTopics(status: ViewStatus, categoryId: String, append: Bool = false) {
         status.requestState = .sending
         if !append { status.selectedTopics.removeAll() }
         var urlString: String
@@ -470,7 +542,6 @@ class GCoresTalk: ObservableObject{
             ].reduce("", +)
         }
         let url = URL( string: urlString)!
-        print("Reading topics from \(url)")
         var request = gcoresRequest(url: url, httpMethod: "GET")
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         let task = session.dataTask(with: request) { data, response, error in
@@ -482,15 +553,13 @@ class GCoresTalk: ObservableObject{
             guard let data = data else{ return }
             let resp = try! JSONDecoder().decode(GCoresTopicResponse.self, from: data)
             let topics = resp.formalize()
-            print("Got \(topics.count) topics")
             self.mainQueue.async {
                 status.selectedTopics += topics
-                print("update \(status.selectedTopics.count) topics")
                 status.requestState = .succeed
                 status.objectWillChange.send()
                 if let recordCount = resp.meta.recordCount, status.selectedTopics.count < recordCount {
                     // There are more tags
-                    self.readTopics(status: status, categoryId: categoryId, append: true)
+                    self.loadTopics(status: status, categoryId: categoryId, append: true)
                 }
                 
             }
@@ -498,8 +567,7 @@ class GCoresTalk: ObservableObject{
         task.resume()
     }
     
-    
-    func readTopicsCategories(status: ViewStatus) {
+    func loadTopicsCategories(status: ViewStatus) {
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/categories?",
@@ -526,14 +594,14 @@ class GCoresTalk: ObservableObject{
                 status.topicCategories += categories
                 if let recordCount = resp.meta.recordCount, status.topicCategories.count < recordCount {
                     // There are more categories
-                    self.readTopicsCategories(status: status)
+                    self.loadTopicsCategories(status: status)
                 }
             }
         }
         task.resume()
     }
     
-    func readReplies(commentId: String, status: ViewStatus) {
+    func loadReplies(commentId: String, status: ViewStatus) {
         
         let url = URL(
             string: "https://www.gcores.com/gapi/v1/comments/\(commentId)?include=commentable%2Cuser%2Cparent.user%2Cdescendants.user%2Cdescendants.parent&from-app=1"
@@ -542,7 +610,6 @@ class GCoresTalk: ObservableObject{
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
                 status.loadingEarlier = .loaded
                 if let errMessage = self.checkResponse(data, response, error) {
                     print("Failed to read replies!")
@@ -551,27 +618,34 @@ class GCoresTalk: ObservableObject{
                 }
                 guard let data = data else{ return }
                 
-                let resp = try! JSONDecoder().decode(GCcoresTalkReplyResponse.self, from: data)
+                let resp = try! JSONDecoder().decode(GCoresTalkReplyResponse.self, from: data)
                 let respCards = resp.formalize()
                 let comment = respCards[0][0]
                 let replies = respCards[1]
 
                 status.loadingEarlier = .empty
+                status.targetRelated = resp.getRelated()
                 status.targetComment = comment
+                let target = resp.target
+                if target.type == .talks {
+                    status.targetTalkId = target.id
+                } else {
+                    status.targetRelated = TalkRelated(id: target.id, type: target.type, title: nil, desc: nil, cover: nil, banner: nil, contentString: nil)
+                }
                 status.replies += replies
             }
         }
         task.resume()
     }
     
-    func readComments(talkId: String, status: ViewStatus, earlier: Bool) {
+    func loadComments(talkId: String, status: ViewStatus, earlier: Bool) {
         let pageOffset = status.comments.count
         if earlier { status.loadingEarlier = .loading } else { status.loadingLatest = .loading }
         
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/talks/\(talkId)/comments?",
-                "include=user%2Cparent.user%2Coldest-descendants.user%2Coldest-descendants.parent&sort=-created-at",
+                "include=commentable%2cuser%2Cparent.user%2Coldest-descendants.user%2Coldest-descendants.parent&sort=-created-at",
                 "&page%5Boffset%5D=\(pageOffset)&page%5Blimit%5D=20&from-app=1"].reduce("", +)
         )!
         let request = gcoresRequest(url: url, httpMethod: "GET", body: nil)
@@ -585,7 +659,7 @@ class GCoresTalk: ObservableObject{
                 }
                 guard let data = data else{ return }
                 
-                let resp = try! JSONDecoder().decode(GCcoresTalkCommentResponse.self, from: data)
+                let resp = try! JSONDecoder().decode(GCoresTalkCommentResponse.self, from: data)
                 let respCards = resp.formalize()
                 let comments = respCards[0]
                 let replies = respCards[1]
@@ -608,11 +682,7 @@ class GCoresTalk: ObservableObject{
     }
     
     
-    func readFollowship(status: ViewStatus, earlier: Bool) {
-        //        let sceneType = _status.sceneType
-        //        guard let idx = indexOf(status: _status) else {
-        //            return
-        //        }
+    func loadFollowship(status: ViewStatus, earlier: Bool) {
         guard let userId = status.userId else { return }
         if earlier { status.loadingEarlier = .loading } else { status.loadingLatest = .loading }
         
@@ -636,8 +706,6 @@ class GCoresTalk: ObservableObject{
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                // The status can be alreaded popped out
-                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else { return }
                 if earlier { status.loadingEarlier = .loaded } else { status.loadingLatest = .loaded }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print("Failed to read users of \(status.statusType)!")
@@ -667,15 +735,13 @@ class GCoresTalk: ObservableObject{
                         status.followees = users
                     }
                 }
-                
-                //                self.publisherTrigger = "Read users!"
             }
         }
         task.resume()
     }
     
     
-    func readUserInfo(userId: String, status: ViewStatus?) {
+    func loadUserInfo(userId: String, status: ViewStatus?) {
         let url = URL(
             string: [
                 "https://www.gcores.com/gapi/v1/users/\(userId)?",
@@ -723,19 +789,14 @@ class GCoresTalk: ObservableObject{
     }
     
     
-    
-    
     // MARK: Intends
     func cancelVote(targetId: String, targetType: VoteTargetType, voteId: String, status: ViewStatus) {
-        //        let sceneType = status.sceneType
-        //        let idx = indexOf(status: status)!
         status.updateVotes(targetId: targetId, targetType: targetType, isVoting: true)
         objectWillChange.send()
         let url = URL(string: "https://www.gcores.com/gapi/v1/votes/\(voteId)?from-app=1")!
         let request = gcoresRequest(url: url, httpMethod: "DELETE")
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                //                guard let _ = self.readStatusOf(sceneType: status.sceneType, of: status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to vote to \(targetType)(\(targetId))!")
                     print(errorMessage)
@@ -810,7 +871,6 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "POST", body: voteData)
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to vote to \(targetType)(\(targetId))!")
                     print(errorMessage)
@@ -838,12 +898,8 @@ class GCoresTalk: ObservableObject{
     }
     
     func sendComment(talkId: String, commentId: String?, status: ViewStatus, comment: String) {
-        //        let sceneType = _status.sceneType
-        //        guard let idx = indexOf(status: _status) else { return }
         let userId = loginInfo.userId
-        //        NSWindowRequestStates[uuid] = .sending
         status.requestLatest = .sending
-        //        self.statusForScene[sceneType]![idx].sendState = .sending
         var data: [String: String]? = nil
         if let commentId = commentId {
             data = [
@@ -884,23 +940,19 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "POST", body: commentData)
         URLSession.shared.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                //                guard let _ = self.readStatusOf(sceneType: _status.sceneType, of: _status.id) else {return}
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to comment to \(talkId)-(\(String(describing: commentId)))!")
                     print(errorMessage)
-                    //                    self.NSWindowRequestStates[uuid] = .failed
                     status.requestLatest = .failed
                     return
                 }
                 
                 guard let res = response as? HTTPURLResponse, res.statusCode == 201, let data = data else {
-                    //                    self.NSWindowRequestStates[uuid] = .failed
                     status.requestLatest = .failed
                     return
                 }
                 let commentRes = try! JSONDecoder().decode(NewCommentResponse.self, from: data)
                 let comment = commentRes.formalize()
-                //                let comment = testComment
                 // Got response from the server about the sent comment
                 // Insert the comment to the list maintained by current status
                 // * For talkTimeLine status:
@@ -966,8 +1018,6 @@ class GCoresTalk: ObservableObject{
                 "username": userName
             ]
         ]
-        
-        
         let loginData = try? JSONSerialization.data(withJSONObject: parameters)
         
         let url = URL(string: "https://www.gcores.com/gapi/v1/tokens/refresh?from-app=1")!
@@ -994,7 +1044,7 @@ class GCoresTalk: ObservableObject{
                     self.loginInfo.userId = userId
                     self.loginInfo.cookie = cookie
                     
-                    self.readUserInfo(userId: userId, status: self.statusForScene[.profile]?.first)
+                    self.loadUserInfo(userId: userId, status: self.statusForScene[.profile]?.first)
                     
                     let loginData = ["userId": userId, "token": token, "cookie": cookie]
                     self.uds.set(loginData, forKey: "loginInfo")
@@ -1018,10 +1068,8 @@ class GCoresTalk: ObservableObject{
             _ = statusForScene[selectedTalkSceneType]!.popLast()
         }
     }
-    
-    //    func readRelated(_status: ViewStatus, )
-    
-    func readTimeline(status: ViewStatus, earlier: Bool, userId: String? = nil) {
+        
+    func loadTimeline(status: ViewStatus, earlier: Bool) {
         var endpoint: TimelineEndPoint
         switch status.statusType {
         case .followeeTimeline:
@@ -1036,22 +1084,160 @@ class GCoresTalk: ObservableObject{
             endpoint = .recommend
             break
         }
-        readTalks(status: status, endpoint: endpoint, earlier: earlier)
-        
+        loadTalks(status: status, endpoint: endpoint, earlier: earlier)
     }
     
     
     func select(sidebarItem: TalkScene) {
         selectedTalkSceneType = sidebarItem.sceneType
-        print(selectedTalkSceneType)
+        let index = talkScenes.firstIndex(of: sidebarItem)
+        talkScenes[index!].selected = true
+    }
+    func markNotificationsAsSeen(status: ViewStatus) {
+        let urlStr = "https://www.gcores.com/gapi/v1/users/17551/notification-feeds/mark-seen?from-app=1"
+        let request = gcoresRequest(url: URL(string: urlStr)!, httpMethod: "POST")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print("Failed to check unread notifications:")
+                print(errMessage)
+                return
+            }
+            status.unreadCount = 0
+
+        }.resume()
+    }
+    func checkUnreadNotifications(status: ViewStatus) {
+        let urlStr = [
+            "https://www.gcores.com/gapi/v1/users/\(loginInfo.userId!)/notification-feeds?",
+            "include=lead-actors%2Clead-objects%2Ctarget&page%5Boffset%5D=0&page%5Blimit%5D=2&fields",
+            "%5Barticles%5D=category%2Cuser%2Cdjs%2Ccollections%2Cpublished-collections",
+            "%2Ccomments%2Cdjs%2Centities%2Centries%2Clatest-collection%2Cmedia",
+            "%2Csimilarities%2Cskus%2Ctags%2Capp-cover%2Cbookmarks-count%2Ccomments-count",
+            "%2Ccover%2Cdesc%2Cduration%2Cpublished-at%2Cis-comment-hidden",
+            "%2Cis-published%2Cis-verified%2Cis-free%2Clikes-count%2Coption-is-focus-showcase",
+            "%2Coption-is-official%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path",
+            "%2Chas-giveaway&fields%5Bradios%5D=albums%2Ccategory%2Cuser%2Cdjs",
+            "%2Cpublished-albums%2Ccollections%2Ccomments%2Cdjs%2Centities%2Centries",
+            "%2Clatest-collection%2Cmedia%2Csimilarities%2Cskus%2Ctags%2Capp-cover",
+            "%2Cbookmarks-count%2Ccomments-count%2Ccover%2Cdesc%2Cduration",
+            "%2Cpublished-at%2Cis-comment-hidden%2Cis-published%2Cis-verified",
+            "%2Cis-free%2Clikes-count%2Ctimelines-images-url%2Coption-is-focus-showcase",
+            "%2Coption-is-official%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path",
+            "%2Chas-giveaway&fields%5Bvideos%5D=category%2Cuser%2Cdjs%2Ccollections",
+            "%2Cpublished-collections%2Ccomments%2Cdjs%2Centities%2Centries",
+            "%2Clatest-collection%2Cmedia%2Csimilarities%2Cskus%2Ctags%2Capp-cover",
+            "%2Cbookmarks-count%2Ccomments-count%2Ccover%2Cdesc%2Cduration",
+            "%2Cpublished-at%2Cis-comment-hidden%2Cis-published%2Cis-verified",
+            "%2Cis-free%2Clikes-count%2Coption-is-focus-showcase%2Coption-is-official",
+            "%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path%2Chas-giveaway&from-app=1"
+        ].joined(separator: "")
+        let request = gcoresRequest(url: URL(string: urlStr)!, httpMethod: "GET")
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print("Failed to check unread notifications:")
+                print(errMessage)
+                return
+            }
+            if let data = data {
+                let resp = try! JSONDecoder().decode(GCoresNotificationResponse.self, from: data)
+                let notifications = resp.formalize()
+                self.mainQueue.async {
+                    if notifications.isEmpty || !notifications[0].unRead {
+                        status.unreadCount = 0
+                        print("All notifications are read!")
+                    } else {
+                        status.unreadCount = 1
+                        print("Found unread notifications!")
+                    }
+                    let index = self.talkScenes.firstIndex(where: {$0.sceneType == status.sceneType})
+                    if status.unreadCount > 0 {
+                        self.talkScenes[index!].unread = true
+                    } else {
+                        self.talkScenes[index!].unread = false
+                    }
+                }
+            }
+        }.resume()
+        
     }
     
-    //    func select(topicCategory: TalkTopicCategory, ) {
-    //        selectedTopicCategory = topicCategory
-    //    }
-    
+    func loadNotifications(status: ViewStatus, earlier: Bool) {
+        var pageOffset = 0
+        if earlier {
+            self.mainQueue.async {
+                status.requestLatest = .succeed
+                status.requestEarlier = .sending
+            }
+            pageOffset = status.notifications.count
+        } else {
+            self.mainQueue.async {
+                status.requestEarlier = .succeed
+                status.requestLatest = .sending
+            }
+        }
+        
+        let urlStr = [
+            "https://www.gcores.com/gapi/v1/users/\(loginInfo.userId!)/notification-feeds?",
+            "include=lead-actors%2Clead-objects%2Ctarget&page%5Boffset%5D=\(pageOffset)&page%5Blimit%5D=20&fields",
+            "%5Barticles%5D=category%2Cuser%2Cdjs%2Ccollections%2Cpublished-collections",
+            "%2Ccomments%2Cdjs%2Centities%2Centries%2Clatest-collection%2Cmedia",
+            "%2Csimilarities%2Cskus%2Ctags%2Capp-cover%2Cbookmarks-count%2Ccomments-count",
+            "%2Ccover%2Cdesc%2Cduration%2Cpublished-at%2Cis-comment-hidden",
+            "%2Cis-published%2Cis-verified%2Cis-free%2Clikes-count%2Coption-is-focus-showcase",
+            "%2Coption-is-official%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path",
+            "%2Chas-giveaway&fields%5Bradios%5D=albums%2Ccategory%2Cuser%2Cdjs",
+            "%2Cpublished-albums%2Ccollections%2Ccomments%2Cdjs%2Centities%2Centries",
+            "%2Clatest-collection%2Cmedia%2Csimilarities%2Cskus%2Ctags%2Capp-cover",
+            "%2Cbookmarks-count%2Ccomments-count%2Ccover%2Cdesc%2Cduration",
+            "%2Cpublished-at%2Cis-comment-hidden%2Cis-published%2Cis-verified",
+            "%2Cis-free%2Clikes-count%2Ctimelines-images-url%2Coption-is-focus-showcase",
+            "%2Coption-is-official%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path",
+            "%2Chas-giveaway&fields%5Bvideos%5D=category%2Cuser%2Cdjs%2Ccollections",
+            "%2Cpublished-collections%2Ccomments%2Cdjs%2Centities%2Centries",
+            "%2Clatest-collection%2Cmedia%2Csimilarities%2Cskus%2Ctags%2Capp-cover",
+            "%2Cbookmarks-count%2Ccomments-count%2Ccover%2Cdesc%2Cduration",
+            "%2Cpublished-at%2Cis-comment-hidden%2Cis-published%2Cis-verified",
+            "%2Cis-free%2Clikes-count%2Coption-is-focus-showcase%2Coption-is-official",
+            "%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path%2Chas-giveaway&from-app=1"
+        ].joined(separator: "")
+
+        let request = gcoresRequest(url: URL(string: urlStr)!, httpMethod: "GET")
+        
+        let task = session.dataTask(with: request) { data, response, error in
+            self.mainQueue.async {
+                if let errMessage = self.checkResponse(data, response, error) {
+                    print("Failed to load notificatons:")
+                    print(errMessage)
+                    return
+                }
+                if let data = data {
+                    let resp = try! JSONDecoder().decode(GCoresNotificationResponse.self, from: data)
+                    let notifications = resp.formalize()
+                    print("Got \(notifications.count) notifications!")
+                    if notifications.isEmpty {
+                        if earlier {
+                            status.requestEarlier = .empty
+                        } else {
+                            status.requestLatest = .empty
+                        }
+                    } else {
+                        status.newNotifications(notifications, earlier: earlier)
+                        if earlier {
+                            status.requestEarlier = .succeed
+                        } else {
+                            status.unreadCount = 1
+                            self.markNotificationsAsSeen(status: status)
+                            status.requestLatest = .succeed
+                        }
+                        self.syncUnreadWith(status: status)
+                    }
+                }
+            }
+        }
+        task.resume()
+    }
+
     func search(status: ViewStatus, endponit: GCoresRelatedType, query: String, earlier: Bool, recommend: Bool) {
-        //        guard NSWindowStatus[searchId] != nil else { return }
         if query == "" && !recommend {
             return
         }
@@ -1100,15 +1286,12 @@ class GCoresTalk: ObservableObject{
                 "query=\(query)&type=\(endponit)&order-by=score&page[offset]=\(pageOffset)&page[limit]=20&from-app=1"
             ].reduce("", +).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         }
-        print(urlStr)
         let url = URL( string: urlStr )!
         
         let request = gcoresRequest(url: url, httpMethod: "GET")
         
         let task = session.dataTask(with: request) { data, response, error in
             self.mainQueue.async {
-                // the status is still alive
-                //                guard self.NSWindowStatus[searchId] != nil else { return }
                 if let errMessage = self.checkResponse(data, response, error) {
                     print(errMessage)
                     return
@@ -1124,8 +1307,6 @@ class GCoresTalk: ObservableObject{
                         }
                         return
                     }
-                    
-                    
                     if let newLast = searchResults.last, let oldLast = status.searchResults.last, newLast == oldLast {
                         if earlier {
                             status.requestEarlier = .succeed
@@ -1144,7 +1325,6 @@ class GCoresTalk: ObservableObject{
                     } else {
                         status.requestLatest = .succeed
                     }
-                    //                    print("count: \(count)")
                 }
             }
         }

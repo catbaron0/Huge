@@ -36,11 +36,13 @@ struct RelatedCardView: View {
             }
             VStack(alignment: .leading) {
                 // Title
-                Text(related.title!).font(.title3.bold()).lineLimit(2)
-//                Spacer()
+                HStack{
+                    Text(related.title!).font(.title3.bold()).frame(alignment:.leading).lineLimit(2).multilineTextAlignment(.leading)
+                }
+                
                 // Desc if exists
                 if let desc = related.desc {
-                    Text(desc).lineLimit(2).font(.body.italic())
+                    Text(desc).lineLimit(2).font(.body.italic()).multilineTextAlignment(.leading)
                 }
                 Spacer()
             }
@@ -102,7 +104,6 @@ struct SearchRersultsView: View {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        print("More offset! \(proxy.size.height - scrollerOffset.y)")
                                         gtalk.search(status: status, endponit: searchType, query: query , earlier: true, recommend: !searchMode)
                                     }
                             }

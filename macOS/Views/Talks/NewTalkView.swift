@@ -248,7 +248,7 @@ struct NewTalkView: View {
                             VStack{
                                 Spacer()
                                 ProgressView()
-                                    .onAppear { gtalk.readTopicsCategories(status: status)}
+                                    .onAppear { gtalk.loadTopicsCategories(status: status)}
                                 Spacer()
                             }
                         } else {

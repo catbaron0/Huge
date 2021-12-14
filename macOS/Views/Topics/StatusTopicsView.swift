@@ -53,7 +53,7 @@ struct TopicCategoriesView: View {
 //                            gtalk.select(topicCategory: category)
                             status.selectedTopicCategory = category
                             withAnimation {
-                                gtalk.readTopics(status: status, categoryId: category.id)
+                                gtalk.loadTopics(status: status, categoryId: category.id)
                             }
                         }
                 }
@@ -92,10 +92,7 @@ struct TopicsView: View {
                         .onTapGesture {
                             related = TalkRelated(id: topic.id, type: .topics, title: topic.title, desc: nil, cover: nil, banner: nil, contentString: nil)
                             if newStatus {
-                                gtalk.addStatusToCurrentScene(
-                                    after: status, statusType: .topicTimeline, title: topic.title!,
-                                    icon: "tag.fill", targetTalk: nil, topic: topic
-                                )
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", topic: topic)
                             }
                         }
                 }
@@ -148,7 +145,7 @@ struct StatusTopicsView: View {
                         .font(.body.bold())
                 }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
             }
-            .padding()
+            .padding([.leading, .trailing, .top])
 
             if searchMode {
                 // Activated by focus in the search input box
@@ -159,25 +156,10 @@ struct StatusTopicsView: View {
                         if let result = searchResult, result.type == .topics {
                             // Create a new TopicTimeline status
                             let topic = TalkRelated(id: result.id, type: .topics, title: result.title, desc: result.desc, cover: result.cover, banner: nil,contentString: nil)
-                            gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", targetTalk: nil, topic: topic)
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", topic: topic)
                         }
 
                     }
-
-//                if status.loadingLatest == .loading {
-//                    ProgressView()
-//                } else {
-//                    // A view to display search results
-//                    SearchRersultsView(searchId: uuid, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchType: .topics)
-//                        .onChange(of: triggerSensor) { _ in
-//                            if let result = searchResult, result.type == .topics {
-//                                // Create a new TopicTimeline status
-//                                let topic = TalkRelated(id: result.id, type: .topics, title: result.title, desc: result.desc, cover: result.cover, banner: nil,contentString: nil)
-//                                gtalk.addStatusToCurrentScene(after: _status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", targetTalk: nil, topic: topic)
-//                            }
-//
-//                        }
-//                }
             }
 
             if !searchMode {
@@ -185,7 +167,7 @@ struct StatusTopicsView: View {
                     VStack{
                         Spacer()
                         ProgressView()
-                            .onAppear { gtalk.readTopicsCategories(status: status)}
+                            .onAppear { gtalk.loadTopicsCategories(status: status)}
                         Spacer()
                     }
                 } else {

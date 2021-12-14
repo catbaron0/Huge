@@ -48,10 +48,8 @@ class ImageReader: ObservableObject {
             }
         }
         
-        print("I'm fetching from \(url!)")
         guard let url = url, let fetchURL = URL(string: url) else {
             // TODO: ivalid url
-            print("Failed to process the url!")
             return
         }
         let request = URLRequest(url: fetchURL, cachePolicy: .returnCacheDataElseLoad)

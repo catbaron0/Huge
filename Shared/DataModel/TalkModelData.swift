@@ -76,21 +76,94 @@ struct SearchStatus {
     var requestLatest: RequestState = .succeed
 }
 
+enum NotificationType: String, Codable {
+    case comment
+    case like
+    case reply
+}
+
+struct Notification: Identifiable, Equatable {
+    let id: String
+    let type: NotificationType
+    let object: [TalkRelated]
+    let target: TalkRelated?
+    var actors: [TalkUser]
+    var unRead: Bool
+    static func == (lhs: Notification, rhs: Notification) -> Bool {
+        lhs.id == rhs.id && lhs.type == rhs.type
+    }
+    
+    var url: String? {
+        if object[0].type == .games || object[0].type == .articles || object[0].type == .radios || object[0].type == .videos {
+            return GCORES_HOST + "\(object[0].type)/\(object[0])"
+        }
+        return nil
+    }
+    
+    var actorNames: String {
+        if actors.count > 1 {
+            return actors[0].nickname + " 等人"
+        } else {
+            return actors[0].nickname
+        }
+    }
+    
+    var verb: String {
+        switch type {
+        case .comment, .reply:
+            return "回复了"
+        case .like:
+            return "喜欢了"
+        }
+    }
+    
+    var objectStr: String {
+        let objType = object[0].type
+        switch objType {
+        case .videos:
+            return "你发布的视频: " + object[0].title!
+        case .radios:
+            return "你参与的电台: " + object[0].title!
+        case .articles:
+            return "你发布的文章: " + object[0].title!
+        case .talks:
+            return "你的动态: " + object[0].contentString!
+        case .comments:
+            if let target = target {
+                switch target.type {
+                case .talks:
+                    return "你的动态: " + object[0].contentString!
+                case .comments:
+                    return "你的评论: " + object[0].contentString!
+                default:
+                    return "你发布的内容"
+                }
+            }
+            return "你的评论: " + object[0].contentString!
+        default:
+            return "你发布的内容"
+        }
+    }
+    var desc: String {
+        actorNames + verb + objectStr
+    }
+}
+
 // MARK: Status of the talk model to decide data and views to display
 class ViewStatus: Identifiable, Equatable, ObservableObject {
     static func == (lhs: ViewStatus, rhs: ViewStatus) -> Bool {
         lhs.id == rhs.id
     }
     
-    init(id: String, sceneType: TalkSceneType, statusType: TalkStatusType, title: String, icon: String, userId: String? = nil) {
+    init(id: String, sceneType: TalkSceneType, statusType: TalkStatusType, title: String, icon: String) {
         self.id = id
         self.statusType = statusType
         self.title = title
         self.icon = icon
-        self.userId = userId
+//        self.userId = userId
         self.sceneType = sceneType
-//        self.searchId = searchId
     }
+    
     // Common properties
     let id: String
     let sceneType: TalkSceneType
@@ -99,12 +172,10 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     var icon: String
     @Published var loadingLatest: LoadingStatus = .loaded
     @Published var loadingEarlier: LoadingStatus = .loaded
-    @Published var requestState: RequestState? = nil
+    @Published var requestState: RequestState?
     @Published var searchSuggestion = [String]()
-    //["suggestion1", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2", "suggestion2"]
-//    var searchResults = [TalkRelated]()
-//    var sendState: SendState? = nil
-    
+    @Published var unreadCount = 0
+
     // For Timeline
     @Published var talks = [TalkCard]()
     @Published var topic: TalkRelated?
@@ -112,37 +183,87 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     //    var selectedCard: TalkCard?
     
     // For Comments
+    var targetTalkId: String?
     @Published var comments = [TalkCommentCard]()
+    @Published var targetRelated: TalkRelated?
     @Published var targetTalk: TalkCard?
     
     // For replies
+    var targetCommentId: String?
     @Published var targetComment: TalkCommentCard?
     @Published var replies = [TalkCommentCard]()
     // For profile
-    let userId: String?
+    var userId: String?
     @Published var user: TalkUser?
     @Published var followers = [TalkUser]()
     @Published var followees = [TalkUser]()
     
     // For Topic
-    @Published var selectedTopicCategory: TalkTopicCategory? = nil
+    @Published var selectedTopicCategory: TalkTopicCategory?
     @Published var topicCategories = [TalkTopicCategory]()
     @Published var selectedTopics = [TalkRelated]()
+
     // For search
-//    let searchId: String?
     @Published var searchResults = [TalkRelated]()
     @Published var requestEarlier: RequestState = .succeed
     @Published var requestLatest: RequestState = .succeed
+    
+    // For notifications
+    @Published var notifications = [Notification]()
+    
+    
+    func readAllNotifications() {
+        unreadCount = 0
+        for i in 0..<notifications.count {
+            notifications[i].unRead = false
+        }
+    }
+    
+    func newNotifications(_ newNotifications: [Notification], earlier: Bool) {
+        if earlier {
+            newNotifications.forEach { notification in
+                if !notification.object.isEmpty && !(self.notifications.contains(where: {$0 == notification})) {
+                    self.notifications.append(notification)
+                }
+            }
+            return
+        }
+//        // sync the unread notifications
+//        if let latest = notifications.first, latest.unRead == false {
+//            // all the notifications are read
+//            readAllNotifications()
+//        }
+        // The latest is loaded
+        notifications = newNotifications
+//        var _notifications = newNotifications
+//        while !_notifications.isEmpty {
+//            let notif = _notifications.popLast()!
+//            if notif.object.isEmpty {
+//                continue
+//            }
+//            if !(self.notifications.contains {$0 == notif}) {
+//                self.notifications.insert(notif, at: 0)
+//                if notif.unRead {
+//                    unreadNotificationsCount += 1
+//                }
+//            }
+//        }
+    }
+    
+    func readNotification(_ notification: Notification) {
+        if let index = notifications.firstIndex(of: notification) {
+            if notifications[index].unRead {
+                unreadCount -= 1
+            }
+            notifications[index].unRead = false
+        }
+    }
     
     func updateVotes(targetId: String, targetType: VoteTargetType, isVoting: Bool) {
         switch targetType {
         case .comments:
             if let idx = comments.firstIndex(where: {$0.id == targetId}) {
-                print("idx: \(idx)")
-                print("\(String(describing: comments[idx].isVoting))")
                 comments[idx].isVoting = isVoting
-                print("\(String(describing: comments[idx].isVoting))")
-                print("I'm changed!")
             }
             if let idx = replies.firstIndex(where: {$0.id == targetId}) {
                 replies[idx].isVoting = isVoting
@@ -252,6 +373,7 @@ enum TalkStatusType {
     case profile
     case followers
     case followees
+    case notification
 }
 
 
@@ -268,16 +390,28 @@ enum TalkSceneType: String, CaseIterable {
     case topics
     case profile
     case newWindow
+    case notification
 }
 
 struct TalkScene: Identifiable, Equatable {
     let sceneType: TalkSceneType
     let label: String
-    let selectedIcon: String
-    let unselectedIcon: String
+    var selectedIcon: String
+    var unselectedIcon: String
+    var selectedBadgeIcon: String
+    var unselectedBadgeIcon: String
+    var unread: Bool = false
+    var selected: Bool = false
     
     var id: TalkSceneType {
         return sceneType
+    }
+    var icon: String {
+        if selected {
+            return unread ? selectedBadgeIcon : selectedIcon
+        } else {
+            return unread ? unselectedBadgeIcon : unselectedIcon
+        }
     }
 }
 

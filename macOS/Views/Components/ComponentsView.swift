@@ -123,8 +123,6 @@ struct NaviSideBarView: View {
     
     var body: some View {
         VStack{
-            //            NewTalkButtonView()
-            
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .center) {
                     HStack {
@@ -134,14 +132,12 @@ struct NaviSideBarView: View {
                             } placeholder: {
                                 ProgressView()
                             }
-                            //                            ImageReaderView(url: src, width: 60, height: 60)
                         } else {
                             AsyncImage(url: URL(string: GCORES_DEFAULT_PROFILE_URL)!) { image in
                                 image.resizable().scaledToFit()
                             } placeholder: {
                                 ProgressView()
                             }
-                            //                            ImageReaderView(url: GCORES_DEFAULT_PROFILE_URL, width: 60, height: 60)
                         }
                     }
                     .frame(width:50, height: 50)
@@ -166,15 +162,38 @@ struct SidebarItemView: View {
         HStack {
             Label(
                 "Timeline",
-                systemImage: gtalk.isSelected(sidebarItem: sidebarItem) ? sidebarItem.selectedIcon: sidebarItem.unselectedIcon
+//                systemImage: gtalk.isSelected(sidebarItem: sidebarItem) ? sidebarItem.selectedIcon: sidebarItem.unselectedIcon
+                systemImage:sidebarItem.icon
             )
                 .labelStyle(.iconOnly)
                 .foregroundColor(gtalk.isSelected(sidebarItem: sidebarItem) ? .red : .white)
                 .font(.largeTitle)
                 .frame(width: 70, height: 45)
         }
+        .contentShape(Rectangle())
         .onTapGesture {
-            gtalk.select(sidebarItem: sidebarItem)
+            if sidebarItem.sceneType == gtalk.selectedTalkSceneType {
+                while gtalk.statusForScene[sidebarItem.sceneType]!.count > 1 {
+                    gtalk.back()
+                }
+                let status = gtalk.statusForScene[sidebarItem.sceneType]![0]
+                switch status.statusType {
+                case .notification:
+                    gtalk.loadNotifications(status: status, earlier: false)
+                    // send mark-seen
+                    gtalk.markNotificationsAsSeen(status: status)
+                case .followeeTimeline, .recommendTimeline, .topicTimeline, .userTimeline:
+                    gtalk.loadTimeline(status: status, earlier: false)
+                case .topics:
+                    gtalk.loadTopicsCategories(status: status)
+                default:
+                    break
+                }
+                
+            } else {
+                gtalk.select(sidebarItem: sidebarItem)
+            }
+            
         }
     }
 }

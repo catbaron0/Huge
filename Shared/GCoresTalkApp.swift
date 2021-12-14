@@ -18,7 +18,7 @@ struct GCoresTalkApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext).environmentObject(gtalk)
         }.windowStyle(HiddenTitleBarWindowStyle())
             .commands {
-                CommandMenu("First menu") {
+                CommandGroup(before: CommandGroupPlacement.newItem) {
                     Button("New Talk") {
                         let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!
                         let newStatus = ViewStatus(id: UUID().uuidString, sceneType: .newWindow, statusType: .newTalk, title: "新 Talk", icon: "pencil.and.outline")
@@ -26,6 +26,5 @@ struct GCoresTalkApp: App {
                     }.keyboardShortcut("N", modifiers: [.command, .shift])
                 }
             }
-        
     }
 }

@@ -30,12 +30,13 @@ struct GCoresTalkCommentData: Decodable {
     struct Relationships: Decodable {
         let user: GCoresIDAndTypeData
         // let root: Any
+        let commentable: GCoresIDAndTypeData
         let parent: GCoresIDAndTypeData
         let descendants: GCoresIDAndTypeDataList?
         let oldestDescendants: GCoresIDAndTypeDataList?
         
         enum CodingKeys: String, CodingKey {
-            case user, parent, descendants
+            case user, parent, descendants, commentable
             case oldestDescendants = "oldest-descendants"
         }
     }
@@ -154,7 +155,7 @@ struct GCoresTalkCommentMeta: Decodable {
     
 }
 
-struct GCcoresTalkCommentResponse: Decodable {
+struct GCoresTalkCommentResponse: Decodable {
     let data: [GCoresTalkCommentData]
     let included: [GCoresTalkCommentIncluded]?
     let meta: GCoresTalkCommentMeta
@@ -259,7 +260,6 @@ struct GCcoresTalkCommentResponse: Decodable {
             images: nil, caption: nil, topics: nil, likesCount: commentData.attributes.likesCount,
             voteFlag: commentData.meta.voteFlag, voteId: commentData.meta.voteId,
             bookMarkId: nil, shareUrl: nil, related: nil)
-
     }
     
     func formalize() -> [[TalkCommentCard]] {
@@ -281,21 +281,10 @@ struct GCcoresTalkCommentResponse: Decodable {
             }
         }
         return [comments, replies]
-//        data.forEach {commentData in
-//            let rootComment = commentFrom(commentData: commentData)
-//            commentCards.append(rootComment)
-//            if !(rootComment.repliesId.isEmpty) {
-//                rootComment.repliesId.forEach { replyId in
-//                    let replyIncluded = included?.first(where:  { $0.id == replyId && $0.type == .comments})
-//                    commentCards.append(commentFrom(commentIncluded: replyIncluded!))
-//                }
-//            }
-//        }
-//        return commentCards
     }
 }
 
-struct GCcoresTalkReplyResponse: Codable {
+struct GCoresTalkReplyResponse: Codable {
     struct Data: Codable {
         struct Attributes: Codable {
             let body: String
@@ -396,6 +385,9 @@ struct GCcoresTalkReplyResponse: Codable {
             let createdAt: String?
             let descendantsCount: Int?
             let nickname: String?
+            let cover: String?
+            let desc: String?
+            let description: String?
             let thumb: String?
             let location: String?
             let isFresh: Bool?
@@ -425,6 +417,9 @@ struct GCcoresTalkReplyResponse: Codable {
                 case createdAt = "created-at"
                 case descendantsCount = "descendants-count"
                 case nickname
+                case cover
+                case desc
+                case description
                 case thumb
                 case location
                 case isFresh = "is-fresh"
@@ -649,7 +644,9 @@ struct GCcoresTalkReplyResponse: Codable {
     }
     let data: Data
     let included: [Included]?
-    
+    var target: Data.Relationships.Commentable.Data {
+        return data.relationships.commentable.data
+    }
     func findTalkUser(with id: String, from included: [Included]) -> TalkUser {
         let data = included.first(where: {$0.id == id && $0.type == .users})!
         let nickname = data.attributes.nickname ?? "nil"
@@ -750,6 +747,33 @@ struct GCcoresTalkReplyResponse: Codable {
             bookMarkId: nil, shareUrl: nil, related: nil)
 
     }
+    
+    func getRelated() -> TalkRelated? {
+        let commentable = data.relationships.commentable.data
+        switch commentable.type {
+        case .articles, .games, .radios, .videos:
+            if let includedData = included?.first(where: { $0.id == commentable.id && $0.type == commentable.type}) {
+                let id = includedData.id
+                let title = includedData.attributes.title
+                let desc = includedData.attributes.desc
+                let description = includedData.attributes.description
+                var cover: String?
+                if let src = includedData.attributes.cover {
+                    cover = GCORES_IMAGE_HOST + src
+                } else if let src = includedData.attributes.thumb {
+                    cover = GCORES_IMAGE_HOST + src
+                } else {
+                    cover = nil
+                }
+                return TalkRelated(id: id, type: includedData.type, title: title, desc: desc ?? description, cover: cover, banner: nil, contentString: nil)
+            } else {
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+
     func formalize() -> [[TalkCommentCard]] {
         var comment: TalkCommentCard
         var replies = [TalkCommentCard]()
@@ -1243,7 +1267,7 @@ struct NewCommentResponse: Codable {
             privateMailsUnreadCount: nil
         )
     }
-    
+
     private func commentFrom(commentData: Data) -> TalkCommentCard {
         
         let userId = commentData.relationships.user.data.id

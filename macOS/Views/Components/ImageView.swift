@@ -75,7 +75,7 @@ struct ImageReaderView: View {
                         Rectangle()
                             .background(.gray)
                             .opacity(0.5)
-                            .frame(maxWidth:200, maxHeight: 300)
+                            .frame(maxWidth:300, maxHeight: 300)
                             .overlay {
                                 ProgressView()
                             }
@@ -99,19 +99,15 @@ struct TalkCardImageView: View {
             .scaledToFit()
             .overlay(alignment: .bottom){
                 if talkImages.count > 1 {
-//                    HStack {
-//                        Spacer()
                     Label("1 of \(talkImages.count)", systemImage: "ellipsis")
                         .font(.title2).labelStyle(.titleOnly).padding(5)
                         .background(Color.gray.opacity(0.8))
                         .foregroundColor(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-//                        Spacer()
-//                    }.background(Color.gray).opacity(0.7)
+                        .padding(.bottom, 5)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
-
             .contentShape(Rectangle())
             .onTapGesture {
                 newWindowForImageSlides(with: talkImages)
@@ -121,14 +117,14 @@ struct TalkCardImageView: View {
 
 struct ImageSlidesView: View {
     let images: [TalkImage]
-    let window: NSWindow?
+//    let window: NSWindow?
     @State private var cur: Int = 0
     @State private var isLoading = true
-    let maxSize = 600
+    let maxSize = 1500
 
     struct ImageView: View {
         let talkImage: TalkImage
-        let window: NSWindow?
+//        let window: NSWindow?
         let maxSize: Int
         @Binding var isLoading: Bool
         var body: some View {
@@ -153,7 +149,6 @@ struct ImageSlidesView: View {
                         frameHeight = maxSize
                         frameWidth = Int(Float(frameHeight) * Float(imgWidth) / Float(imgHeight))
                     }
-//                        window?.setFrame(NSRect(origin: (window?.frame.origin)!, size: CGSize(width: frameWidth, height: frameHeight)), display: true, animate: true)
                 }
             } placeholder: {
                     let imgWidth = talkImage.width
@@ -188,11 +183,12 @@ struct ImageSlidesView: View {
                     if cur > 0 {
                         Rectangle()
                             .opacity(0.001)
-                            .frame(width: proxy.size.width / 2, height: proxy.size.height)
+                            .frame(width: proxy.size.width / 4, height: proxy.size.height)
                             .overlay(alignment: .leading) {
                                 Label("Pre", systemImage: "arrow.left.circle.fill")
                                     .labelStyle(.iconOnly)
                                     .padding(20)
+                                    .foregroundColor(.gray)
                             }
                             .onTapGesture {
                                 cur = cur - 1
@@ -202,27 +198,30 @@ struct ImageSlidesView: View {
                     if cur < imageCount - 1 {
                         Rectangle()
                             .opacity(0.001)
-                            .frame(width: proxy.size.width / 2, height: proxy.size.height)
+                            .frame(width: proxy.size.width / 4, height: proxy.size.height)
                             .overlay(alignment: .trailing) {
                                 Label("Next", systemImage: "arrow.right.circle.fill")
                                     .labelStyle(.iconOnly)
                                     .padding(20)
+                                    .foregroundColor(.gray)
                             }
-                            .offset(x: cur == 0 ? proxy.size.width/2 : 0)
+                            .offset(x: cur == 0 ? proxy.size.width/4*3 : proxy.size.width/2)
                             .onTapGesture {
                                 cur += 1
                                 isLoading = true
                             }
                     }
                 }
-            }.font(.largeTitle)
+            }
+//            .font(.largeTitle)
+            .font(Font.system(size: 36))
         }
     }
 
     var body: some View {
         ForEach(images) { image in
             if let idx = images.firstIndex{$0 == image}, idx == cur {
-                ImageView(talkImage: image, window: window, maxSize: maxSize, isLoading: $isLoading)
+                ImageView(talkImage: image, maxSize: maxSize, isLoading: $isLoading)
                     .overlay {
                         ImageControlView(imageCount: images.count, cur: $cur, isLoading: $isLoading)
                     }

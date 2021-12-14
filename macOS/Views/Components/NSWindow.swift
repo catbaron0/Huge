@@ -18,7 +18,7 @@ func newWindowForImageSlides(with images: [TalkImage])
         backing: .buffered, defer: false)
     winRef.center()
     winRef.isOpaque = false
-    winRef.contentView = NSHostingView(rootView: ImageSlidesView(images: images, window: winRef))
+    winRef.contentView = NSHostingView(rootView: ImageSlidesView(images: images).onTapGesture(count: 2) { NSApplication.shared.keyWindow?.close()})
 //    winRef.setContentSize(view.geo)
     winRef.titlebarAppearsTransparent = true
     winRef.makeKeyAndOrderFront(nil)
