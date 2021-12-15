@@ -121,31 +121,34 @@ struct StatusTopicsView: View {
         let opacity = sendState != nil && sendState! == .sending ? 0.5 : 1.0
         VStack{
             Spacer().frame(height: TimelineTopPadding.titleBar.rawValue + 20)
-            HStack {
-                TextField("话题", text: $query, prompt: Text("搜索话题"))
-                    .onChange(of: query) { text in
-                        if query == "" {
-                            searchMode = false
+            if gtalk.selectedTalkSceneType == status.sceneType {
+                HStack {
+                    TextField("话题", text: $query, prompt: Text("搜索话题"))
+                        .onChange(of: query) { text in
+                            if query == "" {
+                                searchMode = false
+                            }
                         }
-                    }
-                    .font(.title2)
-                    .padding(.bottom, 8)
-                    .onSubmit {
-                        submit()
-                    }
+                        .font(.title2)
+                        .padding(.bottom, 8)
+                        .onSubmit {
+                            submit()
+                        }
 
-                Button {
-                    submit()
-                } label: {
-                    Label("搜索", systemImage: "magnifyingglass")
-                        .padding(5)
-                        .labelStyle(.iconOnly)
-                        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
-                        .foregroundColor(.white)
-                        .font(.body.bold())
-                }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
+                    Button {
+                        submit()
+                    } label: {
+                        Label("搜索", systemImage: "magnifyingglass")
+                            .padding(5)
+                            .labelStyle(.iconOnly)
+                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
+                            .foregroundColor(.white)
+                            .font(.body.bold())
+                    }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
+                }
+                .padding([.leading, .trailing])
             }
-            .padding([.leading, .trailing])
+            
 
             if searchMode {
                 // Activated by focus in the search input box

@@ -125,7 +125,7 @@ struct TalkCardView: View {
 //                ImageSlidesView(images: images)
                 TalkCardImageView(talkImages: images)
 //                    .scaledToFit()
-                    .padding(.leading)
+//                    .padding(.leading)
             }
             VStack{
                 ForEach(card.texts){ text in
@@ -135,7 +135,7 @@ struct TalkCardView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .font(GCoresFont.body)
                 }
-            }
+            }.padding(5)
             
             if let related = card.related {
                 Link(destination: URL(string: related.shareUrl)!) {

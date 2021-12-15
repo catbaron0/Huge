@@ -1106,17 +1106,16 @@ class GCoresTalk: ObservableObject{
     func markNotificationsAsSeen(status: ViewStatus) {
         let urlStr = "https://www.gcores.com/gapi/v1/users/17551/notification-feeds/mark-seen?from-app=1"
         let request = gcoresRequest(url: URL(string: urlStr)!, httpMethod: "POST")
+        self.mainQueue.async {
+            status.unreadCount = 0
+        }
+
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let errMessage = self.checkResponse(data, response, error) {
                 print("Failed to check unread notifications:")
                 print(errMessage)
                 return
             }
-            self.mainQueue.async {
-                
-                status.unreadCount = 0
-            }
-            
         }.resume()
     }
     func checkUnreadNotifications(status: ViewStatus) {

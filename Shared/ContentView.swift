@@ -32,6 +32,7 @@ struct ContentView: View {
                         .padding(.top, CGFloat(TITILEBAR_PADDING))
                 }
                 .frame(width: 380)
+                .frame(minHeight: 600)
             }
         } else {
             LoginView()
