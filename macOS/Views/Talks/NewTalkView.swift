@@ -105,7 +105,7 @@ struct NewTalkView: View {
                         Label("发送", systemImage: "paperplane.fill")
                             .labelStyle(.iconOnly)
                             .frame(width: 40, height: 30)
-                            .background(RoundedRectangle(cornerRadius: 5).fill(.red))
+                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
                             .foregroundColor(.white)
 
                     }.buttonStyle(PlainButtonStyle()).opacity(opacity)
@@ -173,7 +173,7 @@ struct NewTalkView: View {
                 HStack {
                     TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
                         .font(.title2)
-                        .cornerRadius(5)
+                        .cornerRadius(CornerRadius)
                         .padding(.bottom, 8)
                         .onSubmit {
                             submitSearch()
@@ -188,7 +188,7 @@ struct NewTalkView: View {
                         Label("搜索", systemImage: "magnifyingglass")
                             .labelStyle(.iconOnly)
                             .frame(width: 40, height: 30)
-                            .background(RoundedRectangle(cornerRadius: 5).fill(.red).opacity(0.85))
+                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
                             .foregroundColor(.white)
                             .font(.body.bold())
 
@@ -211,7 +211,7 @@ struct NewTalkView: View {
     //                                        images[idx]
                                             .scaledToFill()
                                             .frame(width: size, height: size)
-                                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
                                         }
                                         Button {
                                             importImage = true
@@ -221,14 +221,12 @@ struct NewTalkView: View {
                                                 .font(.largeTitle.bold())
                                         }
                                         .frame(width:size, height: size).foregroundColor(.white)
-                                        .background(RoundedRectangle(cornerRadius: 5).fill(.gray).opacity(0.6))
+                                        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
                                         .buttonStyle(.plain)
                                         .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg], allowsMultipleSelection: true) { result in
                                             switch result {
                                             case .success(let urls):
                                                 images = urls
-    //                                            images = urls.map { url in
-    //                                                Image(systemName: url.absoluteString)
     //                                            }
                                             default:
                                                 break

@@ -74,7 +74,7 @@ struct TalkCardBottomView: View {
                 let likesCount = curTalkCard.likesCount ?? 0
                 HStack {
                     if let isVoting = curTalkCard.isVoting, isVoting {
-                        Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.gray).font(.caption)
+                        Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.white)
                     } else if let voteFlag = curTalkCard.voteFlag, voteFlag {
                         Label(String(likesCount), systemImage: "heart.fill").foregroundColor(.red)
                             .onTapGesture { withAnimation {
@@ -118,14 +118,13 @@ struct TalkCardView: View {
                     .onTapGesture {
                         gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", userId: card.user.id)
                     }
-
                 TalkCardHeadView(user: card.user, created: card.createdAt)
                 Spacer()
             }.padding(.bottom, 5)
             if let images = card.images, !images.isEmpty {
 //                ImageSlidesView(images: images)
                 TalkCardImageView(talkImages: images)
-                    .scaledToFit()
+//                    .scaledToFit()
                     .padding(.leading)
             }
             VStack{
@@ -144,7 +143,7 @@ struct TalkCardView: View {
                         .frame(height: 70)
                         .padding(5)
                         .background(.red)
-                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
                 }.foregroundColor(.white)
             }
             HStack {

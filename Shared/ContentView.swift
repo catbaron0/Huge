@@ -14,15 +14,24 @@ struct ContentView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
         if gtalk.loginInfo.loginState == .succeed {
+            
             HSplitView{
                 NaviSideBarView()
                 ZStack(alignment: .top){
-                    ScenesView()
+                    GeometryReader { proxy in
+                        ZStack {
+                            ForEach(gtalk.talkScenes) { sceneType in
+                                ScenesView(sceneType: sceneType.sceneType)
+                                    .frame(height: proxy.size.height)
+                                    .opacity(sceneType.sceneType == gtalk.selectedTalkSceneType ? 1 : 0)
+                            }
+                        }
+                    }
                     TitleBarView()
                         .background(.ultraThinMaterial, in: Rectangle())
-                        .padding(.top, -30)
+                        .padding(.top, CGFloat(TITILEBAR_PADDING))
                 }
-                .frame(minWidth: 200, idealWidth: 380, maxWidth: 380, minHeight: 600, idealHeight: 800, maxHeight: .infinity, alignment: .center)
+                .frame(width: 380)
             }
         } else {
             LoginView()

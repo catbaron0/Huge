@@ -120,7 +120,7 @@ struct StatusTopicsView: View {
         let sendState = status.requestState
         let opacity = sendState != nil && sendState! == .sending ? 0.5 : 1.0
         VStack{
-            Text("").padding(.top, TimelineTopPadding.titleBar.rawValue)
+            Spacer().frame(height: TimelineTopPadding.titleBar.rawValue + 20)
             HStack {
                 TextField("话题", text: $query, prompt: Text("搜索话题"))
                     .onChange(of: query) { text in
@@ -129,7 +129,6 @@ struct StatusTopicsView: View {
                         }
                     }
                     .font(.title2)
-                    .cornerRadius(5)
                     .padding(.bottom, 8)
                     .onSubmit {
                         submit()
@@ -138,14 +137,15 @@ struct StatusTopicsView: View {
                 Button {
                     submit()
                 } label: {
-                    Label("搜索", systemImage: "magnifyingglass").frame(width: 30, height: 30)
-                        .labelStyle(.iconOnly).frame(width: 50)
-                        .background(RoundedRectangle(cornerRadius: 5).fill(.red).opacity(0.85))
+                    Label("搜索", systemImage: "magnifyingglass")
+                        .padding(5)
+                        .labelStyle(.iconOnly)
+                        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
                         .foregroundColor(.white)
                         .font(.body.bold())
                 }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
             }
-            .padding([.leading, .trailing, .top])
+            .padding([.leading, .trailing])
 
             if searchMode {
                 // Activated by focus in the search input box

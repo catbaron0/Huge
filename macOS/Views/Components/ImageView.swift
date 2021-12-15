@@ -48,8 +48,11 @@ struct ImageReaderView: View {
                     } else {
                         Image(nsImage: image)
                             .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth:300, maxHeight: 300)
+//                            .scaledToFill()
+//                            .aspectRatio(contentMode: .fit)
+//                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+//                            .frame(maxWidth:300, maxHeight: 300)
+
                     }
                 }
                 else {
@@ -96,18 +99,20 @@ struct TalkCardImageView: View {
         let image = talkImages[0]
 
         ImageReaderView(talkImage: image)
-            .scaledToFit()
             .overlay(alignment: .bottom){
                 if talkImages.count > 1 {
                     Label("1 of \(talkImages.count)", systemImage: "ellipsis")
                         .font(.title2).labelStyle(.titleOnly).padding(5)
                         .background(Color.gray.opacity(0.8))
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
                         .padding(.bottom, 5)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .scaledToFill()
+            .frame(width: 300, height: 300)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+            
             .contentShape(Rectangle())
             .onTapGesture {
                 newWindowForImageSlides(with: talkImages)

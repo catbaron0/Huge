@@ -70,8 +70,8 @@ struct TitleBarView: View {
                     Spacer()
                     Label(status.title, systemImage: status.icon)
                         .font(.title3)
+                        .padding(.top, 3)
                         .padding()
-                        .frame(height: TimelineTopPadding.titleBar.rawValue + 40)
                     Spacer()
                 }
                 HStack {
@@ -81,7 +81,7 @@ struct TitleBarView: View {
                                 .labelStyle(.iconOnly)
                                 .font(.title)
                                 .foregroundColor(Color(NSColor.windowFrameTextColor))
-                                .padding(.leading, 15)
+                                .padding(.leading, 12)
                                 .padding(.top, 3)
                         }.buttonStyle(.plain)
                     }
@@ -98,7 +98,7 @@ struct TitleBarView: View {
                     }.buttonStyle(.plain)
                     
                 }
-                .frame(height: TimelineTopPadding.titleBar.rawValue)
+                .frame(height: CGFloat(TITILEBAR_HEIGHT))
             }
             .foregroundColor(Color(NSColor.windowFrameTextColor))
 
@@ -173,9 +173,12 @@ struct SidebarItemView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if sidebarItem.sceneType == gtalk.selectedTalkSceneType {
+                // return to the root view
                 while gtalk.statusForScene[sidebarItem.sceneType]!.count > 1 {
                     gtalk.back()
                 }
+                // clear the unread notification
+                // read unread message
                 let status = gtalk.statusForScene[sidebarItem.sceneType]![0]
                 switch status.statusType {
                 case .notification:
@@ -191,6 +194,7 @@ struct SidebarItemView: View {
                 }
                 
             } else {
+                print("switch item")
                 gtalk.select(sidebarItem: sidebarItem)
             }
             
@@ -213,7 +217,7 @@ struct HeaderView: View {
             }
         }
         .foregroundColor(.white)
-        .background(RoundedRectangle(cornerRadius: 5).fill(Color(red: 1, green: 0, blue: 0, opacity: 0.6)))
+        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(Color(red: 1, green: 0, blue: 0, opacity: 0.6)))
     }
 }
 

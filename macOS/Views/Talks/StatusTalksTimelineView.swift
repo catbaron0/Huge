@@ -20,9 +20,27 @@ struct StatusTalksTimelineView: View {
                 List {// ForEach
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
-                        Text("").padding(.top, scrollTopPadding)
+                        Spacer().frame(height: scrollTopPadding)
                         if let headerView = headerView {
-                            headerView
+                            headerView.padding(.bottom)
+                        }
+                        VStack { // Top LoadingBar
+                            switch status.loadingLatest {
+                            case .loading:
+                                ProgressView()
+                            case .loaded:
+                                if offset.x > CGFloat(topOffsetTrigger.rawValue) {
+                                    Divider()
+                                        .contentShape(Rectangle())
+                                        .onAppear {
+                                            withAnimation {
+                                                gtalk.loadTimeline(status: status, earlier: false)
+                                            }
+                                        }
+                                }
+                            default:
+                                EmptyView()
+                            }
                         }
                         ForEach(status.talks){ card in
                             // We need foreach to avoid reloading images everytime the talkcards appear
@@ -32,45 +50,34 @@ struct StatusTalksTimelineView: View {
                                 }
                             Divider()
                         }
-                        if status.loadingEarlier == .empty {
-                            Text("这就是一切了。").padding()
-                        }
-                        
-                    }.readingScrollView(from: "scroll", into: $offset)
-                }.coordinateSpace(name: "scroll")
-                    .overlay(alignment: .top) {
-                        VStack { // LoadingBar
-                            switch status.loadingLatest {
+                        VStack { // Bottom LoadingBar
+                            switch status.loadingEarlier {
                             case .loading:
                                 ProgressView()
+                            case .empty:
+                                Text("这就是一切了。").padding()
                             case .loaded:
-                                if offset.x > CGFloat(topOffsetTrigger.rawValue) {
+                                if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 10 {
                                     Divider()
                                         .contentShape(Rectangle())
                                         .onAppear {
-                                            gtalk.loadTimeline(status: status, earlier: false)
+                                            print("bottom ofset \(proxy.size.height - offset.y)")
+                                            print(status.loadingLatest)
+                                            status.loadingEarlier = .loading
+                                            gtalk.loadTimeline(status: status, earlier: true)
                                         }
                                 }
-                            default:
-                                EmptyView()
                             }
-                        }
+                        }.padding(.bottom)
+//                        if status.loadingEarlier == .empty {
+//                            Text("这就是一切了。").padding()
+//                        }
                         
-                    }
-                VStack { // LoadingBar
-                    switch status.loadingEarlier {
-                    case .loading:
-                        ProgressView()
-                    case .loaded, .empty:
-                        if proxy.size.height - offset.y > -20 {
-                            Divider()
-                                .contentShape(Rectangle())
-                                .onAppear {
-                                    gtalk.loadTimeline(status: status, earlier: true)
-                                }
-                        }
-                    }
-                }.padding(.bottom)
+                    }.readingScrollView(from: "scroll", into: $offset)
+                }.coordinateSpace(name: "scroll")
+            }
+            .onAppear {
+                gtalk.loadTimeline(status: status, earlier: false)
             }
         }
     }

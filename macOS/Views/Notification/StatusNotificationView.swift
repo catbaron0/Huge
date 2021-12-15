@@ -47,7 +47,7 @@ struct NotificationCardView: View {
             }
         }
         .padding(5)
-        .background(RoundedRectangle(cornerRadius: 10).fill(.red).opacity(notification.unRead ? 0.4 : 0.0))
+        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(notification.unRead ? 0.4 : 0.0))
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
             print("double click")
@@ -97,7 +97,7 @@ struct StatusNotificationView: View {
                 List {// ForEach
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
-                        Text("").padding(.top, scrollTopPadding)
+                        Spacer().frame(height: scrollTopPadding)
                         ForEach(status.notifications){ card in
                             // We need foreach to avoid reloading images everytime the talkcards appear
                             NotificationCardView(status: status, notification: card)

@@ -16,7 +16,7 @@ class GCoresTalk: ObservableObject{
     @Published var publisherTrigger = ""
     @Published var user: TalkUser? = nil
     @Published var loginInfo: LoginInfo
-
+    
     let uds = UserDefaults.standard
     
     
@@ -112,7 +112,6 @@ class GCoresTalk: ObservableObject{
             )
         ]
         
-        selectedTalkSceneType = .topics
         statusForScene = [TalkSceneType: [ViewStatus]]()
         
         // Check login states
@@ -167,14 +166,15 @@ class GCoresTalk: ObservableObject{
             status.topic = topic
             status.targetCommentId = targetCommentId
             status.userId = userId
-
+            
             // stop from jumping to itself
             // * From comments page to the same page
             if curStatus.statusType == .comments && statusType == .comments && curStatus.targetTalkId == targetTalkId {
                 return
             }
-
-            statusForScene[sceneType]!.append(status)
+            withAnimation {
+                statusForScene[sceneType]!.append(status)
+            }
         }
     
     func isSelected(sidebarItem: TalkScene) -> Bool {
@@ -233,7 +233,7 @@ class GCoresTalk: ObservableObject{
         }
         return message
     }
-
+    
     func talkContent(text: String, imgStr: String?) -> String {
         var content = ""
         if let imgStr = imgStr {
@@ -294,7 +294,7 @@ class GCoresTalk: ObservableObject{
             self.mainQueue.async {
                 status.requestState = .succeed
                 NSApplication.shared.keyWindow?.close()
-
+                
             }
         }.resume()
     }
@@ -430,7 +430,7 @@ class GCoresTalk: ObservableObject{
                 }
             }
         }
-        task.resume()    
+        task.resume()
     }
     
     func syncUnreadWith(status: ViewStatus) {
@@ -441,12 +441,14 @@ class GCoresTalk: ObservableObject{
             self.talkScenes[index!].unread = false
         }
     }
-
+    
     func loadTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
-        if earlier {
-            status.loadingEarlier = .loading
-        } else {
-            status.loadingLatest = .loading
+        mainQueue.async {
+            if earlier {
+                status.loadingEarlier = .loading
+            } else {
+                status.loadingLatest = .loading
+            }
         }
         
         var before = ""
@@ -484,26 +486,15 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "GET")
         
         let task = session.dataTask(with: request) { data, response, error in
-            self.mainQueue.async {
-                if earlier {
-                    if status.talks.isEmpty {
-                        status.unreadCount = 0
-                        self.syncUnreadWith(status: status)
-                    }
-                    status.loadingEarlier = .loaded
-                } else {
-                    status.loadingEarlier = .loaded
-                    status.loadingLatest = .loaded
-                    status.unreadCount = 0
-                    self.syncUnreadWith(status: status)
-                }
-                if let errMessage = self.checkResponse(data, response, error) {
-                    print(errMessage)
-                    return
-                }
-                if let data = data {
-                    let resp = try! JSONDecoder().decode(GCoresTalksResponse.self, from: data)
-                    let talks = resp.formalize()
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                return
+            }
+            if let data = data {
+                let resp = try! JSONDecoder().decode(GCoresTalksResponse.self, from: data)
+                let talks = resp.formalize()
+                self.mainQueue.async {
+                    
                     if talks.isEmpty {
                         if earlier {
                             status.loadingEarlier = .empty
@@ -515,6 +506,22 @@ class GCoresTalk: ObservableObject{
                     } else {
                         status.talks = talks
                     }
+                }
+            }
+            if earlier {
+                self.mainQueue.async {
+                    if status.talks.isEmpty {
+                        status.unreadCount = 0
+                        self.syncUnreadWith(status: status)
+                    }
+                    status.loadingEarlier = .loaded
+                }
+            } else {
+                self.mainQueue.async {
+                    status.loadingEarlier = .loaded
+                    status.loadingLatest = .loaded
+                    status.unreadCount = 0
+                    self.syncUnreadWith(status: status)
                 }
             }
         }
@@ -622,7 +629,7 @@ class GCoresTalk: ObservableObject{
                 let respCards = resp.formalize()
                 let comment = respCards[0][0]
                 let replies = respCards[1]
-
+                
                 status.loadingEarlier = .empty
                 status.targetRelated = resp.getRelated()
                 status.targetComment = comment
@@ -1065,10 +1072,13 @@ class GCoresTalk: ObservableObject{
     
     func back() {
         if let count = statusForScene[selectedTalkSceneType]?.count, count > 1 {
-            _ = statusForScene[selectedTalkSceneType]!.popLast()
+            withAnimation {
+                _ = statusForScene[selectedTalkSceneType]!.popLast()
+            }
+            
         }
     }
-        
+    
     func loadTimeline(status: ViewStatus, earlier: Bool) {
         var endpoint: TimelineEndPoint
         switch status.statusType {
@@ -1102,8 +1112,11 @@ class GCoresTalk: ObservableObject{
                 print(errMessage)
                 return
             }
-            status.unreadCount = 0
-
+            self.mainQueue.async {
+                
+                status.unreadCount = 0
+            }
+            
         }.resume()
     }
     func checkUnreadNotifications(status: ViewStatus) {
@@ -1200,7 +1213,7 @@ class GCoresTalk: ObservableObject{
             "%2Cis-free%2Clikes-count%2Coption-is-focus-showcase%2Coption-is-official",
             "%2Cthumb%2Ctitle%2Cvol%2Cis-official%2Cspeech-path%2Chas-giveaway&from-app=1"
         ].joined(separator: "")
-
+        
         let request = gcoresRequest(url: URL(string: urlStr)!, httpMethod: "GET")
         
         let task = session.dataTask(with: request) { data, response, error in
@@ -1236,7 +1249,7 @@ class GCoresTalk: ObservableObject{
         }
         task.resume()
     }
-
+    
     func search(status: ViewStatus, endponit: GCoresRelatedType, query: String, earlier: Bool, recommend: Bool) {
         if query == "" && !recommend {
             return
@@ -1291,14 +1304,15 @@ class GCoresTalk: ObservableObject{
         let request = gcoresRequest(url: url, httpMethod: "GET")
         
         let task = session.dataTask(with: request) { data, response, error in
-            self.mainQueue.async {
-                if let errMessage = self.checkResponse(data, response, error) {
-                    print(errMessage)
-                    return
-                }
-                if let data = data {
-                    let resp = try! JSONDecoder().decode(GCoresSearchResponse.self, from: data)
-                    let searchResults = resp.formalize()
+            
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                return
+            }
+            if let data = data {
+                let resp = try! JSONDecoder().decode(GCoresSearchResponse.self, from: data)
+                let searchResults = resp.formalize()
+                self.mainQueue.async {
                     if searchResults.isEmpty || status.searchResults.count >= resp.meta.recordCount {
                         if earlier {
                             status.requestEarlier = .empty
@@ -1315,6 +1329,7 @@ class GCoresTalk: ObservableObject{
                         }
                         return
                     }
+                    
                     if earlier {
                         status.searchResults += searchResults
                     } else {

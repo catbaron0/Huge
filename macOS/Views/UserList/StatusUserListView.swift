@@ -26,7 +26,7 @@ struct FollowshipCard: View {
                 }
             }
             .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
             
             
         }

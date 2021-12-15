@@ -32,7 +32,6 @@ struct StatusProfilePageView: View {
     @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     
-    
     var body: some View {
         let user = status.user
         if user == nil {
@@ -44,64 +43,61 @@ struct StatusProfilePageView: View {
                     }
                 Spacer()
             }
-            
         } else {
-                VStack {
-                    Text("").padding(.top, TimelineTopPadding.titleBar.rawValue)
-
-                    HStack(alignment: .top) {
-                        // Image, nickname, sex, follower/followee,
-                        ProfileImageView(status: status)
-                        VStack(alignment: .leading) {
-                            HStack{
-                                // TODO: Add gender info before/after the username
-                                Text(user?.nickname ?? "nil")
-                            }.font(.title2.weight(.semibold))
-                            HStack(alignment: .bottom) {
-                                // TODO: Add status of userlist
-                                VStack {
-                                    Text("已关注").font(.callout.weight(.light)).opacity(0.6)
-                                    let count = user?.followeesCount ?? 0
-                                    Text("\(count)").foregroundColor(.blue)
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", userId: status.userId!)
-                                }
-                                VStack{
-                                    Text("被关注").font(.callout.weight(.light)).opacity(0.6)
-                                    let count = user?.followersCount ?? 0
-                                    Text("\(count)").foregroundColor(.blue)
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", userId: status.userId!)
-                                }
-                            }.font(.title2)
-                        }
-                        Spacer()
+            VStack {
+                Spacer().frame(height: TimelineTopPadding.titleBar.rawValue)
+                HStack(alignment: .top) {
+                    // Image, nickname, sex, follower/followee,
+                    ProfileImageView(status: status)
+                    VStack(alignment: .leading) {
+                        HStack{
+                            // TODO: Add gender info before/after the username
+                            Text(user?.nickname ?? "nil")
+                        }.font(.title2.weight(.semibold))
+                        HStack(alignment: .bottom) {
+                            // TODO: Add status of userlist
+                            VStack {
+                                Text("已关注").font(.callout.weight(.light)).opacity(0.6)
+                                let count = user?.followeesCount ?? 0
+                                Text("\(count)").foregroundColor(.blue)
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .followees, title: "已关注他们", icon: "square.and.arrow.up.fill", userId: status.userId!)
+                            }
+                            VStack{
+                                Text("被关注").font(.callout.weight(.light)).opacity(0.6)
+                                let count = user?.followersCount ?? 0
+                                Text("\(count)").foregroundColor(.blue)
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .followers, title: "被他们关注", icon: "square.and.arrow.down.fill", userId: status.userId!)
+                            }
+                        }.font(.title2)
                     }
-                    .padding(20)
-                    .frame(height: TimelineTopPadding.profile.rawValue)
-                    VStack {
-                        if let intro = user?.intro {
-                            StatusTalksTimelineView(
-                                status: status,
-                                scrollTopPadding: 0,
-                                headerView: HeaderView(desc: intro),
-                                topOffsetTrigger: .profile)
-                            
-                        } else {
-                            StatusTalksTimelineView(
-                                status: status,
-                                scrollTopPadding: 0,
-                                headerView: nil,
-                                topOffsetTrigger: .profile)
-                        }
-                    }
+                    Spacer()
                 }
-                
-
+                .padding(20)
+                Divider()
+//                .frame(height: TimelineTopPadding.profile.rawValue)
+//                VStack {
+                    if let intro = user?.intro {
+                        StatusTalksTimelineView(
+                            status: status,
+                            scrollTopPadding: 0,
+                            headerView: HeaderView(desc: intro),
+                            topOffsetTrigger: .profile)
+                        
+                    } else {
+                        StatusTalksTimelineView(
+                            status: status,
+                            scrollTopPadding: 0,
+                            headerView: nil,
+                            topOffsetTrigger: .profile)
+                    }
+//                }
+            }
         }
     }
 }

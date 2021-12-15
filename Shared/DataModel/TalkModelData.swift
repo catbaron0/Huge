@@ -38,19 +38,6 @@ enum Followship: String {
     case followee
 }
 
-enum TopOffsetTrigger: Int {
-    case timeline = 80
-    case profile = 180
-    case userList = 70
-}
-
-
-enum TimelineTopPadding: CGFloat {
-    case titleBar = 10
-    case profile = 80
-    case userList = 70
-}
-
 enum LoginState: String {
     case succeed
     case failed
