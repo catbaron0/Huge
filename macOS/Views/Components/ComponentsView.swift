@@ -150,7 +150,9 @@ struct NaviSideBarView: View {
                 .padding(.top, 20)
                 Spacer()
             }
-        }.background(Color.init(red: 55/255, green: 55/255, blue: 55/255))
+        }
+        .background(.ultraThinMaterial, in: Rectangle()).padding(.top, -20)
+        //        .background(Color.init(red: 55/255, green: 55/255, blue: 55/255))
     }
 }
 

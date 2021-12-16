@@ -107,6 +107,7 @@ struct NewTalkView: View {
                             .frame(width: 40, height: 30)
                             .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
                             .foregroundColor(.white)
+                            .disabled(status.requestState != nil && status.requestState! == .sending)
 
                     }.buttonStyle(PlainButtonStyle()).opacity(opacity)
                 }.padding([.leading, .trailing], 10)
@@ -120,14 +121,6 @@ struct NewTalkView: View {
                 Divider().padding()
                 // Buttons of related contents
                 HStack {
-//                    Button {
-//                        relatedView = .topics
-//                    } label: {
-//                        NewTalkRelatedLabel(text: "话题", icon: "tag", highlight: relatedView == .topics)
-//                    }
-//                    .buttonStyle(.plain)
-
-                    
                     Button {
                         relatedView = .games
                     } label: {
@@ -301,7 +294,7 @@ struct NewTalkView: View {
             return
         }
         checkInfo = ""
-        if status.requestState == nil || status.requestState! == .failed {
+        if status.requestState != .sending {
             if let topic = topic {
                 gtalk.newTalk(text: talkText, imageUrls: images, topic: topic, related: related, status: status)
             }
