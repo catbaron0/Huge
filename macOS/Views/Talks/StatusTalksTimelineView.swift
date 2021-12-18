@@ -18,7 +18,7 @@ struct StatusTalksTimelineView: View {
         GeometryReader { proxy in
             VStack {
                 ScrollViewReader { scroll in
-                    ScrollView {// ForEach
+                    ScrollView(showsIndicators: false) {// ForEach
                         Text("加载更多").frame(height: scrollTopPadding)
                             .id(0)
                             .onChange(of: offset) { _ in
@@ -52,7 +52,7 @@ struct StatusTalksTimelineView: View {
                                 case .empty:
                                     Text("这就是一切了。").padding()
                                 case .loaded:
-                                    if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 0 {
+                                    if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 10 {
                                         Divider()
                                             .contentShape(Rectangle())
                                             .onAppear {

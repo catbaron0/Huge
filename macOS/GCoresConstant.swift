@@ -12,7 +12,7 @@ let GCORES_IMAGE_SCALE_SETTING = "?x-oss-process=image/resize,limit_1,m_fill,w_1
 let GCORES_HOST = "https://www.gcores.com/"
 
 let TITILEBAR_PADDING = CGFloat(-30)
-let TITILEBAR_HEIGHT = 10
+let TITILEBAR_HEIGHT = CGFloat(1)
 let SIDEBAR_TOP_PADDING = CGFloat(20)
 
 let CornerRadius = CGFloat(10)
@@ -25,7 +25,7 @@ enum TopOffsetTrigger: Int {
 }
 
 enum TimelineTopPadding: CGFloat {
-    case titleBar = 50
+    case titleBar = 30
     case profile = 80
     case userList = 70
 }

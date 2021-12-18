@@ -201,7 +201,7 @@ struct NewTalkView: View {
                     VStack {
                         GeometryReader { proxy in
                             let size = (proxy.size.width - 15 ) / 3
-                            ScrollView {
+                            ScrollView(showsIndicators: false) {
                                 LazyVGrid(columns: imageRow, alignment: .leading, spacing: 10) {
                                     ForEach(images, id: \.absoluteString) { url in
                                         ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))

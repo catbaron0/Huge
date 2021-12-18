@@ -69,17 +69,17 @@ struct TitleBarView: View {
                 HStack{
                     Spacer()
                     Label(status.title, systemImage: status.icon)
-                        .font(.title3)
+                        .font(.body)
                         .padding(.top, 3)
-                        .padding()
+                        .padding(8)
                     Spacer()
                 }
                 HStack {
                     if gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count > 1 {
                         Button { gtalk.back()  } label: {
-                            Label("后退", systemImage: "arrow.backward.circle.fill")
+                            Label("后退", systemImage: "arrow.backward")
                                 .labelStyle(.iconOnly)
-                                .font(.title)
+                                .font(.title3.bold())
 //                                .foregroundColor(Color(NSColor.windowFrameTextColor))
                                 .padding(.leading, 12)
                                 .padding(.top, 3)
@@ -93,15 +93,13 @@ struct TitleBarView: View {
                         NewTalkButtonView()
                             .padding(.top, 3)
                             .padding(.trailing)
-//                            .foregroundColor(Color(NSColor.windowFrameTextColor))
-                            .font(.title)
+                            .font(.title3.bold())
+                            .foregroundColor(.red)
                     }.buttonStyle(.plain)
                     
                 }
                 .frame(height: CGFloat(TITILEBAR_HEIGHT))
             }
-//            .foregroundColor(Color(NSColor.windowFrameTextColor))
-
         } else {
             EmptyView()
         }

@@ -85,7 +85,7 @@ struct TopicsView: View {
     let newStatus: Bool
     
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack {
                 ForEach(status.selectedTopics) { topic in
                     TopicCardView(topic: topic)

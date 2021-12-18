@@ -32,7 +32,6 @@ struct ContentView: View {
                         .ignoresSafeArea()
                     }
                     TitleBarView().ignoresSafeArea()
-                        
                         .background(BlurView().colorMultiply(.blue.opacity(0.3)))
                         .background(.ultraThinMaterial, in: Rectangle())
                         .padding(.top, CGFloat(TITILEBAR_PADDING))

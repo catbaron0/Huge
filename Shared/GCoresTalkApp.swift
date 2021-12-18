@@ -36,7 +36,6 @@ struct GCoresTalkApp: App {
                     }
                 }
         }
-        
         .windowStyle(HiddenTitleBarWindowStyle())
         .commands {
             CommandGroup(before: CommandGroupPlacement.newItem) {
