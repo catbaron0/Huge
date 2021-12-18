@@ -85,7 +85,6 @@ struct StatusProfilePageView: View {
                         headerView: nil,
                         topOffsetTrigger: .profile)
                 }
-                //                }
             }
         } else {
             VStack {

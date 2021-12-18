@@ -24,6 +24,7 @@ struct ImageReaderView: View {
 
     
     init(talkImage: TalkImage, forceLoad: Bool = false) {
+        print(talkImage.src)
         self._imageReader = ObservedObject(wrappedValue: ImageReader(url: talkImage.src, forceLoad: forceLoad))
         self.width = talkImage.width
         self.height = talkImage.height
@@ -41,48 +42,53 @@ struct ImageReaderView: View {
     var body: some View {
             HStack {
                 if let image = imageReader.image {
-                    if let _ = largeSize {
-                        Image(nsImage: image)
-                            .resizable()
-                            
-                    } else {
-                        Image(nsImage: image)
-                            .resizable()
-//                            .scaledToFill()
-//                            .aspectRatio(contentMode: .fit)
-//                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
-//                            .frame(maxWidth:300, maxHeight: 300)
-
-                    }
+                    Image(nsImage: image)
+                        .resizable()
+//                    if let _ = largeSize {
+//                        Image(nsImage: image)
+//                            .resizable()
+//
+//                    } else {
+//                        Image(nsImage: image)
+//                            .resizable()
+//                    }
                 }
                 else {
-                    if let largeSize = largeSize {
-                        if width > height {
-                            let frameWidth = Float(largeSize)
-                            let frameHeight = Float(frameWidth) / Float(width) * Float(height)
-                            Rectangle()
-                                .background(Color.red)
-                                .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight))
-                                .opacity(0.5)
-                        } else {
-                            let frameHeight = Float(largeSize)
-                            let frameWidth = Float(frameHeight) / Float(height) * Float(width)
-                            Rectangle()
-                                .background(Color.red)
-                                .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight))
-                                .opacity(0.5)
+                    Rectangle()
+                        .background(.gray)
+                        .opacity(0.5)
+                        .frame(maxWidth:1500, maxHeight: 1500)
+                        .overlay {
+                            ProgressView()
                         }
 
-                    }
-                    else {
-                        Rectangle()
-                            .background(.gray)
-                            .opacity(0.5)
-                            .frame(maxWidth:300, maxHeight: 300)
-                            .overlay {
-                                ProgressView()
-                            }
-                    }
+//                    if let largeSize = largeSize {
+//                        if width > height {
+//                            let frameWidth = Float(largeSize)
+//                            let frameHeight = Float(frameWidth) / Float(width) * Float(height)
+//                            Rectangle()
+//                                .background(Color.red)
+//                                .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight))
+//                                .opacity(0.5)
+//                        } else {
+//                            let frameHeight = Float(largeSize)
+//                            let frameWidth = Float(frameHeight) / Float(height) * Float(width)
+//                            Rectangle()
+//                                .background(Color.red)
+//                                .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight))
+//                                .opacity(0.5)
+//                        }
+//
+//                    }
+//                    else {
+//                        Rectangle()
+//                            .background(.gray)
+//                            .opacity(0.5)
+//                            .frame(maxWidth:300, maxHeight: 300)
+//                            .overlay {
+//                                ProgressView()
+//                            }
+//                    }
 
                 }
             }
@@ -122,22 +128,40 @@ struct TalkCardImageView: View {
 
 struct ImageSlidesView: View {
     let images: [TalkImage]
-//    let window: NSWindow?
     @State private var cur: Int = 0
     @State private var isLoading = true
     let maxSize = 1500
 
     struct ImageView: View {
         let talkImage: TalkImage
-//        let window: NSWindow?
         let maxSize: Int
         @Binding var isLoading: Bool
         var body: some View {
+//            ImageReaderView(talkImage: talkImage)
+//                .scaledToFill()
+//                .ignoresSafeArea()
+//                .onAppear{
+//                    self.isLoading.toggle()
+//                    var frameWidth: Int
+//                    var frameHeight: Int
+//                    let imgWidth = talkImage.width
+//                    let imgHeight = talkImage.height
+//                    if imgWidth < maxSize && imgHeight < maxSize {
+//                        frameWidth = imgWidth
+//                        frameHeight = imgHeight
+//                    } else if imgWidth > imgHeight {
+//                        frameWidth = maxSize
+//                        frameHeight = Int(Float(frameWidth) * Float(imgHeight) / Float(imgWidth))
+//                    } else {
+//                        frameHeight = maxSize
+//                        frameWidth = Int(Float(frameHeight) * Float(imgWidth) / Float(imgHeight))
+//                    }
+//                }
             AsyncImage(url: URL(string: talkImage.src)){ image in
                 image
                 .resizable()
-                .scaledToFill()
                 .ignoresSafeArea()
+                .scaledToFit()
                 .onAppear{
                     self.isLoading.toggle()
                     var frameWidth: Int

@@ -69,7 +69,7 @@ struct TitleBarView: View {
                 HStack{
                     Spacer()
                     Label(status.title, systemImage: status.icon)
-                        .font(.body)
+                        .font(.title3.bold())
                         .padding(.top, 3)
                         .padding(8)
                     Spacer()
@@ -140,12 +140,11 @@ struct NaviSideBarView: View {
                     }
                     .frame(width:50, height: 50)
                     .clipShape(Circle())
-                    .padding(.top, SIDEBAR_TOP_PADDING)
+                    .padding(.bottom, 10)
                     ForEach(gtalk.talkScenes) {item in
                         SidebarItemView(sidebarItem: item)
                     }
-                }
-                .padding(.top, 20)
+                }.padding(.top, SIDEBAR_TOP_PADDING)
                 Spacer()
             }
         }
