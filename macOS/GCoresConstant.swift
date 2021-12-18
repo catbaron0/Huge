@@ -17,7 +17,7 @@ let TITILEBAR_HEIGHT = 10
 let CornerRadius = CGFloat(10)
 
 enum TopOffsetTrigger: Int {
-    case timeline = 80
+    case timeline = 60
 //    case topics = 80
     case profile = 200
     case userList = 70
