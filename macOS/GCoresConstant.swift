@@ -18,14 +18,14 @@ let SIDEBAR_TOP_PADDING = CGFloat(20)
 let CornerRadius = CGFloat(10)
 
 enum TopOffsetTrigger: Int {
-    case timeline = 60
+    case timeline = 100
     case topics = 180
     case profile = 200
     case userList = 70
 }
 
 enum TimelineTopPadding: CGFloat {
-    case titleBar = 20
+    case titleBar = 50
     case profile = 80
     case userList = 70
 }

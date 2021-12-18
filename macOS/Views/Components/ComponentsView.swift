@@ -151,7 +151,6 @@ struct NaviSideBarView: View {
                 Spacer()
             }
         }
-        //        .background(Color.init(red: 55/255, green: 55/255, blue: 55/255))
     }
 }
 
@@ -174,25 +173,28 @@ struct SidebarItemView: View {
         .onTapGesture {
             if sidebarItem.sceneType == gtalk.selectedTalkSceneType {
                 // return to the root view
-                while gtalk.statusForScene[sidebarItem.sceneType]!.count > 1 {
-                    gtalk.back()
+                if gtalk.statusForScene[sidebarItem.sceneType]!.count > 1 {
+                    while gtalk.statusForScene[sidebarItem.sceneType]!.count > 1 {
+                        gtalk.back()
+                    }
+                } else {
+                    // clear the unread notification
+                    // read unread message
+                    let status = gtalk.statusForScene[sidebarItem.sceneType]![0]
+                    switch status.statusType {
+                    case .notification:
+                        gtalk.loadNotifications(status: status, earlier: false)
+                        // send mark-seen
+                        gtalk.markNotificationsAsSeen(status: status)
+                    case .followeeTimeline, .recommendTimeline, .topicTimeline, .userTimeline:
+                        gtalk.loadTimeline(status: status, earlier: false)
+                    case .topics:
+                        gtalk.loadTopicsCategories(status: status)
+                    default:
+                        break
+                    }
+
                 }
-                // clear the unread notification
-                // read unread message
-                let status = gtalk.statusForScene[sidebarItem.sceneType]![0]
-                switch status.statusType {
-                case .notification:
-                    gtalk.loadNotifications(status: status, earlier: false)
-                    // send mark-seen
-                    gtalk.markNotificationsAsSeen(status: status)
-                case .followeeTimeline, .recommendTimeline, .topicTimeline, .userTimeline:
-                    gtalk.loadTimeline(status: status, earlier: false)
-                case .topics:
-                    gtalk.loadTopicsCategories(status: status)
-                default:
-                    break
-                }
-                
             } else {
                 print("switch item")
                 gtalk.select(sidebarItem: sidebarItem)

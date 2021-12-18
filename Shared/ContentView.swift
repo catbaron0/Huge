@@ -20,30 +20,26 @@ struct ContentView: View {
                     .padding(.top, SIDEBAR_TOP_PADDING)
                     .background(BlurView().colorMultiply(.blue.opacity(0.3)))
                     .ignoresSafeArea()
-//                    .foregroundColor(Color(NSColor.windowFrameTextColor))
                 ZStack(alignment: .top){
                     GeometryReader { proxy in
                         ZStack {
                             ForEach(gtalk.talkScenes) { sceneType in
                                 ScenesView(sceneType: sceneType.sceneType)
-                                    .frame(height: proxy.size.height)
                                     .opacity(sceneType.sceneType == gtalk.selectedTalkSceneType ? 1 : 0)
                             }
                         }
                         .background(BlurView().colorMultiply(.blue.opacity(0.3)))
+                        .ignoresSafeArea()
                     }
-                    TitleBarView()
+                    TitleBarView().ignoresSafeArea()
                         
                         .background(BlurView().colorMultiply(.blue.opacity(0.3)))
                         .background(.ultraThinMaterial, in: Rectangle())
-//                        .colorMultiply(.gray)
-//                        .foregroundColor(.wh)
                         .padding(.top, CGFloat(TITILEBAR_PADDING))
                 }
                 .frame(width: 350)
                 .frame(minHeight: 600)
             }
-//            .background(BlurView())
                 .ignoresSafeArea()
         } else {
             LoginView()

@@ -132,14 +132,13 @@ struct StatusCommentsView: View {
         GeometryReader { proxy in
             VStack {
                 let topOffset = scrollerOffset.x
-                List{// ForEach
+                ScrollView{// ForEach
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
                         Spacer().frame(height: TimelineTopPadding.titleBar.rawValue)
                         if status.statusType == .comments {
                             if let targetTalk = status.targetTalk {
                                 TalkCardView(status: status, card: targetTalk, isSelected: false)
-//                                    .padding(.top, TimelineTopPadding.titleBar.rawValue).padding(.top, 5)
                                 Divider().padding(.bottom, 10)
                             } else if let talkId = status.targetTalkId {
                                 ProgressView()
@@ -180,10 +179,6 @@ struct StatusCommentsView: View {
                                         }
                                     Spacer()
                                 }
-//                                .background(.gray)
-//                                .onTapGesture {
-//                                    NSWorkspace.shared.open(URL(string: url)!)
-//                                }
                             }
                             if let targetComment = status.targetComment {
                                 CommentCardView(status: status, comment: targetComment, withReply: false)
@@ -243,7 +238,7 @@ struct StatusCommentsView: View {
                         EmptyView()
                     }
                 }.padding(.bottom)
-            }
+            }.padding()
         }
     }
 }

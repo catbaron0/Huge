@@ -14,7 +14,6 @@ struct ScenesView: View {
     var body: some View {
         GeometryReader{ proxy in
             HStack(alignment: .top) {
-//                let sceneType = gtalk.selectedTalkSceneType
                 let statuses = gtalk.statusForScene[sceneType]!
                 ForEach(statuses){status in
                     Group{
@@ -32,7 +31,6 @@ struct ScenesView: View {
                         case .topicTimeline:
                             StatusTopicTimelineView(
                                 status: status
-//                                scrollTopPadding: TimelineTopPadding.titleBar.rawValue
                             )
                         case .topics:
                             StatusTopicsView(status: status)
@@ -49,34 +47,9 @@ struct ScenesView: View {
                         }
                     }
                     .frame(width: proxy.size.width)
-//                    .onAppear{
-//                        withAnimation {
-//                            if statuses.count > 1 {
-//                                offset = offset - proxy.size.width - 8
-//                                print("appear offset \(offset)")
-//                            } else {
-//                                offset = 0
-//                            }
-//                        }
-//                    }
-//                    .onDisappear {
-//                        withAnimation {
-//                            if statuses.count > 1 {
-//                                print("status count \(statuses.count)")
-//                                offset = offset + proxy.size.width + 8
-//                                print("disappear offset \(offset)")
-//                            } else {
-//                                offset = 0
-//                            }
-//
-//                        }
-//                    }
                 }
             }
             .offset(x: -(proxy.size.width + 8) * CGFloat(gtalk.statusForScene[sceneType]!.count - 1))
-
-//            .offset(x: (-proxy.size.width - 8) * ( CGFloat(gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count) - 1))
-//            .offset(x: -(proxy.size.width + 8) * CGFloat(gtalk.statusForScene[gtalk.selectedTalkSceneType]!.count - 1))
         }
     }
 }
