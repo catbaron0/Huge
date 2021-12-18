@@ -69,9 +69,24 @@ struct TitleBarView: View {
                 HStack{
                     Spacer()
                     Label(status.title, systemImage: status.icon)
+                        .labelStyle(.titleOnly)
                         .font(.title3.bold())
                         .padding(.top, 3)
                         .padding(8)
+//
+//                    if status.title.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+//                        Label(status.title, systemImage: status.icon)
+//                            .labelStyle(.titleOnly)
+//                            .font(.title3.bold())
+//                            .padding(.top, 3)
+//                            .padding(8)
+//                    } else {
+//                        Label(status.title, systemImage: status.icon)
+//                            .font(.title3.bold())
+//                            .padding(.top, 3)
+//                            .padding(8)
+//                    }
+                    
                     Spacer()
                 }
                 HStack {
@@ -82,7 +97,7 @@ struct TitleBarView: View {
                                 .font(.title3.bold())
 //                                .foregroundColor(Color(NSColor.windowFrameTextColor))
                                 .padding(.leading, 12)
-                                .padding(.top, 3)
+//                                .padding(.top, 3)
                         }.buttonStyle(.plain)
                     }
                     Spacer()
@@ -91,11 +106,12 @@ struct TitleBarView: View {
                         newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.topic))
                     } label: {
                         NewTalkButtonView()
-                            .padding(.top, 3)
-                            .padding(.trailing)
+//                            .padding(.top, 3)
                             .font(.title3.bold())
                             .foregroundColor(.red)
-                    }.buttonStyle(.plain)
+                    }
+                    .padding(.trailing, 12)
+                    .buttonStyle(.plain)
                     
                 }
                 .frame(height: CGFloat(TITILEBAR_HEIGHT))

@@ -92,7 +92,7 @@ struct TopicsView: View {
                         .onTapGesture {
                             related = TalkRelated(id: topic.id, type: .topics, title: topic.title, desc: nil, cover: nil, banner: nil, contentString: nil)
                             if newStatus {
-                                gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "tag.fill", topic: topic)
+                                gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "", topic: topic)
                             }
                         }
                 }
@@ -163,9 +163,8 @@ struct StatusTopicsView: View {
                         }
 
                     }
-            }
-
-            if !searchMode {
+            } else {
+                
                 if status.topicCategories.isEmpty {
                     VStack{
                         Spacer()
