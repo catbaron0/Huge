@@ -80,7 +80,7 @@ struct TitleBarView: View {
                             Label("后退", systemImage: "arrow.backward.circle.fill")
                                 .labelStyle(.iconOnly)
                                 .font(.title)
-                                .foregroundColor(Color(NSColor.windowFrameTextColor))
+//                                .foregroundColor(Color(NSColor.windowFrameTextColor))
                                 .padding(.leading, 12)
                                 .padding(.top, 3)
                         }.buttonStyle(.plain)
@@ -93,14 +93,14 @@ struct TitleBarView: View {
                         NewTalkButtonView()
                             .padding(.top, 3)
                             .padding(.trailing)
-                            .foregroundColor(Color(NSColor.windowFrameTextColor))
+//                            .foregroundColor(Color(NSColor.windowFrameTextColor))
                             .font(.title)
                     }.buttonStyle(.plain)
                     
                 }
                 .frame(height: CGFloat(TITILEBAR_HEIGHT))
             }
-            .foregroundColor(Color(NSColor.windowFrameTextColor))
+//            .foregroundColor(Color(NSColor.windowFrameTextColor))
 
         } else {
             EmptyView()
@@ -142,7 +142,7 @@ struct NaviSideBarView: View {
                     }
                     .frame(width:50, height: 50)
                     .clipShape(Circle())
-                    .padding(.bottom)
+                    .padding(.top, SIDEBAR_TOP_PADDING)
                     ForEach(gtalk.talkScenes) {item in
                         SidebarItemView(sidebarItem: item)
                     }
@@ -151,7 +151,6 @@ struct NaviSideBarView: View {
                 Spacer()
             }
         }
-        .background(.ultraThinMaterial, in: Rectangle()).padding(.top, -20)
         //        .background(Color.init(red: 55/255, green: 55/255, blue: 55/255))
     }
 }
@@ -163,12 +162,11 @@ struct SidebarItemView: View {
     var body: some View {
         HStack {
             Label(
-                "Timeline",
-//                systemImage: gtalk.isSelected(sidebarItem: sidebarItem) ? sidebarItem.selectedIcon: sidebarItem.unselectedIcon
+                "",
                 systemImage:sidebarItem.icon
             )
                 .labelStyle(.iconOnly)
-                .foregroundColor(gtalk.isSelected(sidebarItem: sidebarItem) ? .red : .white)
+                .foregroundColor(gtalk.isSelected(sidebarItem: sidebarItem) ? .red : Color(NSColor.windowFrameTextColor))
                 .font(.largeTitle)
                 .frame(width: 70, height: 45)
         }
@@ -218,7 +216,7 @@ struct HeaderView: View {
                 Spacer()
             }
         }
-        .foregroundColor(.white)
+//        .foregroundColor(.white)
         .background(RoundedRectangle(cornerRadius: CornerRadius).fill(Color(red: 1, green: 0, blue: 0, opacity: 0.6)))
     }
 }

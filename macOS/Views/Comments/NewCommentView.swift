@@ -23,9 +23,9 @@ struct NewCommentView: View {
         let opacity = (sendState != nil && sendState! == .sending) ? 0.5 : 1.0
         VStack{
             TextEditor(text: $comment)
-                .background(.red)
-                .font(.title3)
-                
+//                .background(.red)
+                .font(.body)
+                .padding([.leading, .trailing])
                 
             HStack{
                 Spacer()
@@ -56,11 +56,13 @@ struct NewCommentView: View {
                 } label: {
                     Label("发送", systemImage: "paperplane.fill").frame(width: 60, height: 30)
                         .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
-                        .foregroundColor(.white)
+//                        .foregroundColor(.white)
 
                 }.padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
             }
         }
+        .preferredColorScheme(.dark)
+        .background(BlurView().colorMultiply(.blue.opacity(0.3)))
 //        .onDisappear {
 //            gtalk.NSWindowRequestStates.removeValue(forKey: uuid)
 //        }

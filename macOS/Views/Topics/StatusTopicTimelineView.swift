@@ -18,7 +18,7 @@ struct StatusTopicTimelineView: View {
                 status: status,
                 scrollTopPadding: TimelineTopPadding.titleBar.rawValue,
                 headerView: descView,
-                topOffsetTrigger: .timeline)
+                topOffsetTrigger: .topics)
 
 //        }
     }

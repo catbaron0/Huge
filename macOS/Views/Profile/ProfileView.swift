@@ -33,17 +33,8 @@ struct StatusProfilePageView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-        let user = status.user
-        if user == nil {
-            VStack {
-                Spacer()
-                ProgressView()
-                    .onAppear {
-                        gtalk.loadUserInfo(userId: status.userId!, status: status)
-                    }
-                Spacer()
-            }
-        } else {
+
+        if let user = status.user {
             VStack {
                 Spacer().frame(height: TimelineTopPadding.titleBar.rawValue)
                 HStack(alignment: .top) {
@@ -52,13 +43,13 @@ struct StatusProfilePageView: View {
                     VStack(alignment: .leading) {
                         HStack{
                             // TODO: Add gender info before/after the username
-                            Text(user?.nickname ?? "nil")
+                            Text(user.nickname )
                         }.font(.title2.weight(.semibold))
                         HStack(alignment: .bottom) {
                             // TODO: Add status of userlist
                             VStack {
                                 Text("已关注").font(.callout.weight(.light)).opacity(0.6)
-                                let count = user?.followeesCount ?? 0
+                                let count = user.followeesCount ?? 0
                                 Text("\(count)").foregroundColor(.blue)
                             }
                             .contentShape(Rectangle())
@@ -67,7 +58,7 @@ struct StatusProfilePageView: View {
                             }
                             VStack{
                                 Text("被关注").font(.callout.weight(.light)).opacity(0.6)
-                                let count = user?.followersCount ?? 0
+                                let count = user.followersCount ?? 0
                                 Text("\(count)").foregroundColor(.blue)
                             }
                             .contentShape(Rectangle())
@@ -80,24 +71,34 @@ struct StatusProfilePageView: View {
                 }
                 .padding(20)
                 Divider()
-//                .frame(height: TimelineTopPadding.profile.rawValue)
-//                VStack {
-                    if let intro = user?.intro {
-                        StatusTalksTimelineView(
-                            status: status,
-                            scrollTopPadding: 0,
-                            headerView: HeaderView(desc: intro),
-                            topOffsetTrigger: .profile)
-                        
-                    } else {
-                        StatusTalksTimelineView(
-                            status: status,
-                            scrollTopPadding: 0,
-                            headerView: nil,
-                            topOffsetTrigger: .profile)
-                    }
-//                }
+                if let intro = user.intro, intro.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                    StatusTalksTimelineView(
+                        status: status,
+                        scrollTopPadding: 0,
+                        headerView: HeaderView(desc: intro),
+                        topOffsetTrigger: .profile)
+                    
+                } else {
+                    StatusTalksTimelineView(
+                        status: status,
+                        scrollTopPadding: 0,
+                        headerView: nil,
+                        topOffsetTrigger: .profile)
+                }
+                //                }
+            }
+        } else {
+            VStack {
+                Spacer()
+                if let userId = status.userId {
+                    ProgressView()
+                        .onAppear {
+                            gtalk.loadUserInfo(userId: userId, status: status)
+                        }
+                    Spacer()
+                }
             }
         }
+        
     }
 }

@@ -46,6 +46,7 @@
 		0780F92D275A385F0062F9B7 /* StatusTopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */; };
 		0780F930275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */; };
 		0780F931275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */; };
+		079D086D276DD0B9008D78EA /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079D086C276DD0B8008D78EA /* BlurView.swift */; };
 		07A100F72754742C00D599D5 /* StatusTalksTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100F62754742B00D599D5 /* StatusTalksTimelineView.swift */; };
 		07A100F9275474B900D599D5 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100F8275474B900D599D5 /* ImageView.swift */; };
 		07A100FB2754750600D599D5 /* ComponentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07A100FA2754750600D599D5 /* ComponentsView.swift */; };
@@ -101,6 +102,7 @@
 		0780F9222757E3A30062F9B7 /* ReadableScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadableScroller.swift; sourceTree = "<group>"; };
 		0780F92B275A385F0062F9B7 /* StatusTopicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTopicsView.swift; sourceTree = "<group>"; };
 		0780F92F275A53AE0062F9B7 /* StatusTopicTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTopicTimelineView.swift; sourceTree = "<group>"; };
+		079D086C276DD0B8008D78EA /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		07A100F42753361600D599D5 /* GCoresTalk--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GCoresTalk--macOS--Info.plist"; sourceTree = "<group>"; };
 		07A100F62754742B00D599D5 /* StatusTalksTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTalksTimelineView.swift; sourceTree = "<group>"; };
 		07A100F8275474B900D599D5 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				070DE89227608885008B3F08 /* NSWindow.swift */,
 				07A100FA2754750600D599D5 /* ComponentsView.swift */,
 				07A100F8275474B900D599D5 /* ImageView.swift */,
+				079D086C276DD0B8008D78EA /* BlurView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -467,6 +470,7 @@
 				071C492F2754D15A000D879B /* StatusCommentsView.swift in Sources */,
 				075BC8A2275CF04900EAC204 /* StatusUserListView.swift in Sources */,
 				07AE5A132750F6F400FF9649 /* TalkModelData.swift in Sources */,
+				079D086D276DD0B9008D78EA /* BlurView.swift in Sources */,
 				07EE3C832762F87700DC3A03 /* SearchRersultsView.swift in Sources */,
 				0780F9242757E3A30062F9B7 /* ReadableScroller.swift in Sources */,
 			);
@@ -663,6 +667,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "GCoresTalk--macOS--Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -693,6 +698,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "GCoresTalk--macOS--Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

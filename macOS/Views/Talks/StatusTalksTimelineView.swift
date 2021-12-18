@@ -31,7 +31,7 @@ struct StatusTalksTimelineView: View {
                                     gtalk.loadTimeline(status: status, earlier: false)
                                 }
                             }
-                        Spacer().frame(height: 10)
+                        Spacer().frame(height: SIDEBAR_TOP_PADDING)
                         if status.loadingLatest == .loading {
                             ProgressView().padding(.top, 30)
                                 .onDisappear {
@@ -42,7 +42,7 @@ struct StatusTalksTimelineView: View {
 //                            .padding(.bottom, 10)
 //                        }
                         if let headerView = headerView {
-                            headerView.padding(.bottom)
+                            headerView.padding([.top, .leading, .trailing])
                         }
                         LazyVStack{
                             ForEach(status.talks){ card in
@@ -52,6 +52,7 @@ struct StatusTalksTimelineView: View {
                                         print(card.id)
                                         gtalk.addStatusToCurrentScene(after: status, statusType: .comments, title: "评论", icon: "bubble.right.fill", targetTalkId: card.id)
                                     }
+                                Divider()
                             }.padding()
                             VStack { // Bottom LoadingBar
                                 switch status.loadingEarlier {

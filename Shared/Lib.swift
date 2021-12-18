@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import SwiftUI
 enum TimelineEndPoint {
     case recommend
     case followee
@@ -74,5 +74,15 @@ extension Data {
         default:
             return nil
         }
+    }
+}
+
+extension NSTextView {
+    open override var frame: CGRect {
+        didSet {
+            backgroundColor = .clear //<<here clear
+            drawsBackground = true
+        }
+
     }
 }

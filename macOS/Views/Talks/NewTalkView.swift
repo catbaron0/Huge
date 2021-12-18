@@ -30,8 +30,8 @@ struct NewTalkRelatedLabel: View {
 }
 
 struct NewTalkView: View {
-//    let windowId: String
-//    let _status: ViewStatus
+    //    let windowId: String
+    //    let _status: ViewStatus
     @ObservedObject var status: ViewStatus
     @ObservedObject var gtalk: GCoresTalk
     
@@ -39,7 +39,7 @@ struct NewTalkView: View {
     @State  var talkText: String = ""
     @State  var checkInfo: String = ""
     @State  var relatedView: GCoresRelatedType = .topics
-//    @State  var images = [Image]()
+    //    @State  var images = [Image]()
     @State  var images = [URL]()
     @State  var related: TalkRelated? = nil
     @State  var query: String = ""
@@ -53,12 +53,18 @@ struct NewTalkView: View {
     var body: some View {
         let sendState = status.requestState
         let opacity = (sendState != nil && sendState! == .sending) ? 0.5 : 1.0
-
+        
         VStack {
             TextEditor(text: $talkText)
                 .frame(minWidth: 300)
                 .frame(height: 100)
-
+                .padding([.leading, .trailing], 5)
+                .font(.body)
+                .ignoresSafeArea()
+            
+            Divider().padding()
+            
+            
             VStack {
                 // send button
                 HStack {
@@ -108,16 +114,16 @@ struct NewTalkView: View {
                             .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
                             .foregroundColor(.white)
                             .disabled(status.requestState != nil && status.requestState! == .sending)
-
+                        
                     }.buttonStyle(PlainButtonStyle()).opacity(opacity)
                 }.padding([.leading, .trailing], 10)
-
+                
                 // Related content
                 if let related = related {
                     RelatedCardView(related: related)
                         .padding([.leading, .trailing])
                 }
-
+                
                 Divider().padding()
                 // Buttons of related contents
                 HStack {
@@ -160,8 +166,8 @@ struct NewTalkView: View {
                     searchMode = false
                     gtalk.search(status: status, endponit: relatedView, query: "", earlier: false, recommend: true)
                 }
-
-
+                
+                
                 // Search input box
                 HStack {
                     TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
@@ -174,7 +180,7 @@ struct NewTalkView: View {
                         .onChange(of: relatedView) { _relatedView in
                             searchMode = false
                         }
-
+                    
                     Button {
                         submitSearch()
                     } label: {
@@ -184,54 +190,50 @@ struct NewTalkView: View {
                             .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
                             .foregroundColor(.white)
                             .font(.body.bold())
-
+                        
                     }.padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
                 }.padding(.bottom, -5).padding([.leading, .trailing], 10)
-
-
+                
+                
                 // Related search results
                 if relatedView == .image {
                     // Images
-    //                if !images.isEmpty {
-                        VStack {
-                            GeometryReader { proxy in
-                                let size = (proxy.size.width - 15 ) / 3
-                                ScrollView {
-                                    LazyVGrid(columns: imageRow, alignment: .leading, spacing: 10) {
-                                        ForEach(images, id: \.absoluteString) { url in
-                                            ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))
-    //                                    ForEach(0..<images.count) { idx in
-    //                                        images[idx]
+                    VStack {
+                        GeometryReader { proxy in
+                            let size = (proxy.size.width - 15 ) / 3
+                            ScrollView {
+                                LazyVGrid(columns: imageRow, alignment: .leading, spacing: 10) {
+                                    ForEach(images, id: \.absoluteString) { url in
+                                        ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))
                                             .scaledToFill()
                                             .frame(width: size, height: size)
                                             .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
-                                        }
-                                        Button {
-                                            importImage = true
-                                        } label: {
-                                            Label("添加图片", systemImage: "plus.viewfinder")
-                                                .labelStyle(.iconOnly)
-                                                .font(.largeTitle.bold())
-                                        }
-                                        .frame(width:size, height: size).foregroundColor(.white)
-                                        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
-                                        .buttonStyle(.plain)
-                                        .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg], allowsMultipleSelection: true) { result in
-                                            switch result {
-                                            case .success(let urls):
-                                                images = urls
-    //                                            }
-                                            default:
-                                                break
-                                            }
+                                    }
+                                    Button {
+                                        importImage = true
+                                    } label: {
+                                        Label("添加图片", systemImage: "plus.viewfinder")
+                                            .labelStyle(.iconOnly)
+                                            .font(.largeTitle.bold())
+                                    }
+                                    .frame(width:size, height: size).foregroundColor(.white)
+                                    .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
+                                    .buttonStyle(.plain)
+                                    .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg], allowsMultipleSelection: true) { result in
+                                        switch result {
+                                        case .success(let urls):
+                                            images = urls
+                                        default:
+                                            break
                                         }
                                     }
                                 }
                             }
-
                         }
                         
-    //                }
+                    }
+                    
+                    //                }
                 } else if !searchMode && relatedView == .topics {
                     // List of topics
                     HStack {
@@ -255,7 +257,7 @@ struct NewTalkView: View {
                                 
                                 Spacer()
                             }
-
+                            
                         }
                     }
                     .frame(minHeight: 500)
@@ -263,18 +265,21 @@ struct NewTalkView: View {
                 } else {
                     SearchRersultsView(status: status, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchMode: $searchMode, searchType: relatedView).environmentObject(gtalk)
                         .frame(minHeight: 500)
+                        .padding([.leading, .trailing])
                         .onChange(of: triggerSensor) { result in
                             if let result = searchResult {
                                 if relatedView == .topics {
                                     topic = result
                                 } else {
-                                 related = result
+                                    related = result
                                 }
                             }
                         }
                 }
             }
         }
+        .preferredColorScheme(.dark)
+        .background((BlurView().colorMultiply(.blue.opacity(0.3))))
     }
     
     func submitSearch() {
@@ -287,7 +292,7 @@ struct NewTalkView: View {
         // gtalk.searchTopic
         gtalk.search(status: status, endponit: relatedView, query: query, earlier: false, recommend: false)
     }
-
+    
     func submit() {
         if talkText.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 && images.isEmpty{
             checkInfo = "内容不能为空！"

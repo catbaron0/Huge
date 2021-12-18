@@ -67,13 +67,12 @@ struct SearchRersultsView: View {
 
         GeometryReader { proxy in
             VStack {
-                List{// ForEach
-                    LazyVStack{ // ForEach(cards)
+                ScrollView{// ForEach
+                    LazyVStack { // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
                         ForEach(status.searchResults){ result in
                             // We need foreach to avoid reloading images everytime the talkcards appear
                             RelatedCardView(related: result)
-//                                .padding([.top, .leading])
                                 .onTapGesture {
                                     selectResult = result
                                     switchTrigger.toggle()
@@ -82,37 +81,34 @@ struct SearchRersultsView: View {
                         if status.requestEarlier == .empty {
                             Text("这就是一切了。").padding()
                         }
+                        VStack { // LoadingBar
+                            
+                            switch  status.requestEarlier {
+                            case .sending:
+                                VStack {
+                                    Spacer()
+                                    ProgressView()
+                                    Spacer()
+                                }
+                                
+                            case .succeed:
+                                if proxy.size.height - scrollerOffset.y > -260 && proxy.size.height - scrollerOffset.y < 0{
+                                    Divider()
+                                        .contentShape(Rectangle())
+                                        .onAppear {
+                                            gtalk.search(status: status, endponit: searchType, query: query , earlier: true, recommend: !searchMode)
+                                        }
+                                }
+                            default:
+                                EmptyView()
+                            }
+                        }.padding(.bottom)
                     }.readingScrollView(from: "scroll", into: $scrollerOffset)
                 }
+
                 .frame(maxWidth: .infinity)
                 .frame(height: proxy.size.height)
                 .coordinateSpace(name: "scroll")
-                
-                .overlay(alignment: .bottom) {
-                    VStack { // LoadingBar
-                        
-                        switch  status.requestEarlier {
-                        case .sending:
-                            VStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            
-                        case .succeed:
-                            if proxy.size.height - scrollerOffset.y > -260 && proxy.size.height - scrollerOffset.y < 0{
-                                Divider()
-                                    .contentShape(Rectangle())
-                                    .onAppear {
-                                        gtalk.search(status: status, endponit: searchType, query: query , earlier: true, recommend: !searchMode)
-                                    }
-                            }
-                        default:
-                            EmptyView()
-                        }
-                    }.padding(.bottom)
-                }
-                
             }
         }
     }

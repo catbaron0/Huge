@@ -16,7 +16,7 @@ struct GCoresTalkApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .background(Color.clear)
+                .preferredColorScheme(.dark)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext).environmentObject(gtalk)
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "*"), allowing: Set(arrayLiteral: "*"))
                 .onOpenURL { url in

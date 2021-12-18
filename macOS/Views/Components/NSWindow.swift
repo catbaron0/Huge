@@ -38,7 +38,7 @@ func newNSWindow<T>(view: T) where T: View
         backing: .buffered, defer: false)
     winRef.center()
     winRef.isOpaque = false
-    winRef.contentView = NSHostingView(rootView: view)
+    winRef.contentView = NSHostingView(rootView: view.ignoresSafeArea())
 //    winRef.setContentSize(view.geo)
     winRef.titlebarAppearsTransparent = true
     winRef.makeKeyAndOrderFront(nil)

@@ -135,6 +135,9 @@ class GCoresTalk: ObservableObject{
         Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
             self.scheduleQueue.async {
                 // check notifications
+                if self.loginInfo.loginState == .logout {
+                    return
+                }
                 var status = self.statusForScene[.notification]![0]
                 if status.loadingLatest != .loading {
                     self.checkUnreadNotifications(status: status)
