@@ -94,7 +94,7 @@ struct StatusNotificationView: View {
     var body: some View {
         GeometryReader { proxy in
             VStack {
-                List {// ForEach
+                ScrollView {// ForEach
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
                         Spacer().frame(height: scrollTopPadding)
@@ -142,7 +142,7 @@ struct StatusNotificationView: View {
                         }
                     }
                 }.padding(.bottom)
-            }
+            }.padding()
         }
     }
 }

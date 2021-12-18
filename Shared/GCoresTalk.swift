@@ -1177,6 +1177,12 @@ class GCoresTalk: ObservableObject{
     }
     
     func loadNotifications(status: ViewStatus, earlier: Bool) {
+        mainQueue.async {
+            if earlier {
+                status.requestEarlier = .succeed
+            } else {
+                status.unreadCount = 0
+            }        }
         var pageOffset = 0
         if earlier {
             self.mainQueue.async {
@@ -1240,7 +1246,6 @@ class GCoresTalk: ObservableObject{
                         if earlier {
                             status.requestEarlier = .succeed
                         } else {
-                            status.unreadCount = 1
                             self.markNotificationsAsSeen(status: status)
                             status.requestLatest = .succeed
                         }

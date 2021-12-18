@@ -198,6 +198,16 @@ struct SidebarItemView: View {
             } else {
                 print("switch item")
                 gtalk.select(sidebarItem: sidebarItem)
+                let status = gtalk.statusForScene[sidebarItem.sceneType]![0]
+                switch status.statusType {
+                case .notification:
+                    // Update notifications evert time switch to this view
+                    gtalk.loadNotifications(status: status, earlier: false)
+                    gtalk.markNotificationsAsSeen(status: status)
+                default:
+                    break
+                }
+
             }
             
         }

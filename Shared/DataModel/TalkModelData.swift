@@ -223,26 +223,8 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
             }
             return
         }
-//        // sync the unread notifications
-//        if let latest = notifications.first, latest.unRead == false {
-//            // all the notifications are read
-//            readAllNotifications()
-//        }
         // The latest is loaded
         notifications = newNotifications
-//        var _notifications = newNotifications
-//        while !_notifications.isEmpty {
-//            let notif = _notifications.popLast()!
-//            if notif.object.isEmpty {
-//                continue
-//            }
-//            if !(self.notifications.contains {$0 == notif}) {
-//                self.notifications.insert(notif, at: 0)
-//                if notif.unRead {
-//                    unreadNotificationsCount += 1
-//                }
-//            }
-//        }
     }
     
     func readNotification(_ notification: Notification) {
