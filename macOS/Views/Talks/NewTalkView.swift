@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct NewTalkRelatedLabel: View {
     let text: String
@@ -40,7 +41,7 @@ struct NewTalkView: View {
     @State  var checkInfo: String = ""
     @State  var relatedView: GCoresRelatedType = .topics
     //    @State  var images = [Image]()
-    @State  var images = [URL]()
+    @State  var images = [NSImage]()
     @State  var related: TalkRelated? = nil
     @State  var query: String = ""
     @State  var searchMode = false
@@ -61,6 +62,22 @@ struct NewTalkView: View {
                 .padding([.leading, .trailing], 5)
                 .font(.body)
                 .ignoresSafeArea()
+                .onPasteCommand(of: [.image, .url]) { providers in
+                    for provider in providers {
+                        if self.images.count < 9 {
+                            if provider.registeredTypeIdentifiers.contains(UTType.image.identifier) {
+                                provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
+                                    print("load image")
+                                }
+                            }
+                            if provider.registeredTypeIdentifiers.contains(UTType.url.identifier) {
+                                provider.loadDataRepresentation(forTypeIdentifier: UTType.url.identifier) { data, error in
+                                    print("load url")
+                                }
+                            }
+                        }
+                    }
+                }
             
             Divider().padding()
             
@@ -172,7 +189,7 @@ struct NewTalkView: View {
                 HStack {
                     TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
                         .font(.title2)
-                        .cornerRadius(CornerRadius)
+                        .cornerRadius(SearchBoxCornerRadius)
                         .padding(.bottom, 8)
                         .onSubmit {
                             submitSearch()
@@ -186,14 +203,13 @@ struct NewTalkView: View {
                     } label: {
                         Label("搜索", systemImage: "magnifyingglass")
                             .labelStyle(.iconOnly)
-                            .frame(width: 40, height: 30)
+                            .frame(width: 40, height: 25)
                             .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
                             .foregroundColor(.white)
                             .font(.body.bold())
                         
                     }.padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
                 }.padding(.bottom, -5).padding([.leading, .trailing], 10)
-                
                 
                 // Related search results
                 if relatedView == .image {
@@ -203,11 +219,21 @@ struct NewTalkView: View {
                             let size = (proxy.size.width - 15 ) / 3
                             ScrollView(showsIndicators: false) {
                                 LazyVGrid(columns: imageRow, alignment: .leading, spacing: 10) {
-                                    ForEach(images, id: \.absoluteString) { url in
-                                        ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))
+                                    ForEach(0..<images.count, id: \.self) { idx in
+                                        Image(nsImage: images[idx])
+//                                    }
+//                                    ForEach(images, id: \.absoluteString) { url in
+//                                        ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))
                                             .scaledToFill()
                                             .frame(width: size, height: size)
                                             .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+                                            .overlay(alignment: .topTrailing) {
+                                                // delete buton
+                                                Label("", systemImage: "minus.circle").font(.title3)
+                                                    .onTapGesture {
+                                                        images.remove(at: idx)
+                                                    }
+                                            }
                                     }
                                     Button {
                                         importImage = true
@@ -215,14 +241,20 @@ struct NewTalkView: View {
                                         Label("添加图片", systemImage: "plus.viewfinder")
                                             .labelStyle(.iconOnly)
                                             .font(.largeTitle.bold())
+                                            .frame(width:size, height: size).foregroundColor(.white)
+                                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
+                                            .contentShape(Rectangle())
                                     }
-                                    .frame(width:size, height: size).foregroundColor(.white)
-                                    .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
                                     .buttonStyle(.plain)
                                     .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg], allowsMultipleSelection: true) { result in
                                         switch result {
                                         case .success(let urls):
-                                            images = urls
+                                            for url in urls {
+                                                let img = NSImage(byReferencing: url)
+                                                img.setName(url.absoluteString)
+                                                images.append(img)
+                                            }
+//                                            images = urls.map { url in NSImage(byReferencing: url) }
                                         default:
                                             break
                                         }
@@ -231,7 +263,7 @@ struct NewTalkView: View {
                             }
                         }
                         
-                    }
+                    }.padding([.leading, .trailing])
                     
                     //                }
                 } else if !searchMode && relatedView == .topics {
@@ -301,7 +333,7 @@ struct NewTalkView: View {
         checkInfo = ""
         if status.requestState != .sending {
             if let topic = topic {
-                gtalk.newTalk(text: talkText, imageUrls: images, topic: topic, related: related, status: status)
+                gtalk.newTalk(text: talkText, nsImages: images, topic: topic, related: related, status: status)
             }
             
         }

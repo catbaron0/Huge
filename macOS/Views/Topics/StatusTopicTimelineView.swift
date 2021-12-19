@@ -10,16 +10,14 @@ import SwiftUI
 
 struct StatusTopicTimelineView: View {
     @StateObject var status: ViewStatus
-//    @State var scrollerOffset: CGFloat
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
-            let descView = HeaderView(desc: status.topic!.desc!)
-            StatusTalksTimelineView(
-                status: status,
-                scrollTopPadding: TimelineTopPadding.titleBar.rawValue,
-                headerView: descView,
-                topOffsetTrigger: .topics)
-
-//        }
+        let descView = HeaderView(desc: status.topic!.desc!)
+        StatusTalksTimelineView(
+            status: status,
+            scrollTopPadding: TimelineTopPadding.titleBar.rawValue,
+            headerView: descView,
+            topOffsetTrigger: .topics)
+        
     }
 }

@@ -248,7 +248,9 @@ class GCoresTalk: ObservableObject{
     }
     
     func newTalk(content: String, topic: TalkRelated, related: TalkRelated?, status: ViewStatus) {
-        status.requestState = .sending
+        self.mainQueue.async {
+            status.requestState = .sending
+        }
         let jsonData = [
             "data": [
                 "type": "talks",
@@ -302,23 +304,23 @@ class GCoresTalk: ObservableObject{
         }.resume()
     }
     
-    func newTalk(text: String, imageUrls: [URL]?, topic: TalkRelated, related: TalkRelated?, status: ViewStatus) {
+    func newTalk(text: String, nsImages: [NSImage]?, topic: TalkRelated, related: TalkRelated?, status: ViewStatus) {
         // upload image
         
         var uploadedImages = [String: String]()
         
         let dispatchGroup = DispatchGroup()
-        if let urls = imageUrls, !urls.isEmpty {
-            urls.forEach{url in
+        if let nsImages = nsImages, !nsImages.isEmpty {
+            nsImages.forEach{image in
                 dispatchGroup.enter()
-                uploadImage(url: url)
+                uploadImage(image: image)
             }
             dispatchGroup.notify(queue: .global()) {
-                // Generate Content
+                // Generate content string of new talks
                 var imgStr = [String]()
-                imageUrls?.forEach { url in
-                    let img = NSImage(contentsOf: url)!
-                    let src = uploadedImages[url.absoluteString]!
+                nsImages.forEach { img in
+//                    let img = NSImage(contentsOf: url)!
+                    let src = uploadedImages[img.name()!]!
                     let width = img.size.width
                     let height = img.size.height
                     imgStr.append("{\"path\":\"\(src)\",\"width\":\(width),\"height\":\(height)}")
@@ -333,9 +335,10 @@ class GCoresTalk: ObservableObject{
         }
         
         
-        func uploadImage(url: URL) {
+        func uploadImage(image: NSImage) {
             let endPoint = URL(string: "https://www.gcores.com/gapi/v1/images")!
-            let data = try? Data(contentsOf: url)
+//            let data = try? Data(contentsOf: image.url)
+            let data = image.tiffRepresentation
             let boundary = UUID().uuidString
             let body = createHttpBody(binaryData: data!, boundary: boundary, parameters: ["file": UUID().uuidString])
             let request = gcoresRequest(url: endPoint, httpMethod: "POST", body: body, image: true, boundary: boundary)
@@ -347,7 +350,7 @@ class GCoresTalk: ObservableObject{
                 guard let data = data else{ return }
                 
                 let resp = try! JSONSerialization.jsonObject(with: data) as! [String: String]
-                uploadedImages[url.absoluteString] = resp["path"]
+                uploadedImages[image.name()!] = resp["path"]
                 dispatchGroup.leave()
             }
             task.resume()

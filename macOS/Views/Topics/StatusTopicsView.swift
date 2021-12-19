@@ -26,20 +26,13 @@ struct TopicCategoryCardView: View {
 
 struct TopicCategoriesView: View {
     @StateObject var status: ViewStatus
-//    let windowId: String?
     @State private var offset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
-//    @State var selectedTopicCategory: TalkTopicCategory? = nil
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//        let status = gtalk.statusForScene[sceneType]![idx]
-//        let status = windowId == nil ? gtalk.statusForScene[_status.sceneType]!.first { $0.id == _status.id} : gtalk.NSWindowStatus[windowId!]!
         ScrollView(showsIndicators: false) {
             VStack {
                 ForEach(status.topicCategories) { category in
                     Group {
-//                        if category == gtalk.selectedTopicCategory {
                         if category == status.selectedTopicCategory {
                             TopicCategoryCardView(topicCategory: category)
                                 .background(Rectangle().fill(.red).opacity(0.8))
@@ -50,7 +43,6 @@ struct TopicCategoriesView: View {
 
                     }
                         .onTapGesture{
-//                            gtalk.select(topicCategory: category)
                             status.selectedTopicCategory = category
                             withAnimation {
                                 gtalk.loadTopics(status: status, categoryId: category.id)
@@ -124,7 +116,8 @@ struct StatusTopicsView: View {
             if gtalk.selectedTalkSceneType == status.sceneType {
                 HStack {
                     TextField("话题", text: $query, prompt: Text("搜索话题"))
-                        .onChange(of: query) { text in
+                        .cornerRadius(SearchBoxCornerRadius)
+                        .onChange(of: query) { text in 
                             if query == "" {
                                 searchMode = false
                             }
@@ -139,8 +132,9 @@ struct StatusTopicsView: View {
                         submit()
                     } label: {
                         Label("搜索", systemImage: "magnifyingglass")
-                            .padding(5)
+//                            .padding(5)
                             .labelStyle(.iconOnly)
+                            .frame(width: 40, height: 25)
                             .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
                             .foregroundColor(.white)
                             .font(.body.bold())
