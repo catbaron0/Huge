@@ -57,11 +57,7 @@ struct NewCommentView: View {
                     Label("发送", systemImage: "paperplane.fill").frame(width: 60, height: 30)
                         .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
                 }.padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
-                    .onChange(of: status) { _ in
-                        print(status.requestState)
-                    }
                     .disabled(status.requestState != nil && status.requestState! == .sending)
-//                    .disabled(true)
 
             }
         }

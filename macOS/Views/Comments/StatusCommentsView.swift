@@ -69,7 +69,7 @@ struct TalkCommentBottomView: View {
             }
             Spacer()
             Button{
-                print("New window for comment")
+                newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: status.targetTalk!.id, targetCommentId: comment.id, status: status, gtalk: gtalk))
             } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
         }.font(.title3.bold())
