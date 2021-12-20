@@ -132,7 +132,7 @@ struct StatusCommentsView: View {
         GeometryReader { proxy in
             VStack {
                 let topOffset = scrollerOffset.x
-                ScrollView{// ForEach
+                ScrollView(showsIndicators: false) {// ForEach
                     LazyVStack{ // ForEach(cards)
                         // LazyVstack to avoid refresh of cards
                         Spacer().frame(height: TimelineTopPadding.titleBar.rawValue)

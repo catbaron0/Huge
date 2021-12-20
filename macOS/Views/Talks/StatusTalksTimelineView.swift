@@ -45,25 +45,21 @@ struct StatusTalksTimelineView: View {
                                     }
                                 Divider()
                             }.padding([.leading, .trailing])
-                            VStack { // Bottom LoadingBar
-                                switch status.loadingEarlier {
-                                case .loading:
-                                    ProgressView()
-                                case .empty:
-                                    Text("这就是一切了。").padding()
-                                case .loaded:
-                                    if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 10 {
-                                        Divider()
-                                            .contentShape(Rectangle())
-                                            .onAppear {
-                                                print("bottom ofset \(proxy.size.height - offset.y)")
-                                                print(status.loadingLatest)
-                                                status.loadingEarlier = .loading
-                                                gtalk.loadTimeline(status: status, earlier: true)
-                                            }
+                            
+                            if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 0 && status.loadingEarlier == .loaded {
+                                ProgressView()
+                                    .padding(.bottom)
+                                    .id(3)
+                                    .contentShape(Rectangle())
+                                    .onAppear {
+                                        print("bottom ofset \(proxy.size.height - offset.y)")
+                                        print(status.loadingLatest)
+                                        gtalk.loadTimeline(status: status, earlier: true)
                                     }
-                                }
-                            }.padding(.bottom).id(3)
+                            } else if status.loadingEarlier == .empty {
+                                Text("这就是一切了。").padding()
+                            }
+
                         }.readingScrollView(from: "scroll", into: $offset)
                     }.coordinateSpace(name: "scroll")
                 }

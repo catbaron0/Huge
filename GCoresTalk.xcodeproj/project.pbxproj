@@ -69,7 +69,6 @@
 		07AE5A132750F6F400FF9649 /* TalkModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE5A112750F6F300FF9649 /* TalkModelData.swift */; };
 		07EE3C7F2762605500DC3A03 /* GCoresSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C7E2762605500DC3A03 /* GCoresSearchResponse.swift */; };
 		07EE3C802762605500DC3A03 /* GCoresSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C7E2762605500DC3A03 /* GCoresSearchResponse.swift */; };
-		07EE3C822762F87700DC3A03 /* SearchRersultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */; };
 		07EE3C832762F87700DC3A03 /* SearchRersultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */; };
 		07EE3C8527631B5300DC3A03 /* NewTalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C8427631B5300DC3A03 /* NewTalkView.swift */; };
 		07EE3C8627631B5300DC3A03 /* NewTalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C8427631B5300DC3A03 /* NewTalkView.swift */; };
@@ -157,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				070DE89227608885008B3F08 /* NSWindow.swift */,
+				07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */,
 				07A100FA2754750600D599D5 /* ComponentsView.swift */,
 				07A100F8275474B900D599D5 /* ImageView.swift */,
 				079D086C276DD0B8008D78EA /* BlurView.swift */,
@@ -179,7 +179,6 @@
 			children = (
 				071C492D2754D15A000D879B /* StatusCommentsView.swift */,
 				070DE8952760890B008B3F08 /* NewCommentView.swift */,
-				07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */,
 			);
 			path = Comments;
 			sourceTree = "<group>";
@@ -423,7 +422,6 @@
 				07AE59FA274F5B0300FF9649 /* ContentView.swift in Sources */,
 				0780F91D2757985C0062F9B7 /* GCoresData.swift in Sources */,
 				07EE3C7F2762605500DC3A03 /* GCoresSearchResponse.swift in Sources */,
-				07EE3C822762F87700DC3A03 /* SearchRersultsView.swift in Sources */,
 				07FF7FFE276987E300674790 /* GCoresConstant.swift in Sources */,
 				075BC88A275B294D00EAC204 /* LoginView.swift in Sources */,
 				075BC88D275B5FA100EAC204 /* GCoresUserData.swift in Sources */,

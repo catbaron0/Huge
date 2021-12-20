@@ -432,16 +432,16 @@ class GCoresTalk: ObservableObject{
                     } else {
                         status.unreadCount = 0
                     }
-                    self.syncUnreadWith(status: status)
+                    self.syncUnread(withStatus: status)
                 }
             }
         }
         task.resume()
     }
     
-    func syncUnreadWith(status: ViewStatus) {
-        let index = self.talkScenes.firstIndex(where: {$0.sceneType == status.sceneType})
-        if status.unreadCount > 0 {
+    func syncUnread(withStatus: ViewStatus) {
+        let index = self.talkScenes.firstIndex(where: {$0.sceneType == withStatus.sceneType})
+        if withStatus.unreadCount > 0 {
             self.talkScenes[index!].unread = true
         } else {
             self.talkScenes[index!].unread = false
@@ -449,6 +449,9 @@ class GCoresTalk: ObservableObject{
     }
     
     func loadTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
+        if status.loadingEarlier == .empty {
+            return
+        }
         mainQueue.async {
             if earlier {
                 status.loadingEarlier = .loading
@@ -509,8 +512,18 @@ class GCoresTalk: ObservableObject{
                         }
                     } else if earlier {
                         status.talks += talks
+                        if earlier {
+                            status.loadingEarlier = .loaded
+                        } else {
+                            status.loadingLatest = .loaded
+                        }
                     } else {
                         status.talks = talks
+                        if earlier {
+                            status.loadingEarlier = .loaded
+                        } else {
+                            status.loadingLatest = .loaded
+                        }
                     }
                 }
             }
@@ -518,16 +531,13 @@ class GCoresTalk: ObservableObject{
                 self.mainQueue.async {
                     if status.talks.isEmpty {
                         status.unreadCount = 0
-                        self.syncUnreadWith(status: status)
+                        self.syncUnread(withStatus: status)
                     }
-                    status.loadingEarlier = .loaded
                 }
             } else {
                 self.mainQueue.async {
-                    status.loadingEarlier = .loaded
-                    status.loadingLatest = .loaded
                     status.unreadCount = 0
-                    self.syncUnreadWith(status: status)
+                    self.syncUnread(withStatus: status)
                 }
             }
         }
@@ -913,6 +923,9 @@ class GCoresTalk: ObservableObject{
     func sendComment(talkId: String, commentId: String?, status: ViewStatus, comment: String) {
         let userId = loginInfo.userId
         status.requestLatest = .sending
+        status.objectWillChange.send()
+        
+        
         var data: [String: String]? = nil
         if let commentId = commentId {
             data = [
@@ -966,6 +979,7 @@ class GCoresTalk: ObservableObject{
                 }
                 let commentRes = try! JSONDecoder().decode(NewCommentResponse.self, from: data)
                 let comment = commentRes.formalize()
+//                NSApplication.shared.keyWindow?.close()
                 // Got response from the server about the sent comment
                 // Insert the comment to the list maintained by current status
                 // * For talkTimeLine status:
@@ -1252,7 +1266,7 @@ class GCoresTalk: ObservableObject{
                             self.markNotificationsAsSeen(status: status)
                             status.requestLatest = .succeed
                         }
-                        self.syncUnreadWith(status: status)
+                        self.syncUnread(withStatus: status)
                     }
                 }
             }
