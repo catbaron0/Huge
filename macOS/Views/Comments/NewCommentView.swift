@@ -22,6 +22,14 @@ struct NewCommentView: View {
         let sendState = status.requestState
         let opacity = (sendState != nil && sendState! == .sending) ? 0.5 : 1.0
         VStack{
+            if let targetCommentId = targetCommentId {
+                let replyToUser = status.getUserOfReplyTo(replyToId: targetCommentId)
+                HStack{
+                    Text("回复").font(.callout)
+                    Text("\(replyToUser!.nickname)").foregroundColor(.red).font(.callout.bold())
+                        .padding(.top, 3)
+                }.padding(.top, 5)
+            }
             TextEditor(text: $comment)
                 .font(.body)
                 .padding([.leading, .trailing])
