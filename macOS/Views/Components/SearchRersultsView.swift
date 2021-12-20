@@ -79,7 +79,7 @@ struct SearchRersultsView: View {
                                 }
                         }
                         if status.requestEarlier == .empty {
-                            Text("这就是一切了。").padding()
+                            Text("这就是一切了。").padding(.bottom, 20)
                         }
                         VStack { // LoadingBar
                             

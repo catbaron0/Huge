@@ -7,48 +7,72 @@
 
 import SwiftUI
 
+struct CommentCardHeadView: View {
+    let user: TalkUser
+    let created: String
+    let replyTo: TalkUser?
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading){
+                HStack {
+                    Text(user.nickname).font(.title3)
+                    if let replyTo = replyTo {
+                        Label(replyTo.nickname, systemImage: "arrow.right.circle")
+                    }
+                }
+                Text(String(created)).foregroundColor(.gray)
+            }
+            .frame(height: 50)
+            
+            Spacer()
+        }
+    }
+}
+
+
 struct TalkCommentBottomView: View {
     let comment: TalkCommentCard
     @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-            HStack{
-                // thumb up
-                let likesCount = comment.likesCount ?? 0
-                if let isVoting = comment.isVoting, isVoting {
-                    Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.gray).font(.caption)
-                } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, voteFlag  {
-                    Label("\(likesCount)", systemImage: "hand.thumbsup.circle.fill").foregroundColor(.red)
-                        .onTapGesture {
-                            gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
-                        }
-                } else {
-                    Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.red)
-                        .onTapGesture {
-                            gtalk.voteTo(targetId: comment.id, targetType: .comments, voteFlag: true, status: status)
-                        }
-                }
-                // thumb down
-                if let isVoting = comment.isVoting, isVoting {
-                    Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.gray).font(.caption)
-                } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, !voteFlag  {
-                    Label("-", systemImage: "hand.thumbsdown.circle.fill").labelStyle(.iconOnly).foregroundColor(.red)
-                        .onTapGesture {
-                            gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
-                        }
-                } else {
-                    Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.red)
-                        .onTapGesture {
-                            gtalk.voteTo(targetId: comment.id, targetType: .comments, voteFlag: false, status: status)
-                        }
-                }
-                Spacer()
-                Button{
-                    print("New window for comment")
-                } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
+        HStack{
+            // thumb up
+            let likesCount = comment.likesCount ?? 0
+            if let isVoting = comment.isVoting, isVoting {
+                Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.gray).font(.caption)
+            } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, voteFlag  {
+                Label("\(likesCount)", systemImage: "hand.thumbsup.circle.fill").foregroundColor(.red)
+                    .onTapGesture {
+                        gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
+                    }
+            } else {
+                Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.red)
+                    .onTapGesture {
+                        gtalk.voteTo(targetId: comment.id, targetType: .comments, voteFlag: true, status: status)
+                    }
+            }
+            // thumb down
+            if let isVoting = comment.isVoting, isVoting {
+                Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.gray).font(.caption)
+            } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, !voteFlag  {
+                Label("-", systemImage: "hand.thumbsdown.circle.fill").labelStyle(.iconOnly).foregroundColor(.red)
+                    .onTapGesture {
+                        gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
+                    }
+            } else {
+                Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.red)
+                    .onTapGesture {
+                        gtalk.voteTo(targetId: comment.id, targetType: .comments, voteFlag: false, status: status)
+                    }
+            }
+            Spacer()
+            Button{
+                print("New window for comment")
+            } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
-            }.font(.title3.bold())
+        }.font(.title3.bold())
     }
 }
 
@@ -58,19 +82,20 @@ struct ReplyCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
+        VStack(alignment: .leading) {
             HStack(alignment: .top) {
                 TalkCardProfileView(user: reply.user)
                     .onTapGesture {
                         gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", userId: reply.user.id)
                     }
-                VStack(alignment: .leading) {
-                    TalkCardHeadView(user: reply.user, created: reply.createdAt)
-                    Text(reply.text)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .font(GCoresFont.body)
-                    TalkCommentBottomView(comment: reply, status: status)
-                }
-            }.padding(.leading, 40)
+                
+                CommentCardHeadView(user: reply.user, created: reply.createdAt, replyTo: status.getUserOfReplyTo(replyToId: reply.replyTo))
+            }
+            Text(reply.text)
+                .fixedSize(horizontal: false, vertical: true)
+                .font(GCoresFont.body)
+            TalkCommentBottomView(comment: reply, status: status)
+        }.padding(.leading, 40)
     }
 }
 
@@ -81,46 +106,46 @@ struct CommentCardView: View {
     @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
-
-            VStack {
-                HStack(alignment: .top) {
-                    TalkCardProfileView(user: comment.user).padding(.trailing)
+        VStack {
+            VStack(alignment: .leading) {
+                HStack(alignment: .bottom) {
+                    TalkCardProfileView(user: comment.user)
                         .onTapGesture {
                             gtalk.addStatusToCurrentScene(
                                 after: status, statusType: .profile, title: comment.user.nickname, icon: "person.fill", userId: comment.user.id
                             )
                         }
-                    VStack(alignment: .leading) {
-                        TalkCardHeadView(user: comment.user, created: comment.createdAt)
-                        Text(comment.text)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .font(GCoresFont.body)
-                        TalkCommentBottomView(comment: comment, status: status)
-                    }
+                    CommentCardHeadView(user: comment.user, created: comment.createdAt, replyTo: status.getUserOfReplyTo(replyToId: comment.replyTo))
                 }
-                .padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 10))
-                if let oldestDecendants = comment.oldestDescendants, withReply {
-                    VStack {
-                        ForEach(oldestDecendants, id: \.self) { replyId in
-                            if let reply = status.replies.first {$0.id == replyId} {
-                                Divider()
-                                ReplyCardView(status: status, reply: reply)
-                            }
+                Text(comment.text)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .font(GCoresFont.body)
+                TalkCommentBottomView(comment: comment, status: status)
+                
+            }
+            .padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 10))
+            if let oldestDecendants = comment.oldestDescendants, withReply {
+                VStack {
+                    ForEach(oldestDecendants, id: \.self) { replyId in
+                        if let reply = status.replies.first {$0.id == replyId} {
+                            Divider()
+                            ReplyCardView(status: status, reply: reply)
                         }
-                        if let decendantsCount = comment.descendantsCount, let oldestDecendants = comment.oldestDescendants, decendantsCount > oldestDecendants.count {
-                            HStack {
-                                Spacer()
-                                Label("更多回复", systemImage: "arrow.down.circle").foregroundColor(.blue)
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetCommentId: comment.id)
-                            }
+                    }
+                    if let decendantsCount = comment.descendantsCount, let oldestDecendants = comment.oldestDescendants, decendantsCount > oldestDecendants.count {
+                        HStack {
+                            Spacer()
+                            Label("更多回复", systemImage: "arrow.down.circle").foregroundColor(.blue)
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.2.circle.fill", targetCommentId: comment.id)
                         }
                     }
                 }
             }
+        }
     }
 }
 
@@ -152,7 +177,7 @@ struct StatusCommentsView: View {
                                 Divider()
                             }
                             if status.loadingEarlier == .empty {
-                                Text("这就是一切了。").padding()
+                                Text("这就是一切了。").padding(.bottom, 20)
                             }
                         } else if status.statusType == .replies {
                             if let targetTalkId = status.targetTalkId {
@@ -190,7 +215,7 @@ struct StatusCommentsView: View {
                                 Divider()
                             }
                             if status.loadingEarlier == .empty {
-                                Text("这就是一切了。").padding()
+                                Text("这就是一切了。").padding(.bottom, 20)
                             }
                         }
                     }.readingScrollView(from: "scroll", into: $scrollerOffset)
@@ -200,7 +225,7 @@ struct StatusCommentsView: View {
                 .coordinateSpace(name: "scroll")
                 .overlay(alignment: .top) {
                     VStack { // LoadingBar
-
+                        
                         switch status.loadingLatest {
                         case .loading:
                             ProgressView()
@@ -211,7 +236,7 @@ struct StatusCommentsView: View {
                                     .onAppear {
                                         gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: false)
                                     }
-
+                                
                             }
                         default:
                             EmptyView()
@@ -249,60 +274,60 @@ struct StatusRepliesView: View {
     @State var scrollerOffset: CGPoint = .zero
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
-            GeometryReader { proxy in
-                VStack {
-                    let topOffset = scrollerOffset.x
-                    List{// ForEach
-                        LazyVStack{ // ForEach(cards)
-                            // LazyVstack to avoid refresh of cards
-                            TalkCardView(status: status, card: status.targetTalk!, isSelected: false)
-                            Divider().padding(.bottom, 10)
-                            ForEach(status.comments){ comment in
-                                // We need foreach to avoid reloading images everytime the talkcards appear
-                                CommentCardView(status: status, comment: comment, withReply: false)
-                                Divider()
-                            }
-                        }.readingScrollView(from: "scroll", into: $scrollerOffset)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .coordinateSpace(name: "scroll")
-                    .overlay(alignment: .top) {
-                        VStack { // LoadingBar
-                            
-                            switch status.loadingLatest {
-                            case .loading:
-                                ProgressView()
-                            case .empty, .loaded:
-                                if scrollerOffset.x - topOffset > 40 {
-                                    Divider()
-                                        .contentShape(Rectangle())
-                                        .onAppear {
-                                            gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: false)
-                                        }
-                                    
-                                }
-                            }
+        //        let sceneType = _status.sceneType
+        //        if let idx = gtalk.indexOf(status: _status) {
+        //            let status = gtalk.statusForScene[sceneType]![idx]
+        GeometryReader { proxy in
+            VStack {
+                let topOffset = scrollerOffset.x
+                List{// ForEach
+                    LazyVStack{ // ForEach(cards)
+                        // LazyVstack to avoid refresh of cards
+                        TalkCardView(status: status, card: status.targetTalk!, isSelected: false)
+                        Divider().padding(.bottom, 10)
+                        ForEach(status.comments){ comment in
+                            // We need foreach to avoid reloading images everytime the talkcards appear
+                            CommentCardView(status: status, comment: comment, withReply: false)
+                            Divider()
                         }
-                    }
+                    }.readingScrollView(from: "scroll", into: $scrollerOffset)
+                }
+                .frame(maxWidth: .infinity)
+                .coordinateSpace(name: "scroll")
+                .overlay(alignment: .top) {
                     VStack { // LoadingBar
-                        switch status.loadingEarlier {
+                        
+                        switch status.loadingLatest {
                         case .loading:
                             ProgressView()
-                        case .loaded, .empty:
-                            if proxy.size.height - scrollerOffset.y > -20 {
+                        case .empty, .loaded:
+                            if scrollerOffset.x - topOffset > 40 {
                                 Divider()
                                     .contentShape(Rectangle())
                                     .onAppear {
-                                        gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: true)
+                                        gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: false)
                                     }
+                                
                             }
                         }
-                    }.padding(.bottom)
+                    }
                 }
+                VStack { // LoadingBar
+                    switch status.loadingEarlier {
+                    case .loading:
+                        ProgressView()
+                    case .loaded, .empty:
+                        if proxy.size.height - scrollerOffset.y > -20 {
+                            Divider()
+                                .contentShape(Rectangle())
+                                .onAppear {
+                                    gtalk.loadComments(talkId: status.targetTalk!.id, status: status, earlier: true)
+                                }
+                        }
+                    }
+                }.padding(.bottom)
             }
-//        }
+        }
+        //        }
     }
 }

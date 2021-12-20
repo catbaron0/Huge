@@ -104,7 +104,7 @@ struct StatusNotificationView: View {
                             Divider()
                         }
                         if status.loadingEarlier == .empty {
-                            Text("这就是一切了。").padding()
+                            Text("这就是一切了。").padding(.bottom, 20)
                         }
                         
                     }.readingScrollView(from: "scroll", into: $offset)

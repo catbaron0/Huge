@@ -205,8 +205,16 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     
     // For notifications
     @Published var notifications = [Notification]()
-    
-    
+    func getUserOfReplyTo(replyToId: String?) -> TalkUser? {
+        guard let replyToId = replyToId else {
+            return nil
+        }
+        if let comment =  comments.first(where: { $0.id == replyToId}) {
+            return comment.user
+        } else {
+            return (replies.first {$0.id == replyToId})?.user
+        }
+    }
     func readAllNotifications() {
         unreadCount = 0
         for i in 0..<notifications.count {

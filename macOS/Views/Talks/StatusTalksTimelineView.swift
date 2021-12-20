@@ -57,7 +57,7 @@ struct StatusTalksTimelineView: View {
                                         gtalk.loadTimeline(status: status, earlier: true)
                                     }
                             } else if status.loadingEarlier == .empty {
-                                Text("这就是一切了。").padding()
+                                Text("这就是一切了。").padding(.bottom, 20)
                             }
 
                         }.readingScrollView(from: "scroll", into: $offset)
