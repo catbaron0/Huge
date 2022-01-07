@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct CommentCardHeadView: View {
+    @StateObject var status: ViewStatus
     let user: TalkUser
     let created: String
     let replyTo: TalkUser?
+    @EnvironmentObject var gtalk:GCoresTalk
     
     var body: some View {
         HStack {
             VStack(alignment: .leading){
                 HStack {
-                    Text(user.nickname).font(.title3)
+                    NicknameView(status: status, user: user)
                     if let replyTo = replyTo {
                         Label(replyTo.nickname, systemImage: "arrow.right.circle")
                     }
@@ -69,7 +71,7 @@ struct TalkCommentBottomView: View {
             }
             Spacer()
             Button{
-                newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: status.targetTalk!.id, targetCommentId: comment.id, status: status, gtalk: gtalk))
+                newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: status.targetTalk!.id, targetCommentId: comment.id, status: status.copy(), gtalk: gtalk))
             } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
         }.font(.title3.bold())
@@ -89,7 +91,7 @@ struct ReplyCardView: View {
                         gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: reply.user.nickname, icon: "person.fill", userId: reply.user.id)
                     }
                 
-                CommentCardHeadView(user: reply.user, created: reply.createdAt, replyTo: status.getUserOfReplyTo(replyToId: reply.replyTo))
+                CommentCardHeadView(status: status, user: reply.user, created: reply.createdAt, replyTo: status.getUserOfReplyTo(replyToId: reply.replyTo))
             }
             Text(reply.text)
                 .fixedSize(horizontal: false, vertical: true)
@@ -115,7 +117,7 @@ struct CommentCardView: View {
                                 after: status, statusType: .profile, title: comment.user.nickname, icon: "person.fill", userId: comment.user.id
                             )
                         }
-                    CommentCardHeadView(user: comment.user, created: comment.createdAt, replyTo: status.getUserOfReplyTo(replyToId: comment.replyTo))
+                    CommentCardHeadView(status: status, user: comment.user, created: comment.createdAt, replyTo: status.getUserOfReplyTo(replyToId: comment.replyTo))
                 }
                 Text(comment.text)
                     .fixedSize(horizontal: false, vertical: true)

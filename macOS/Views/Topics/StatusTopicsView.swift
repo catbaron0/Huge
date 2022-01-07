@@ -51,8 +51,15 @@ struct TopicCategoriesView: View {
                 }
                 Spacer()
             }
+            .onAppear {
+                if status.selectedTopicCategory == nil {
+                    status.selectedTopicCategory = status.topicCategories[0]
+                    gtalk.loadTopics(status: status, categoryId: status.topicCategories[0].id)
+                }
+            }
         }
     }
+    
 }
 
 
@@ -64,9 +71,11 @@ struct TopicCardView: View {
             Text(topic.title!)
             Spacer()
         }
-        .padding(.top)
+        .padding(.top, 5)
+        .padding(.bottom, 5)
         .padding(.leading)
         .contentShape(Rectangle())
+        .border(width: topic.subscriptionId == nil ? 0 : 2, edges: [.leading], color: .yellow)
     }
 }
 
@@ -79,13 +88,29 @@ struct TopicsView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack {
-                ForEach(status.selectedTopics) { topic in
+                ForEach(status.topics) { topic in
                     TopicCardView(topic: topic)
                         .onTapGesture {
                             related = TalkRelated(id: topic.id, type: .topics, title: topic.title, desc: nil, cover: nil, banner: nil, contentString: nil)
                             if newStatus {
                                 gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title!, icon: "", topic: topic)
                             }
+                        }
+                        .contextMenu {
+                            if let _ = topic.subscriptionId {
+                                Button {
+                                    gtalk.unsubscribe(status: status, targetId: topic.id, targetType: .topics, updateSubscriptionId: gtalk.updateSubscriptionId)
+                                } label: {
+                                    Text("取消收藏")
+                                }
+                            } else {
+                                Button {
+                                    gtalk.subscribe(status: status, targetId: topic.id, targetType: .topics, updateSubscriptionId: gtalk.updateSubscriptionId)
+                                } label: {
+                                    Text("收藏")
+                                }
+                            }
+                            
                         }
                 }
                 Spacer()
@@ -135,14 +160,13 @@ struct StatusTopicsView: View {
 //                            .padding(5)
                             .labelStyle(.iconOnly)
                             .frame(width: 40, height: 25)
-                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
+                            .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red).opacity(0.85))
                             .foregroundColor(.white)
                             .font(.body.bold())
                     }.padding(.bottom, 8).buttonStyle(.plain).opacity(opacity)
                 }
                 .padding([.leading, .trailing])
             }
-            
 
             if searchMode {
                 // Activated by focus in the search input box
@@ -170,6 +194,12 @@ struct StatusTopicsView: View {
                     HStack {
                         TopicCategoriesView(status: status)
                             .frame(width: 100)
+//                            .onAppear {
+//                                if status.selectedTopicCategory == nil {
+//                                    status.selectedTopicCategory = status.topicCategories[0]
+//                                    gtalk.loadTopics(status: status, categoryId: status.topicCategories[0].id)
+//                                }
+//                            }
                         if status.requestState == .sending {
                             Spacer()
                             ProgressView()

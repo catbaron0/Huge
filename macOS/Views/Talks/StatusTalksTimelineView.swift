@@ -52,7 +52,7 @@ struct StatusTalksTimelineView: View {
                                 case .empty:
                                     Text("这就是一切了。").padding()
                                 case .loaded:
-                                    if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 0 {
+                                    if proxy.size.height - offset.y > -20 && proxy.size.height - offset.y < 100 {
                                         Divider()
                                             .contentShape(Rectangle())
                                             .onAppear {

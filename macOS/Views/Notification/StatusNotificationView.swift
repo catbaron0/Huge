@@ -47,10 +47,9 @@ struct NotificationCardView: View {
             }
         }
         .padding(5)
-        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(notification.unRead ? 0.4 : 0.0))
+        .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red).opacity(notification.unRead ? 0.4 : 0.0))
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
-            print("double click")
             switch notification.type {
             case .like:
                 switch notification.object[0].type {
@@ -73,12 +72,21 @@ struct NotificationCardView: View {
                 if let target = notification.target, target.type == .comments, notification.object[0].type == .comments {
                     gtalk.addStatusToCurrentScene(after: status, statusType: .replies, title: "回复", icon: "arrowshape.turn.up.left.circle.fill", targetCommentId: target.id)
                 }
+            case .follow:
+                break;
             }
         }
         .onTapGesture {
             print("click")
             let idx = status.notifications.firstIndex(of: notification)
             status.notifications[idx!].unRead = false
+        }
+        .contextMenu {
+            Button {
+                print("test")
+            } label: {
+                Text("test")
+            }
         }
         
     }

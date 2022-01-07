@@ -166,7 +166,7 @@ class GCoresTalk: ObservableObject{
             let statusId = "\(sceneType)-\(statusType)-\(statusForScene[sceneType]!.count)"
             let status = ViewStatus(id: statusId, sceneType: sceneType, statusType: statusType, title: title, icon: icon)
             status.targetTalkId = targetTalkId
-            status.topic = topic
+            status.targetTopic = topic
             status.targetCommentId = targetCommentId
             status.userId = userId
             
@@ -239,10 +239,11 @@ class GCoresTalk: ObservableObject{
     
     func talkContent(text: String, imgStr: String?) -> String {
         var content = ""
+        let newText = text.escaped
         if let imgStr = imgStr {
             content = "{\"blocks\":[{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[{\"key\":0,\"length\":1,\"offset\":0}],\"inlineStyleRanges\":[],\"key\":\"57tge\",\"text\":\"-\",\"type\":\"atomic\"},{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[],\"inlineStyleRanges\":[],\"key\":\"ikdgu\",\"text\":\"\(text)\",\"type\":\"unstyled\"}],\"entityMap\":{\"0\":{\"data\":{\"caption\":\"\",\"images\":[\(imgStr)]},\"mutability\":\"IMMUTABLE\",\"type\":\"GALLERY\"}}}"
         } else {
-            content = "{\"blocks\":[{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[],\"inlineStyleRanges\":[],\"key\":\"30c8n\",\"text\":\"\(text)\",\"type\":\"unstyled\"}],\"entityMap\":{}}"
+            content = "{\"blocks\":[{\"data\":{\"spoiler\":false},\"depth\":0,\"entityRanges\":[],\"inlineStyleRanges\":[],\"key\":\"30c8n\",\"text\":\"\(newText)\",\"type\":\"unstyled\"}],\"entityMap\":{}}"
         }
         return content
     }
@@ -291,12 +292,12 @@ class GCoresTalk: ObservableObject{
             string: "https://www.gcores.com/gapi/v1/talks?include=user%2Ctopic%2Cgames%2Carticles%2Cradios%2Cvideos&from-app=1")!
         let request = gcoresRequest(url: url, httpMethod: "POST", body: body)
         URLSession.shared.dataTask(with: request) { data, response, error in
-            if let errMessage = self.checkResponse(data, response, error) {
-                print(errMessage)
-                status.requestState = .failed
-                return
-            }
             self.mainQueue.async {
+                if let errMessage = self.checkResponse(data, response, error) {
+                    print(errMessage)
+                    status.requestState = .failed
+                    return
+                }
                 status.requestState = .succeed
                 NSApplication.shared.keyWindow?.close()
                 
@@ -402,7 +403,7 @@ class GCoresTalk: ObservableObject{
                 ].reduce("", +)
             )!
         case .topic:
-            let topicId = status.topic!.id
+            let topicId = status.targetTopic!.id
             url = URL(
                 string: [
                     "https://www.gcores.com/gapi/v1/topics/\(topicId)/recommend?",
@@ -448,6 +449,135 @@ class GCoresTalk: ObservableObject{
         }
     }
     
+    
+    func updateFollowship(status: ViewStatus, targetId: String, follow: Bool) {
+        let parameters: [String: Any] = [
+            "data": [[
+                "id": targetId,
+                "type": "users"
+            ]]
+        ]
+        let userId = loginInfo.userId!
+        let postData = try? JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
+        let url = URL(string: "https://www.gcores.com/gapi/v1/users/\(userId)/relationships/followees?from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: follow ? "POST" : "DELETE", body: postData)
+        
+        session.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                return
+            }
+            self.mainQueue.async {
+                status.updateFollowship(userId: targetId, followshipId: follow ? "0" : nil)
+            }
+        }.resume()
+    }
+    
+    
+    
+    func updateSubscriptionId(status: ViewStatus, topicId: String, subscriptionId: String?) -> String? {
+        var currentSubscriptionId: String? = nil
+        if let _ = status.targetTopic {
+            currentSubscriptionId = status.targetTopic?.subscriptionId
+            status.targetTopic?.subscriptionId = subscriptionId
+        }
+        if let idx = status.topics.firstIndex(where: {$0.id == topicId}) {
+            currentSubscriptionId = status.topics[idx].subscriptionId
+            status.topics[idx].subscriptionId = subscriptionId
+        }
+        return currentSubscriptionId
+    }
+
+    func subscribeTopic(status: ViewStatus, topicId: String) {
+        subscribe(status: status, targetId: topicId, targetType: .topics, updateSubscriptionId: updateSubscriptionId)
+    }
+    
+    func unsubscribe(status: ViewStatus, targetId: String, targetType: GCoresRelatedType, updateSubscriptionId: @escaping (ViewStatus, String, String?) -> String?) {
+
+        // update the subscriptionId to 0 temperarily
+        // indicating that the request is being sent
+        let currentSubscriptionId = updateSubscriptionId(status, targetId, "0")
+        
+        let url = URL(string: "https://www.gcores.com/gapi/v1/subscriptions/\(currentSubscriptionId!)?from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: "DELETE")
+        session.dataTask(with: request) { data, response, error in
+            self.mainQueue.async {
+                if let errMessage = self.checkResponse(data, response, error) {
+                    print(errMessage)
+                    _ = updateSubscriptionId(status, targetId, currentSubscriptionId)
+                    return
+                }
+                _ = updateSubscriptionId(status, targetId, nil)
+            }
+        }.resume()
+    }
+    
+    func subscribe(status: ViewStatus, targetId: String, targetType: GCoresRelatedType, updateSubscriptionId: @escaping (ViewStatus, String, String?) -> String?) {
+//        {
+//          "data": {
+//            "attributes": {},
+//            "relationships": {
+//              "subscriptable": {
+//                "data": {
+//                  "id": "59",
+//                  "type": "topics"
+//                }
+//              },
+//              "user": {
+//                "data": {
+//                  "id": "17551",
+//                  "type": "users"
+//                }
+//              }
+//            },
+//            "type": "subscriptions"
+//          }
+//        }
+        let userId = loginInfo.userId
+
+        // update the subscriptionId to 0 temperarily
+        // indicating that the request is being sent
+        _ = updateSubscriptionId(status, targetId, "0")
+        let parameters: [String: Any] = [
+            "data": [
+                "attributes": [],
+                "relationships": [
+                    "subscriptable": [
+                        "data": [
+                            "id": targetId,
+                            "type": targetType.rawValue
+                        ]
+                    ],
+                    "user": [
+                        "data": [
+                            "id": userId,
+                            "type": "users"
+                        ]
+                    ],
+                ],
+                "type": "subscriptions"
+            ]
+        ]
+        let postData = try? JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
+        let url = URL(string: "https://www.gcores.com/gapi/v1/subscriptions?from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: "POST", body: postData)
+        session.dataTask(with: request) { data, response, error in
+            if let errMessage = self.checkResponse(data, response, error) {
+                print(errMessage)
+                self.mainQueue.async {
+                    _ = updateSubscriptionId(status, targetId, nil)
+                }
+                return
+            }
+            if let json = try? JSONSerialization.jsonObject(with: data!) as? [String: Any] {
+                let data = json["data"] as! [String: Any]
+                let subscriptionId = data["id"] as! String
+                self.mainQueue.async {
+                    _ = updateSubscriptionId(status, targetId, subscriptionId)
+                }
+            }
+        }.resume()
+    }
     func loadTalks(status: ViewStatus, endpoint endponit: TimelineEndPoint, earlier: Bool = false) {
         if status.loadingEarlier == .empty {
             return
@@ -478,7 +608,7 @@ class GCoresTalk: ObservableObject{
                 ].reduce("", +)
             )!
         case .topic:
-            let topicId = status.topic!.id
+            let topicId = status.targetTopic!.id
             url = URL(
                 string: [
                     "https://www.gcores.com/gapi/v1/topics/\(topicId)/recommend?",
@@ -546,22 +676,22 @@ class GCoresTalk: ObservableObject{
     
     func loadTopics(status: ViewStatus, categoryId: String, append: Bool = false) {
         status.requestState = .sending
-        if !append { status.selectedTopics.removeAll() }
+        if !append { status.topics.removeAll() }
         var urlString: String
         if categoryId == "popular" {
             urlString = [
                 "https://www.gcores.com/gapi/v1/popular-topics?",
-                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.topics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         } else if let userId = loginInfo.userId, categoryId == "subscribed" {
             urlString = [
                 "https://www.gcores.com/gapi/v1/users/\(userId)/subscribed-topics?",
-                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.topics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         } else {
             urlString = [
                 "https://www.gcores.com/gapi/v1/categories/\(categoryId)/topics?",
-                "page%5Boffset%5D=\(status.selectedTopics.count)&page%5Blimit%5D=50&from-app=1"
+                "page%5Boffset%5D=\(status.topics.count)&page%5Blimit%5D=50&from-app=1"
             ].reduce("", +)
         }
         let url = URL( string: urlString)!
@@ -577,10 +707,10 @@ class GCoresTalk: ObservableObject{
             let resp = try! JSONDecoder().decode(GCoresTopicResponse.self, from: data)
             let topics = resp.formalize()
             self.mainQueue.async {
-                status.selectedTopics += topics
+                status.topics += topics
                 status.requestState = .succeed
                 status.objectWillChange.send()
-                if let recordCount = resp.meta.recordCount, status.selectedTopics.count < recordCount {
+                if let recordCount = resp.meta.recordCount, status.topics.count < recordCount {
                     // There are more tags
                     self.loadTopics(status: status, categoryId: categoryId, append: true)
                 }
@@ -611,8 +741,8 @@ class GCoresTalk: ObservableObject{
             let categories = resp.formalize()
             self.mainQueue.async {
                 if status.topicCategories.isEmpty {
-                    status.topicCategories.append(TalkTopicCategory(id: "popular", name: "热门", desc: nil, logo: nil, background: nil))
                     status.topicCategories.append(TalkTopicCategory(id: "subscribed", name: "收藏", desc: nil, logo: nil, background: nil))
+                    status.topicCategories.append(TalkTopicCategory(id: "popular", name: "热门", desc: nil, logo: nil, background: nil))
                 }
                 status.topicCategories += categories
                 if let recordCount = resp.meta.recordCount, status.topicCategories.count < recordCount {
@@ -977,6 +1107,7 @@ class GCoresTalk: ObservableObject{
                     status.requestLatest = .failed
                     return
                 }
+                status.requestLatest = .succeed
                 let commentRes = try! JSONDecoder().decode(NewCommentResponse.self, from: data)
                 let comment = commentRes.formalize()
 //                NSApplication.shared.keyWindow?.close()

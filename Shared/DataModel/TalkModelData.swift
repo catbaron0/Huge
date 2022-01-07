@@ -67,6 +67,7 @@ enum NotificationType: String, Codable {
     case comment
     case like
     case reply
+    case follow
 }
 
 struct Notification: Identifiable, Equatable {
@@ -101,6 +102,8 @@ struct Notification: Identifiable, Equatable {
             return "回复了"
         case .like:
             return "喜欢了"
+        case .follow:
+            return "关注了"
         }
     }
     
@@ -108,26 +111,29 @@ struct Notification: Identifiable, Equatable {
         let objType = object[0].type
         switch objType {
         case .videos:
-            return ["视频: ", object[0].title!]
+            return ["你参与的视频: ", object[0].title!]
         case .radios:
-            return ["电台: ", object[0].title!]
+            return ["你参与的电台: ", object[0].title!]
         case .articles:
-            return ["文章: ", object[0].title!]
+            return ["你发布的文章: ", object[0].title!]
         case .talks:
-            return ["动态: ", object[0].contentString!]
+            return ["你发布的动态: ", object[0].contentString!]
         case .comments:
             if let target = target {
                 switch target.type {
                 case .talks:
-                    return ["动态: ", object[0].contentString!]
+                    return ["你的动态: ", object[0].contentString!]
                 case .comments:
-                    return ["评论: ", object[0].contentString!]
+                    return ["你的评论: ", object[0].contentString!]
                 default:
-                    return ["内容", ""]
+                    return ["你发布的内容", ""]
                 }
             }
             return ["评论: ", object[0].contentString!]
+        case .users:
+            return ["你", ""]
         default:
+            print("objType: \(objType)")
             return ["内容", ""]
         }
     }
@@ -135,7 +141,7 @@ struct Notification: Identifiable, Equatable {
         var styledActorName = AttributedString(actorNames)
         styledActorName.foregroundColor = .red
         styledActorName.font = .body.bold()
-        var styledVerb = AttributedString(verb + "你发布的" + objectStr[0])
+        var styledVerb = AttributedString(verb + objectStr[0])
         styledVerb.font = .body.weight(.light)
         var styledObject = AttributedString(objectStr[1])
         styledObject.font = .body.bold()
@@ -155,7 +161,6 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         self.statusType = statusType
         self.title = title
         self.icon = icon
-//        self.userId = userId
         self.sceneType = sceneType
     }
     
@@ -173,7 +178,7 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
 
     // For Timeline
     @Published var talks = [TalkCard]()
-    @Published var topic: TalkRelated?
+    @Published var targetTopic: TalkRelated?
     //    var selectedCardIndex: Int?
     //    var selectedCard: TalkCard?
     
@@ -196,7 +201,7 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     // For Topic
     @Published var selectedTopicCategory: TalkTopicCategory?
     @Published var topicCategories = [TalkTopicCategory]()
-    @Published var selectedTopics = [TalkRelated]()
+    @Published var topics = [TalkRelated]()
 
     // For search
     @Published var searchResults = [TalkRelated]()
@@ -221,7 +226,18 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
             notifications[i].unRead = false
         }
     }
-    
+    func updateFollowship(userId: String, followshipId: String?) {
+        if user?.id == userId {
+            user?.followshipId = followshipId
+        }
+        if let idx = followees.firstIndex(where: {$0.id == userId}) {
+            followees[idx].followshipId = followshipId
+        }
+        if let idx = followers.firstIndex(where: {$0.id == userId}) {
+            followers[idx].followshipId = followshipId
+        }
+        
+    }
     func newNotifications(_ newNotifications: [Notification], earlier: Bool) {
         if earlier {
             newNotifications.forEach { notification in
@@ -344,6 +360,18 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         }
         objectWillChange.send()
     }
+    func copy() -> ViewStatus {
+        let status = ViewStatus(id: self.id, sceneType: self.sceneType, statusType: self.statusType, title: self.title, icon: self.icon)
+        status.targetTopic = self.targetTopic
+        status.user = self.user
+        status.userId = self.userId
+        status.comments = self.comments
+        status.replies = self.replies
+        status.talks = self.talks
+        status.followers = self.followers
+        status.followees = self.followees
+        return status
+    }
 }
 
 enum TalkStatusType {
@@ -429,8 +457,8 @@ struct TalkUser: Identifiable, Equatable {
     let steamId: String?
     let isDeleted: Bool?
     let isTreated: Bool?
-    let followshipId: String?
-    let inverseFollowshipId: String?
+    var followshipId: String?
+    var inverseFollowshipId: String?
     
     let _notificationFeedsLastSeenAt: Date?
     let notificationFeedsUnseenCount: Int?
@@ -481,6 +509,7 @@ struct TalkRelated: Identifiable, Equatable {
     var shareUrl: String {
         return GCORES_HOST + "\(type)/\(id)"
     }
+    var subscriptionId: String?
 }
 //struct SearchResult: Identifiable, Equatable {
 //    let id: String

@@ -153,7 +153,8 @@ struct GCoresTopicResponse: Codable {
                     desc: _topic.attributes.desc,
                     cover: _topic.attributes.cover,
                     banner: _topic.attributes.banner,
-                    contentString: nil
+                    contentString: nil,
+                    subscriptionId: _topic.meta.subscriptionId
                 )
             )
         }

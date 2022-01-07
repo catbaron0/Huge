@@ -15,8 +15,14 @@ let TITILEBAR_PADDING = CGFloat(-30)
 let TITILEBAR_HEIGHT = CGFloat(1)
 let SIDEBAR_TOP_PADDING = CGFloat(20)
 
-let CornerRadius = CGFloat(10)
+//let CornerRadius = CGFloat(10)
+//let CornerRadius = CGFloat(10)
 let SearchBoxCornerRadius = CGFloat(5)
+
+enum CornerRadius: CGFloat {
+    case normal = 10
+    case profileFollowship = 5
+}
 
 enum TopOffsetTrigger: Int {
     case timeline = 80

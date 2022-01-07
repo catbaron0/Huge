@@ -23,7 +23,7 @@ struct RelatedCardView: View {
                     
                     .frame(width: size, height: size)
                     .background(.gray)
-                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
                 
             } else {
                 HStack{
@@ -32,7 +32,7 @@ struct RelatedCardView: View {
                         .foregroundColor(.white)
                 }
                 .frame(width:size, height: size)
-                .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
+                .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red))
             }
             VStack(alignment: .leading) {
                 // Title

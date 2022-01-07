@@ -48,6 +48,8 @@ struct NewTalkView: View {
     @State  var triggerSensor: Bool = false
     @State  var searchResult: TalkRelated? = nil
     @State private var importImage: Bool = false
+    @FocusState private var editorIsFocused: Bool
+    
     
     var imageRow: [GridItem] = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     
@@ -57,31 +59,17 @@ struct NewTalkView: View {
         
         VStack {
             TextEditor(text: $talkText)
+                .focusable()
                 .frame(minWidth: 300)
-                .frame(height: 100)
+                .frame(height: 150)
                 .padding([.leading, .trailing], 5)
                 .font(.body)
                 .ignoresSafeArea()
-                .onPasteCommand(of: [.image, .url]) { providers in
-                    for provider in providers {
-                        if self.images.count < 9 {
-                            if provider.registeredTypeIdentifiers.contains(UTType.image.identifier) {
-                                provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, error in
-                                    print("load image")
-                                }
-                            }
-                            if provider.registeredTypeIdentifiers.contains(UTType.url.identifier) {
-                                provider.loadDataRepresentation(forTypeIdentifier: UTType.url.identifier) { data, error in
-                                    print("load url")
-                                }
-                            }
-                        }
-                    }
+
+                .onPasteCommand(of: [.image, .url]) { _ in
+                    pasteImage()
                 }
-            
-            Divider().padding()
-            
-            
+            Divider()
             VStack {
                 // send button
                 HStack {
@@ -117,7 +105,9 @@ struct NewTalkView: View {
                     Spacer()
                     
                     Button {
+                        editorIsFocused = true
                         relatedView = .image
+                        
                     } label: {
                         NewTalkRelatedLabel(text: "图片", icon: "photo", highlight: !images.isEmpty)
                     }
@@ -128,7 +118,7 @@ struct NewTalkView: View {
                         Label("发送", systemImage: "paperplane.fill")
                             .labelStyle(.iconOnly)
                             .frame(width: 40, height: 30)
-                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red))
+                            .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red))
                             .foregroundColor(.white)
                             .disabled(status.requestState != nil && status.requestState! == .sending)
                         
@@ -139,6 +129,7 @@ struct NewTalkView: View {
                 if let related = related {
                     RelatedCardView(related: related)
                         .padding([.leading, .trailing])
+                        .frame(maxHeight: 80)
                 }
                 
                 Divider().padding()
@@ -184,33 +175,6 @@ struct NewTalkView: View {
                     gtalk.search(status: status, endponit: relatedView, query: "", earlier: false, recommend: true)
                 }
                 
-                
-                // Search input box
-                HStack {
-                    TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
-                        .font(.title2)
-                        .cornerRadius(SearchBoxCornerRadius)
-                        .padding(.bottom, 8)
-                        .onSubmit {
-                            submitSearch()
-                        }
-                        .onChange(of: relatedView) { _relatedView in
-                            searchMode = false
-                        }
-                    
-                    Button {
-                        submitSearch()
-                    } label: {
-                        Label("搜索", systemImage: "magnifyingglass")
-                            .labelStyle(.iconOnly)
-                            .frame(width: 40, height: 25)
-                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.red).opacity(0.85))
-                            .foregroundColor(.white)
-                            .font(.body.bold())
-                        
-                    }.padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
-                }.padding(.bottom, -5).padding([.leading, .trailing], 10)
-                
                 // Related search results
                 if relatedView == .image {
                     // Images
@@ -221,18 +185,26 @@ struct NewTalkView: View {
                                 LazyVGrid(columns: imageRow, alignment: .leading, spacing: 10) {
                                     ForEach(0..<images.count, id: \.self) { idx in
                                         Image(nsImage: images[idx])
-//                                    }
-//                                    ForEach(images, id: \.absoluteString) { url in
-//                                        ImageReaderView(url: url.absoluteString, width: Int(size), height: Int(size))
-                                            .scaledToFill()
+                                            .resizable()
                                             .frame(width: size, height: size)
-                                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+                                            .scaledToFill()
+                                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
+                                            .onTapGesture {
+                                                print("tap \(idx)")
+                                            }
                                             .overlay(alignment: .topTrailing) {
                                                 // delete buton
-                                                Label("", systemImage: "minus.circle").font(.title3)
-                                                    .onTapGesture {
-                                                        images.remove(at: idx)
-                                                    }
+                                                Button {
+                                                    images.remove(at: idx)
+                                                } label: {
+                                                    Label("", systemImage: "minus.circle.fill").font(.title3).foregroundColor(.red)
+                                                        .padding(1)
+                                                        .background(.white.opacity(0.5))
+                                                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
+                                                        .labelStyle(.iconOnly)
+                                                }
+                                                .contentShape(Rectangle())
+                                                .buttonStyle(.plain)
                                             }
                                     }
                                     Button {
@@ -242,19 +214,18 @@ struct NewTalkView: View {
                                             .labelStyle(.iconOnly)
                                             .font(.largeTitle.bold())
                                             .frame(width:size, height: size).foregroundColor(.white)
-                                            .background(RoundedRectangle(cornerRadius: CornerRadius).fill(.gray).opacity(0.6))
+                                            .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.gray).opacity(0.6))
                                             .contentShape(Rectangle())
                                     }
                                     .buttonStyle(.plain)
-                                    .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg], allowsMultipleSelection: true) { result in
+                                    .fileImporter(isPresented: $importImage, allowedContentTypes: [.png, .jpeg, .gif], allowsMultipleSelection: true) { result in
                                         switch result {
                                         case .success(let urls):
                                             for url in urls {
                                                 let img = NSImage(byReferencing: url)
-                                                img.setName(url.absoluteString)
+                                                img.setName(UUID().uuidString)
                                                 images.append(img)
                                             }
-//                                            images = urls.map { url in NSImage(byReferencing: url) }
                                         default:
                                             break
                                         }
@@ -262,58 +233,123 @@ struct NewTalkView: View {
                                 }
                             }
                         }
-                        
-                    }.padding([.leading, .trailing])
+                        Button {
+                            pasteImage()
+                        } label: {
+                            Text(" ").opacity(0.5)
+                        }
+                        .buttonStyle(.plain)
+                        .keyboardShortcut("v", modifiers: [.command, .shift])
+                    }
+                    .padding([.leading, .trailing])
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        editorIsFocused = true
+                    }
                     
                     //                }
-                } else if !searchMode && relatedView == .topics {
-                    // List of topics
+                } else {
+                    // Search input box
                     HStack {
-                        if status.topicCategories.isEmpty && !searchMode {
-                            VStack{
-                                Spacer()
-                                ProgressView()
-                                    .onAppear { gtalk.loadTopicsCategories(status: status)}
-                                Spacer()
+                        TextField("搜索", text: $query, prompt: Text("搜索关联内容"))
+                            .font(.title2)
+                            .cornerRadius(SearchBoxCornerRadius)
+                            .padding(.bottom, 8)
+                            .onSubmit {
+                                submitSearch()
                             }
-                        } else {
-                            HStack {
-                                TopicCategoriesView(status: status).environmentObject(gtalk)
-                                    .frame(width: 100)
-                                if status.requestState == .sending {
+                            .onChange(of: relatedView) { _relatedView in
+                                searchMode = false
+                            }
+                        
+                        Button {
+                            submitSearch()
+                        } label: {
+                            Label("搜索", systemImage: "magnifyingglass")
+                                .labelStyle(.iconOnly)
+                                .frame(width: 40, height: 25)
+                                .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red).opacity(0.85))
+                                .foregroundColor(.white)
+                                .font(.body.bold())
+                            
+                        }.padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
+                    }.padding(.bottom, -5).padding([.leading, .trailing], 10)
+                    if !searchMode && relatedView == .topics {
+                        // List of topics
+                        HStack {
+                            if status.topicCategories.isEmpty && !searchMode {
+                                VStack{
                                     Spacer()
                                     ProgressView()
-                                } else {
-                                    TopicsView(status: status, related: $topic, newStatus: false).environmentObject(gtalk)
+                                        .onAppear { gtalk.loadTopicsCategories(status: status)}
+                                    Spacer()
+                                }
+                            } else {
+                                HStack {
+                                    TopicCategoriesView(status: status).environmentObject(gtalk)
+                                        .frame(width: 100)
+                                    if status.requestState == .sending {
+                                        Spacer()
+                                        ProgressView()
+                                    } else {
+                                        TopicsView(status: status, related: $topic, newStatus: false).environmentObject(gtalk)
+                                    }
+                                    
+                                    Spacer()
                                 }
                                 
-                                Spacer()
                             }
-                            
                         }
-                    }
-                    .frame(minHeight: 500)
-                    
-                } else {
-                    SearchRersultsView(status: status, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchMode: $searchMode, searchType: relatedView).environmentObject(gtalk)
                         .frame(minHeight: 500)
-                        .padding([.leading, .trailing])
-                        .onChange(of: triggerSensor) { result in
-                            if let result = searchResult {
-                                if relatedView == .topics {
-                                    topic = result
-                                } else {
-                                    related = result
+                        
+                    } else {
+                        SearchRersultsView(status: status, selectResult: $searchResult, switchTrigger: $triggerSensor, query: $query, searchMode: $searchMode, searchType: relatedView).environmentObject(gtalk)
+                            .frame(minHeight: 500)
+                            .padding([.leading, .trailing])
+                            .onChange(of: triggerSensor) { result in
+                                if let result = searchResult {
+                                    if relatedView == .topics {
+                                        topic = result
+                                    } else {
+                                        related = result
+                                    }
                                 }
                             }
-                        }
+                    }
                 }
             }
+        Spacer()
         }
         .preferredColorScheme(.dark)
         .background((BlurView().colorMultiply(.blue.opacity(0.3))))
     }
-    
+    func pasteImage() {
+        let pasteboard = NSPasteboard.general
+        let classes = [NSURL.self, NSImage.self]
+        let options = [NSPasteboard.ReadingOptionKey : Any]()
+        
+        let canRead = pasteboard.canReadObject(forClasses: classes, options: options)
+        if canRead {
+            let objectsToPaste = pasteboard.readObjects(forClasses: classes,
+                                                        options: options) ?? []
+
+            for obj in objectsToPaste {
+                if let img = obj as? NSImage {
+                    img.setName(UUID().uuidString)
+                    images.append(img)  // 出力して確認
+                } else
+                if let url = obj as? URL{
+                    if let data = try? Data(contentsOf: url), let img = NSImage(data: data) {
+                        img.setName(UUID().uuidString)
+                        images.append(img)
+                    }
+                }
+                
+            }
+        } else {
+            print("クリップボードに画像はありませんでした")
+        }
+    }
     func submitSearch() {
         if query.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 {
             checkInfo = "内容不能为空！"

@@ -22,13 +22,15 @@ struct TalkCardProfileView: View {
 }
 
 struct TalkCardHeadView: View {
+    @StateObject var status: ViewStatus
     let user: TalkUser
     let created: String
+    @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
         HStack {
             VStack(alignment: .leading){
-                Text(user.nickname).font(.title3)
+                NicknameView(status: status, user: user)
                 Text(String(created)).foregroundColor(.gray)
             }
             .frame(height: 50)
@@ -52,7 +54,7 @@ struct TalkCardTopicsView: View {
                     .background(Color(hue: 1.0, saturation: 0.368, brightness: 0.235))
                     .cornerRadius(30)
                     .onTapGesture {
-                        if status.statusType != .topicTimeline, topic != status.topic {
+                        if status.statusType != .topicTimeline, topic != status.targetTopic {
                             gtalk.addStatusToCurrentScene(after: status, statusType: .topicTimeline, title: topic.title ?? "nil", icon: "tag.fill", topic: topic)
                         }
                     }
@@ -92,7 +94,7 @@ struct TalkCardBottomView: View {
                 HStack {
                     Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
                         .onTapGesture {
-                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status, gtalk: gtalk))
+                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status.copy(), gtalk: gtalk))
                         }
                 }
             }
@@ -118,14 +120,11 @@ struct TalkCardView: View {
                     .onTapGesture {
                         gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: card.user.nickname, icon: "person.fill", userId: card.user.id)
                     }
-                TalkCardHeadView(user: card.user, created: card.createdAt)
+                TalkCardHeadView(status: status, user: card.user, created: card.createdAt)
                 Spacer()
             }.padding(.bottom, 5)
             if let images = card.images, !images.isEmpty {
-//                ImageSlidesView(images: images)
                 TalkCardImageView(talkImages: images)
-//                    .scaledToFit()
-//                    .padding(.leading)
             }
             VStack{
                 ForEach(card.texts){ text in
@@ -143,7 +142,7 @@ struct TalkCardView: View {
                         .frame(height: 70)
                         .padding(5)
                         .background(.red)
-                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
                 }.foregroundColor(.white)
             }
             HStack {

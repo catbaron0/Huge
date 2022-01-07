@@ -12,7 +12,7 @@ struct StatusTopicTimelineView: View {
     @StateObject var status: ViewStatus
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {
-        let descView = HeaderView(desc: status.topic!.desc!)
+        let descView = HeaderView(status: status, headerType: .topics)
         StatusTalksTimelineView(
             status: status,
             scrollTopPadding: TimelineTopPadding.titleBar.rawValue,

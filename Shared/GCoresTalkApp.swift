@@ -42,8 +42,8 @@ struct GCoresTalkApp: App {
                 Button("New Talk") {
                     let status = gtalk.statusForScene[gtalk.selectedTalkSceneType]!.last!
                     let newStatus = ViewStatus(id: UUID().uuidString, sceneType: .newWindow, statusType: .newTalk, title: "新 Talk", icon: "pencil.and.outline")
-                    newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.topic))
-                }.keyboardShortcut("N", modifiers: [.command, .shift])
+                    newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.targetTopic))
+                }.keyboardShortcut("N", modifiers: [.command])
             }
         }
     }

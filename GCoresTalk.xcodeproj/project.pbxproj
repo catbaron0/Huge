@@ -67,6 +67,8 @@
 		07AE5A102750B0A100FF9649 /* Lib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE5A0E2750B0A100FF9649 /* Lib.swift */; };
 		07AE5A122750F6F400FF9649 /* TalkModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE5A112750F6F300FF9649 /* TalkModelData.swift */; };
 		07AE5A132750F6F400FF9649 /* TalkModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07AE5A112750F6F300FF9649 /* TalkModelData.swift */; };
+		07EA77CF27819586000E4771 /* webview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EA77CE27819586000E4771 /* webview.swift */; };
+		07EA77D027819586000E4771 /* webview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EA77CE27819586000E4771 /* webview.swift */; };
 		07EE3C7F2762605500DC3A03 /* GCoresSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C7E2762605500DC3A03 /* GCoresSearchResponse.swift */; };
 		07EE3C802762605500DC3A03 /* GCoresSearchResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C7E2762605500DC3A03 /* GCoresSearchResponse.swift */; };
 		07EE3C832762F87700DC3A03 /* SearchRersultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */; };
@@ -118,6 +120,7 @@
 		07AE5A0B274FD09900FF9649 /* TalkCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkCardView.swift; sourceTree = "<group>"; };
 		07AE5A0E2750B0A100FF9649 /* Lib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lib.swift; sourceTree = "<group>"; };
 		07AE5A112750F6F300FF9649 /* TalkModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkModelData.swift; sourceTree = "<group>"; };
+		07EA77CE27819586000E4771 /* webview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = webview.swift; sourceTree = "<group>"; };
 		07EE3C7E2762605500DC3A03 /* GCoresSearchResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresSearchResponse.swift; sourceTree = "<group>"; };
 		07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRersultsView.swift; sourceTree = "<group>"; };
 		07EE3C8427631B5300DC3A03 /* NewTalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTalkView.swift; sourceTree = "<group>"; };
@@ -238,6 +241,7 @@
 				0780F92E275A537D0062F9B7 /* Topics */,
 				075BC899275C83F400EAC204 /* ScenesView.swift */,
 				075BC8A3275D16CA00EAC204 /* test.swift */,
+				07EA77CE27819586000E4771 /* webview.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -396,6 +400,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07FF7FFB27676A9900674790 /* StatusNotificationView.swift in Sources */,
+				07EA77CF27819586000E4771 /* webview.swift in Sources */,
 				071C49312755BB35000D879B /* ImageReader.swift in Sources */,
 				075BC89D275CD45900EAC204 /* GCoresFollowshipData.swift in Sources */,
 				0780F920275798940062F9B7 /* GCoresTopicData.swift in Sources */,
@@ -458,6 +463,7 @@
 				0780F918275797A60062F9B7 /* GCoresTalkData.swift in Sources */,
 				075BC88E275B5FA100EAC204 /* GCoresUserData.swift in Sources */,
 				07AE59F7274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
+				07EA77D027819586000E4771 /* webview.swift in Sources */,
 				070DE89427608885008B3F08 /* NSWindow.swift in Sources */,
 				07EE3C8627631B5300DC3A03 /* NewTalkView.swift in Sources */,
 				071C492C2754C6CD000D879B /* PreviewData.swift in Sources */,
@@ -481,6 +487,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -540,6 +547,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -653,7 +661,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -684,7 +692,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;

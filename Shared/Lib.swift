@@ -55,6 +55,14 @@ extension Int {
     var boolValue: Bool { return self != 0 }
 }
 
+extension String {
+    var escaped: String {
+        return self.replacingOccurrences(of: "\n", with: "\\n")
+            .replacingOccurrences(of: "\r", with: "\\r")
+            .replacingOccurrences(of: "\0", with: "\\0")
+            .replacingOccurrences(of: "\t", with: "\\t")
+    }
+}
 
 extension Data {
 
@@ -84,5 +92,11 @@ extension NSTextView {
             drawsBackground = true
         }
 
+    }
+}
+
+extension View {
+    func border(width: CGFloat, edges: [Edge], color: Color) -> some View {
+        overlay(EdgeBorder(width: width, edges: edges).foregroundColor(color))
     }
 }

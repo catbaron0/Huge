@@ -8,27 +8,36 @@
 import SwiftUI
 
 struct FollowshipCard: View {
+    @StateObject var status: ViewStatus
     let user: TalkUser
+    @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
         HStack {
             // Profile image, nickname, followship
             HStack {
                 TalkCardProfileView(user: user)
-                Text(user.nickname)
+                    .onTapGesture {
+                        gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: user.nickname, icon: "person.fill", userId: user.id)
+                    }
+                NicknameView(status: status, user: user)
             }
             Spacer()
             Group {
                 if let _ = user.followshipId {
                     Text("取消关注").frame(width: 100).padding(5).background(.gray)
+                        .onTapGesture {
+                            gtalk.updateFollowship(status: status, targetId: user.id, follow: false)
+                        }
                 } else {
                     Text("关注").frame(width: 100).padding(5).background(.blue)
+                        .onTapGesture {
+                            gtalk.updateFollowship(status: status, targetId: user.id, follow: true)
+                        }
                 }
             }
             .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
-            
-            
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
         }
     }
 }
@@ -39,18 +48,18 @@ struct StatusUserListView: View {
     @State var scrollerOffset: CGPoint = .zero
     let topOffsetTrigger = TopOffsetTrigger.userList
     var body: some View {
-//        let sceneType = _status.sceneType
-//        if let idx = gtalk.indexOf(status: _status) {
-//            let status = gtalk.statusForScene[sceneType]![idx]
             let users = (status.statusType == .followers) ? status.followers : status.followees
             GeometryReader { proxy in
                 VStack {
-                    List{// ForEach
+                    ScrollView(showsIndicators: false) {// ForEach
+                        Spacer().frame(height: TimelineTopPadding.titleBar.rawValue).padding(.top)
                         LazyVStack{ // ForEach(cards)
                             // LazyVstack to avoid refresh of cards
                             ForEach(users){ user in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
-                                FollowshipCard(user: user)
+                                FollowshipCard(status: status, user: user)
+                                    .padding(.leading)
+                                    .padding(.trailing)
                                 Divider()
                             }
                             if status.loadingEarlier == .empty {
@@ -92,9 +101,8 @@ struct StatusUserListView: View {
                         default:
                             EmptyView()
                         }
-                    }.padding(.bottom)
+                    }
                 }
             }
-//        }
     }
 }

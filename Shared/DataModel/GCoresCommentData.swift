@@ -361,8 +361,8 @@ struct GCoresTalkReplyResponse: Codable {
             }
         }
         struct Meta: Codable {
-            let voteFlag: Bool? //TODO: Specify the type to conforms Codable protocol
-            let voteId: String? //TODO: Specify the type to conforms Codable protocol
+            let voteFlag: Bool?
+            let voteId: String?
             private enum CodingKeys: String, CodingKey {
                 case voteFlag = "vote-flag"
                 case voteId = "vote-id"
@@ -391,7 +391,7 @@ struct GCoresTalkReplyResponse: Codable {
             let thumb: String?
             let location: String?
             let isFresh: Bool?
-            let intro: String? //TODO: Specify the type to conforms Codable protocol
+            let intro: String?
             let sex: Int?
             let followersCount: Int?
             let followeesCount: Int?
@@ -402,7 +402,7 @@ struct GCoresTalkReplyResponse: Codable {
             let isDeleted: Bool?
             let isTreated: Bool?
             let disableImageDownload: Bool?
-            let title: String? //TODO: Specify the type to conforms Codable protocol
+            let title: String?
             let content: String?
             let updatedAt: String?
             let commentsCount: Int?
@@ -627,11 +627,11 @@ struct GCoresTalkReplyResponse: Codable {
         }
         let relationships: Relationships
         struct Meta: Codable {
-            let voteFlag: Bool? //TODO: Specify the type to conforms Codable protocol
-            let voteId: String? //TODO: Specify the type to conforms Codable protocol
-            let followshipId: String? //TODO: Specify the type to conforms Codable protocol
-            let inverseFollowshipId: String? //TODO: Specify the type to conforms Codable protocol
-            let bookmarkId: String? //TODO: Specify the type to conforms Codable protocol
+            let voteFlag: Bool?
+            let voteId: String?
+            let followshipId: String?
+            let inverseFollowshipId: String?
+            let bookmarkId: String?
             private enum CodingKeys: String, CodingKey {
                 case voteFlag = "vote-flag"
                 case voteId = "vote-id"
@@ -874,8 +874,8 @@ struct NewCommentResponse: Codable {
         }
         let relationships: Relationships
         struct Meta: Codable {
-            let voteFlag: Bool? //TODO: Specify the type to conforms Codable protocol
-            let voteId: String? //TODO: Specify the type to conforms Codable protocol
+            let voteFlag: Bool?
+            let voteId: String?
             private enum CodingKeys: String, CodingKey {
                 case voteFlag = "vote-flag"
                 case voteId = "vote-id"

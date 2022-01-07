@@ -164,8 +164,8 @@ struct GCoresFollowshipResponse: Codable {
         }
         
         struct Meta: Codable {
-            let followshipId: String? //TODO: Specify the type to conforms Codable protocol
-            let inverseFollowshipId: String? //TODO: Specify the type to conforms Codable protocol
+            let followshipId: String?
+            let inverseFollowshipId: String?
             private enum CodingKeys: String, CodingKey {
                 case followshipId = "followship-id"
                 case inverseFollowshipId = "inverse-followship-id"

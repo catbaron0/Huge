@@ -6,58 +6,74 @@
 //
 
 import SwiftUI
+import WebKit
+
+
+struct NicknameView: View {
+    @StateObject var status: ViewStatus
+    let user: TalkUser
+    @EnvironmentObject var gtalk: GCoresTalk
+    
+    var body: some View {
+        Text(user.nickname).font(.title3)
+            .onTapGesture {
+                gtalk.addStatusToCurrentScene(after: status, statusType: .profile, title: user.nickname, icon: "person.fill", userId: user.id)
+            }
+    }
+}
+
 
 enum LoadingBarPosition {
     case top
     case bottom
 }
 
-struct LoadingBarView: View {
-    @EnvironmentObject var gtalk: GCoresTalk
-    @State  var status: ViewStatus
-    @State  var barPosition: LoadingBarPosition
-    @Binding  var offset: CGPoint
-    
-    var  action: () -> Void
-    
-    var body: some View {
-        VStack { // LoadingBar
-            switch status.loadingEarlier {
-            case .loading:
-                ProgressView()
-            case .empty:
-                if barPosition == .bottom {
-                    Text("没有更多了")
-                }
-            case .loaded:
-                if barPosition == .top && offset.x > 10 {
-                    Divider()
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            action()
-                        }
-                        .onAppear {
-                            action()
-                        }
-                } else if barPosition == .top && offset.x > 10 {
-                    HStack {
-                        Spacer()
-                        Label("点击加载更多", systemImage: "arrow.up.arrow.down")
-                        Spacer()
-                    }
-                    .frame(height: 20)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        action()
-                    }
-                    .onAppear {
-                        action()
-                    }
-                }
-            }
-        }
-    }
-}
+//struct LoadingBarView: View {
+//    @EnvironmentObject var gtalk: GCoresTalk
+//    @State  var status: ViewStatus
+//    @State  var barPosition: LoadingBarPosition
+//    @Binding  var offset: CGPoint
+//
+//    var  action: () -> Void
+//
+//    var body: some View {
+//        VStack { // LoadingBar
+//            switch status.loadingEarlier {
+//            case .loading:
+//                ProgressView()
+//            case .empty:
+//                if barPosition == .bottom {
+//                    Text("没有更多了")
+//                }
+//            case .loaded:
+//                if barPosition == .top && offset.x > 10 {
+//                    Divider()
+//                        .contentShape(Rectangle())
+//                        .onTapGesture {
+//                            action()
+//                        }
+//                        .onAppear {
+//                            action()
+//                        }
+//                } else if barPosition == .top && offset.x > 10 {
+//                    HStack {
+//                        Spacer()
+//                        Label("点击加载更多", systemImage: "arrow.up.arrow.down")
+//                        Spacer()
+//                    }
+//                    .frame(height: 20)
+//                    .contentShape(Rectangle())
+//                    .onTapGesture {
+//                        action()
+//                    }
+//                    .onAppear {
+//                        action()
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 struct TitleBarView: View {
     @EnvironmentObject var gtalk: GCoresTalk
@@ -73,20 +89,11 @@ struct TitleBarView: View {
                         .font(.title3.bold())
                         .padding(.top, 3)
                         .padding(8)
-//
-//                    if status.title.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-//                        Label(status.title, systemImage: status.icon)
-//                            .labelStyle(.titleOnly)
-//                            .font(.title3.bold())
-//                            .padding(.top, 3)
-//                            .padding(8)
-//                    } else {
-//                        Label(status.title, systemImage: status.icon)
-//                            .font(.title3.bold())
-//                            .padding(.top, 3)
-//                            .padding(8)
-//                    }
-                    
+//                        .onTapGesture {
+//                            let webConfiguration = WKWebViewConfiguration()
+//                            var webView = WKWebView(frame: .zero, configuration: webConfiguration)
+//                            webView.uiDelegate = self
+//                        }
                     Spacer()
                 }
                 HStack {
@@ -97,16 +104,14 @@ struct TitleBarView: View {
                                 .font(.title3.bold())
 //                                .foregroundColor(Color(NSColor.windowFrameTextColor))
                                 .padding(.leading, 12)
-//                                .padding(.top, 3)
                         }.buttonStyle(.plain)
                     }
                     Spacer()
                     Button {
                         let newStatus = ViewStatus(id: UUID().uuidString, sceneType: .newWindow, statusType: .newTalk, title: "新 Talk", icon: "pencil.and.outline")
-                        newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.topic))
+                        newNSWindow(view: NewTalkView(status: newStatus, gtalk: gtalk, topic: status.targetTopic))
                     } label: {
                         NewTalkButtonView()
-//                            .padding(.top, 3)
                             .font(.title3.bold())
                             .foregroundColor(.red)
                     }
@@ -203,6 +208,8 @@ struct SidebarItemView: View {
                         gtalk.loadTimeline(status: status, earlier: false)
                     case .topics:
                         gtalk.loadTopicsCategories(status: status)
+                    case .profile:
+                        gtalk.loadTalks(status: status, endpoint: .user)
                     default:
                         break
                     }
@@ -227,22 +234,122 @@ struct SidebarItemView: View {
     }
 }
 
-struct HeaderView: View {
-    let desc: String
+struct TopicDescView: View {
+    @StateObject var status: ViewStatus
+    @EnvironmentObject var gtalk: GCoresTalk
     
     var body: some View {
+        
         VStack {
             HStack {
                 Text("简介:").font(.title2).padding(.leading).padding(.top)
                 Spacer()
+                Group {
+                    if let _ = status.targetTopic?.subscriptionId {
+                        Label("subscribe", systemImage: "star.fill")
+                            .onTapGesture {
+                                gtalk.unsubscribe(status: status, targetId: status.targetTopic!.id, targetType: .topics, updateSubscriptionId: gtalk.updateSubscriptionId)
+                            }
+                    } else {
+                        Label("subscribe", systemImage: "star")
+                            .onTapGesture {
+                                gtalk.subscribe(status: status, targetId: status.targetTopic!.id, targetType: .topics, updateSubscriptionId: gtalk.updateSubscriptionId)
+                            }
+                    }
+                }
+                .foregroundColor(.yellow)
+                .labelStyle(.iconOnly)
+                .font(.title2)
+                .padding(.trailing)
             }
-            HStack {
-                Text(desc).padding(.bottom).padding(.leading)
-                Spacer()
+            if let topic = status.targetTopic, let desc = topic.desc, desc.trimmingCharacters(in: .whitespacesAndNewlines) != ""  {
+                HStack {
+                    Text(desc).padding(.bottom).padding(.leading)
+                    Spacer()
+                }
             }
         }
-//        .foregroundColor(.white)
-        .background(RoundedRectangle(cornerRadius: CornerRadius).fill(Color(red: 1, green: 0, blue: 0, opacity: 0.6)))
+        .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red.opacity(0.6)))
+    }
+}
+
+struct UserDescView: View {
+    @StateObject var status: ViewStatus
+    
+    var body: some View {
+        if let intro = status.user?.intro, intro.trimmingCharacters(in: .whitespacesAndNewlines) != ""  {
+            VStack {
+                HStack {
+                    Text("简介:").font(.title2).padding(.leading).padding(.top)
+                    Spacer()
+                }
+                HStack {
+                    Text(intro).padding(.bottom).padding(.leading)
+                    Spacer()
+                }
+            }
+            .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red.opacity(0.6)))
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+struct HeaderView: View {
+    @StateObject var status: ViewStatus
+    let headerType: GCoresRelatedType
+    
+    var body: some View {
+        if headerType == .topics {
+            TopicDescView(status: status)
+        } else if headerType == .users {
+            UserDescView(status: status)
+        }
+        else {
+            EmptyView()
+        }
+    }
+}
+
+
+struct EdgeBorder: Shape {
+
+    var width: CGFloat
+    var edges: [Edge]
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        for edge in edges {
+            var x: CGFloat {
+                switch edge {
+                case .top, .bottom, .leading: return rect.minX
+                case .trailing: return rect.maxX - width
+                }
+            }
+
+            var y: CGFloat {
+                switch edge {
+                case .top, .leading, .trailing: return rect.minY
+                case .bottom: return rect.maxY - width
+                }
+            }
+
+            var w: CGFloat {
+                switch edge {
+                case .top, .bottom: return rect.width
+                case .leading, .trailing: return self.width
+                }
+            }
+
+            var h: CGFloat {
+                switch edge {
+                case .top, .bottom: return self.width
+                case .leading, .trailing: return rect.height
+                }
+            }
+            path.addPath(Path(CGRect(x: x, y: y, width: w, height: h)))
+        }
+        return path
     }
 }
 

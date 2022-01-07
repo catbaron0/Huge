@@ -39,11 +39,29 @@ struct StatusProfilePageView: View {
                 Spacer().frame(height: TimelineTopPadding.titleBar.rawValue)
                 HStack(alignment: .top) {
                     // Image, nickname, sex, follower/followee,
-                    ProfileImageView(status: status)
+                    ProfileImageView(status: status).padding(.trailing)
                     VStack(alignment: .leading) {
+                        Spacer().frame(height: 10)
                         HStack{
                             // TODO: Add gender info before/after the username
                             Text(user.nickname )
+                            Spacer()
+                            Group {
+                                if let _ = user.followshipId {
+                                    Text("取消关注").padding(5).background(.gray)
+                                        .onTapGesture {
+                                            gtalk.updateFollowship(status: status, targetId: user.id, follow: false)
+                                        }
+                                } else {
+                                    Text("  关注  ").padding(5).background(.blue)
+                                        .onTapGesture {
+                                            gtalk.updateFollowship(status: status, targetId: user.id, follow: true)
+                                        }
+                                }
+                            }
+                            .font(.body)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.profileFollowship.rawValue))
                         }.font(.title2.weight(.semibold))
                         HStack(alignment: .bottom) {
                             // TODO: Add status of userlist
@@ -71,20 +89,26 @@ struct StatusProfilePageView: View {
                 }
                 .padding(20)
                 Divider()
-                if let intro = user.intro, intro.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                    StatusTalksTimelineView(
-                        status: status,
-                        scrollTopPadding: 0,
-                        headerView: HeaderView(desc: intro),
-                        topOffsetTrigger: .profile)
-                    
-                } else {
-                    StatusTalksTimelineView(
-                        status: status,
-                        scrollTopPadding: 0,
-                        headerView: nil,
-                        topOffsetTrigger: .profile)
-                }
+                let descView = HeaderView(status: status, headerType: .users)
+                StatusTalksTimelineView(
+                    status: status,
+                    scrollTopPadding: 0,
+                    headerView: descView,
+                    topOffsetTrigger: .profile)
+//                if let intro = user.intro, intro.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+//                    StatusTalksTimelineView(
+//                        status: status,
+//                        scrollTopPadding: 0,
+//                        headerView: HeaderView(status: status, headerType: <#T##GCoresRelatedType#>)
+//                        topOffsetTrigger: .profile)
+//
+//                } else {
+//                    StatusTalksTimelineView(
+//                        status: status,
+//                        scrollTopPadding: 0,
+//                        headerView: nil,
+//                        topOffsetTrigger: .profile)
+//                }
             }
         } else {
             VStack {

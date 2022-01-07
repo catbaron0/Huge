@@ -111,13 +111,13 @@ struct TalkCardImageView: View {
                         .font(.title2).labelStyle(.titleOnly).padding(5)
                         .background(Color.gray.opacity(0.8))
                         .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
                         .padding(.bottom, 5)
                 }
             }
             .scaledToFill()
             .frame(width: 300, height: 300)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue))
             
             .contentShape(Rectangle())
             .onTapGesture {
