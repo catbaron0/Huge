@@ -66,8 +66,10 @@ struct NewCommentView: View {
                 } label: {
                     Label("发送", systemImage: "paperplane.fill").frame(width: 60, height: 30)
                         .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red))
-                }.padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
-                    .disabled(sendStatus.requestState != nil && sendStatus.requestState! == .sending)
+                }
+                .padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
+                .disabled(sendStatus.requestState != nil && sendStatus.requestState! == .sending)
+                .keyboardShortcut(.`return`, modifiers: [.command])
 
             }
         }

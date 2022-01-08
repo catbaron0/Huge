@@ -127,7 +127,9 @@ struct NewTalkView: View {
                             .foregroundColor(.white)
                             .disabled(status.requestState != nil && status.requestState! == .sending)
                         
-                    }.buttonStyle(PlainButtonStyle()).opacity(opacity)
+                    }
+                    .buttonStyle(PlainButtonStyle()).opacity(opacity)
+                    .keyboardShortcut(.`return`, modifiers: [.command])
                 }.padding([.leading, .trailing], 10)
                 
                 // Related content
@@ -243,7 +245,7 @@ struct NewTalkView: View {
 //                        } label: {
 //                            Text(" ").opacity(0.5)
 //                        }
-                        .buttonStyle(.plain)
+//                        .buttonStyle(.plain)
                         .keyboardShortcut("v", modifiers: [.command, .shift])
                     }
                     .padding([.leading, .trailing])
