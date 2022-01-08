@@ -605,7 +605,7 @@ struct GCoresNotificationResponse: Codable {
             cover: cover, banner: nil, contentString: includedData.attributes.body ?? text)
     }
 
-    func formalize() -> [Notification] {
+    func formalize() -> [GCoresNotification] {
         let lastReadDate = DateUtils.dateFromString(string: meta.notificationFeedsLastSeenAt, platform: .gcores)
         return data.map { d in
             let ntfId = d.id
@@ -624,7 +624,7 @@ struct GCoresNotificationResponse: Codable {
             }
             
             let notificationDate = DateUtils.dateFromString(string: d.attributes.createdAt!, platform: .gcores)
-            return Notification(id: ntfId, type: ntfType, object: object, target: target, actors: actors, unRead: notificationDate > lastReadDate)
+            return GCoresNotification(id: ntfId, type: ntfType, object: object, target: target, actors: actors, unRead: notificationDate > lastReadDate)
             
         }
         

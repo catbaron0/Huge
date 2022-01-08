@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NotificationCardView: View {
     @StateObject var status: ViewStatus
-    let notification:Notification
+    let notification:GCoresNotification
     @State var listActors = false
     @EnvironmentObject var gtalk: GCoresTalk
     var body: some View {

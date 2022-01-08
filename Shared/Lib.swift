@@ -100,3 +100,10 @@ extension View {
         overlay(EdgeBorder(width: width, edges: edges).foregroundColor(color))
     }
 }
+
+public extension NSTextField {
+    override var focusRingType: NSFocusRingType {
+            get { .none }
+            set { }
+    }
+}

@@ -70,14 +70,14 @@ enum NotificationType: String, Codable {
     case follow
 }
 
-struct Notification: Identifiable, Equatable {
+struct GCoresNotification: Identifiable, Equatable {
     let id: String
     let type: NotificationType
     let object: [TalkRelated]
     let target: TalkRelated?
     var actors: [TalkUser]
     var unRead: Bool
-    static func == (lhs: Notification, rhs: Notification) -> Bool {
+    static func == (lhs: GCoresNotification, rhs: GCoresNotification) -> Bool {
         lhs.id == rhs.id && lhs.type == rhs.type
     }
     
@@ -209,7 +209,8 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     @Published var requestLatest: RequestState = .succeed
     
     // For notifications
-    @Published var notifications = [Notification]()
+    @Published var notifications = [GCoresNotification]()
+//    @Published var unreadNotificationsCount = 0
     func getUserOfReplyTo(replyToId: String?) -> TalkUser? {
         guard let replyToId = replyToId else {
             return nil
@@ -221,7 +222,7 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         }
     }
     func readAllNotifications() {
-        unreadCount = 0
+//        unreadCount = 0
         for i in 0..<notifications.count {
             notifications[i].unRead = false
         }
@@ -238,7 +239,7 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         }
         
     }
-    func newNotifications(_ newNotifications: [Notification], earlier: Bool) {
+    func newNotifications(_ newNotifications: [GCoresNotification], earlier: Bool) {
         if earlier {
             newNotifications.forEach { notification in
                 if !notification.object.isEmpty && !(self.notifications.contains(where: {$0 == notification})) {
@@ -251,14 +252,14 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         notifications = newNotifications
     }
     
-    func readNotification(_ notification: Notification) {
-        if let index = notifications.firstIndex(of: notification) {
-            if notifications[index].unRead {
-                unreadCount -= 1
-            }
-            notifications[index].unRead = false
-        }
-    }
+//    func readNotification(_ notification: GCoresNotification) {
+//        if let index = notifications.firstIndex(of: notification) {
+//            if notifications[index].unRead {
+//                unreadNotificationsCount -= 1
+//            }
+//            notifications[index].unRead = false
+//        }
+//    }
     
     func updateVotes(targetId: String, targetType: VoteTargetType, isVoting: Bool) {
         switch targetType {

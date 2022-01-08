@@ -1305,12 +1305,16 @@ class GCoresTalk: ObservableObject{
                 let resp = try! JSONDecoder().decode(GCoresNotificationResponse.self, from: data)
                 let notifications = resp.formalize()
                 self.mainQueue.async {
-                    if notifications.isEmpty || !notifications[0].unRead {
+                    if notifications.isEmpty || resp.meta.notificationFeedsUnseenCount == 0 {
                         status.unreadCount = 0
                         print("All notifications are read!")
+                        NSApp.dockTile.badgeLabel = ""
+                        NSApp.dockTile.display()
                     } else {
                         status.unreadCount = 1
                         print("Found unread notifications!")
+                        NSApp.dockTile.badgeLabel = "\(resp.meta.notificationFeedsUnseenCount)"
+                        NSApp.dockTile.display()
                     }
                     let index = self.talkScenes.firstIndex(where: {$0.sceneType == status.sceneType})
                     if status.unreadCount > 0 {
@@ -1404,6 +1408,7 @@ class GCoresTalk: ObservableObject{
         }
         task.resume()
     }
+    
     
     func search(status: ViewStatus, endponit: GCoresRelatedType, query: String, earlier: Bool, recommend: Bool) {
         if query == "" && !recommend {

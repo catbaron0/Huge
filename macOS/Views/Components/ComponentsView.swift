@@ -204,6 +204,8 @@ struct SidebarItemView: View {
                         gtalk.loadNotifications(status: status, earlier: false)
                         // send mark-seen
                         gtalk.markNotificationsAsSeen(status: status)
+                        NSApp.dockTile.badgeLabel = ""
+                        NSApp.dockTile.display()
                     case .followeeTimeline, .recommendTimeline, .topicTimeline, .userTimeline:
                         gtalk.loadTimeline(status: status, earlier: false)
                     case .topics:
@@ -353,3 +355,16 @@ struct EdgeBorder: Shape {
     }
 }
 
+//struct TextEditorView: NSViewRepresentable {
+//    
+//    typealias NSViewType = NSTextView
+//    var configuration = { (view: NSViewType) in }
+//    
+//    func makeNSView(context: NSViewRepresentableContext<Self>) -> NSViewType {
+//        NSViewType()
+//    }
+//    
+//    func updateNSView(_ nsView: NSViewType, context: NSViewRepresentableContext<Self>) {
+//        configuration(nsView)
+//    }
+//}

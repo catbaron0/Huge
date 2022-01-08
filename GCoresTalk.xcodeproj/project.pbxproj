@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		070DE89427608885008B3F08 /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070DE89227608885008B3F08 /* NSWindow.swift */; };
 		070DE8962760890B008B3F08 /* NewCommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070DE8952760890B008B3F08 /* NewCommentView.swift */; };
 		070DE8972760890B008B3F08 /* NewCommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 070DE8952760890B008B3F08 /* NewCommentView.swift */; };
 		071C492B2754C6CD000D879B /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071C492A2754C6CD000D879B /* PreviewData.swift */; };
@@ -16,6 +15,7 @@
 		071C492F2754D15A000D879B /* StatusCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071C492D2754D15A000D879B /* StatusCommentsView.swift */; };
 		071C49312755BB35000D879B /* ImageReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071C49302755BB35000D879B /* ImageReader.swift */; };
 		071C49322755BB35000D879B /* ImageReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071C49302755BB35000D879B /* ImageReader.swift */; };
+		073FE2E627897F6B00D22CBC /* NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073FE2E527897F6A00D22CBC /* NSWindow.swift */; };
 		075BC88A275B294D00EAC204 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075BC889275B294D00EAC204 /* LoginView.swift */; };
 		075BC88B275B294D00EAC204 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075BC889275B294D00EAC204 /* LoginView.swift */; };
 		075BC88D275B5FA100EAC204 /* GCoresUserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075BC88C275B5FA100EAC204 /* GCoresUserData.swift */; };
@@ -83,11 +83,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		070DE89227608885008B3F08 /* NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		070DE8952760890B008B3F08 /* NewCommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCommentView.swift; sourceTree = "<group>"; };
 		071C492A2754C6CD000D879B /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		071C492D2754D15A000D879B /* StatusCommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusCommentsView.swift; sourceTree = "<group>"; };
 		071C49302755BB35000D879B /* ImageReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageReader.swift; sourceTree = "<group>"; };
+		073FE2E527897F6A00D22CBC /* NSWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSWindow.swift; sourceTree = "<group>"; };
 		075BC889275B294D00EAC204 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		075BC88C275B5FA100EAC204 /* GCoresUserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCoresUserData.swift; sourceTree = "<group>"; };
 		075BC892275C6F0B00EAC204 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -158,9 +158,9 @@
 		075BC8A6275F322100EAC204 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				070DE89227608885008B3F08 /* NSWindow.swift */,
 				07EE3C812762F87700DC3A03 /* SearchRersultsView.swift */,
 				07A100FA2754750600D599D5 /* ComponentsView.swift */,
+				073FE2E527897F6A00D22CBC /* NSWindow.swift */,
 				07A100F8275474B900D599D5 /* ImageView.swift */,
 				079D086C276DD0B8008D78EA /* BlurView.swift */,
 			);
@@ -448,6 +448,7 @@
 				0780F931275A53AE0062F9B7 /* StatusTopicTimelineView.swift in Sources */,
 				07A100F72754742C00D599D5 /* StatusTalksTimelineView.swift in Sources */,
 				07FF7FFC27676A9900674790 /* StatusNotificationView.swift in Sources */,
+				073FE2E627897F6B00D22CBC /* NSWindow.swift in Sources */,
 				0780F91E2757985C0062F9B7 /* GCoresData.swift in Sources */,
 				075BC88B275B294D00EAC204 /* LoginView.swift in Sources */,
 				075BC89E275CD45A00EAC204 /* GCoresFollowshipData.swift in Sources */,
@@ -464,7 +465,6 @@
 				075BC88E275B5FA100EAC204 /* GCoresUserData.swift in Sources */,
 				07AE59F7274F5B0300FF9649 /* GCoresTalk.xcdatamodeld in Sources */,
 				07EA77D027819586000E4771 /* webview.swift in Sources */,
-				070DE89427608885008B3F08 /* NSWindow.swift in Sources */,
 				07EE3C8627631B5300DC3A03 /* NewTalkView.swift in Sources */,
 				071C492C2754C6CD000D879B /* PreviewData.swift in Sources */,
 				0780F921275798940062F9B7 /* GCoresTopicData.swift in Sources */,

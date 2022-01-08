@@ -59,16 +59,21 @@ struct NewTalkView: View {
         
         VStack {
             TextEditor(text: $talkText)
-                .focusable()
+                .focusable(editorIsFocused)
+                .focused($editorIsFocused)
                 .frame(minWidth: 300)
                 .frame(height: 150)
                 .padding([.leading, .trailing], 5)
                 .font(.body)
                 .ignoresSafeArea()
-
+                .onAppear {
+                    editorIsFocused = false
+                }
                 .onPasteCommand(of: [.image, .url]) { _ in
+                    print("paste!")
                     pasteImage()
                 }
+
             Divider()
             VStack {
                 // send button
@@ -107,11 +112,11 @@ struct NewTalkView: View {
                     Button {
                         editorIsFocused = true
                         relatedView = .image
-                        
                     } label: {
                         NewTalkRelatedLabel(text: "图片", icon: "photo", highlight: !images.isEmpty)
                     }
                     .buttonStyle(.plain)
+
                     Button {
                         submit()
                     } label: {
@@ -233,11 +238,11 @@ struct NewTalkView: View {
                                 }
                             }
                         }
-                        Button {
-                            pasteImage()
-                        } label: {
-                            Text(" ").opacity(0.5)
-                        }
+//                        Button {
+//                            pasteImage()
+//                        } label: {
+//                            Text(" ").opacity(0.5)
+//                        }
                         .buttonStyle(.plain)
                         .keyboardShortcut("v", modifiers: [.command, .shift])
                     }

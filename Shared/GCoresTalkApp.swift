@@ -12,7 +12,7 @@ struct GCoresTalkApp: App {
     let persistenceController = PersistenceController.shared
     @StateObject var gtalk = GCoresTalk()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -71,11 +71,12 @@ class StatusBarController {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBar: StatusBarController?
     
-    private func applicationDidFinishLaunching(_ aNotification: Notification) {
-        let contentView = ContentView()
-        let mainView = NSHostingView(rootView: contentView)
-        mainView.frame =  NSRect(x: 0, y: 0, width: 200, height: 200)
-        statusBar = StatusBarController(mainView)
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        print("LOADED!")
+//        let contentView = ContentView()
+//        let mainView = NSHostingView(rootView: contentView)
+//        mainView.frame =  NSRect(x: 0, y: 0, width: 200, height: 200)
+//        statusBar = StatusBarController(mainView)
     }
     
 }

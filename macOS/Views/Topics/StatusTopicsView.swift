@@ -147,6 +147,7 @@ struct StatusTopicsView: View {
                                 searchMode = false
                             }
                         }
+//                        .focusable()
                         .font(.title2)
                         .padding(.bottom, 8)
                         .onSubmit {
