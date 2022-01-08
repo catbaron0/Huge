@@ -81,13 +81,6 @@ struct NotificationCardView: View {
             let idx = status.notifications.firstIndex(of: notification)
             status.notifications[idx!].unRead = false
         }
-        .contextMenu {
-            Button {
-                print("test")
-            } label: {
-                Text("test")
-            }
-        }
         
     }
 }

@@ -215,8 +215,10 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         guard let replyToId = replyToId else {
             return nil
         }
-        if let comment =  comments.first(where: { $0.id == replyToId}) {
+        if let comment = comments.first(where: { $0.id == replyToId}) {
             return comment.user
+        } else if targetComment?.id == replyToId {
+            return targetComment?.user
         } else {
             return (replies.first {$0.id == replyToId})?.user
         }
@@ -364,8 +366,16 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
     func copy() -> ViewStatus {
         let status = ViewStatus(id: self.id, sceneType: self.sceneType, statusType: self.statusType, title: self.title, icon: self.icon)
         status.targetTopic = self.targetTopic
+        status.comments = self.comments
+        status.replies = self.replies
+        
+        status.targetTalk = self.targetTalk
+        status.targetTalkId = self.targetTalkId
+        status.targetComment = self.targetComment
+        status.targetCommentId = self.targetCommentId
         status.user = self.user
         status.userId = self.userId
+//        status.replyToId = self.replyToId
         status.comments = self.comments
         status.replies = self.replies
         status.talks = self.talks
@@ -373,6 +383,73 @@ class ViewStatus: Identifiable, Equatable, ObservableObject {
         status.followees = self.followees
         return status
     }
+    
+    func addComment(comment: TalkCommentCard, replyTargetCommentId: String?) {
+        if replyTargetCommentId == nil {
+            // reply to a talk
+            comments.append(comment)
+        } else {
+//            let _replies = replies
+//            let _comments = comments
+            //      * If the comment is replied to a comment or a reply, append the new comment to the replies list,
+            replies.append(comment)
+//            let _new_replies = replies
+            //      * If the comment is replied to a comment ,locate the targetComment and nsert the new commentId to its oldestDecendant list
+            if let targetComment = targetComment, targetComment.id == replyTargetCommentId {
+                self.targetComment!.oldestDescendants.append(comment.id)
+            }
+            if let index = comments.firstIndex(where: {$0.id == replyTargetCommentId}) {
+                comments[index].oldestDescendants.append(comment.id)
+            }
+            //      * If the comment is replied to a reply, locate the targetComment by its parentId
+            if let commendIndex = comments.firstIndex(where: { element in
+                if element.oldestDescendants.contains(where: {$0 == comment.replyTo}) {
+                    return true
+                } else {
+                    return false
+                }
+            }){
+                comments[commendIndex].oldestDescendants.append(comment.id)
+            }
+            if let _ = targetComment {
+                if targetComment!.oldestDescendants.contains(where: {$0 == comment.replyTo}) {
+                    targetComment!.oldestDescendants.append(comment.id)
+                }
+            }
+        }
+        objectWillChange.send()
+    }
+
+
+    // TODO: Protocal of Deletable to make the code simpler
+    func setDeleteFlagToComment(commentId: String, flag: Bool) {
+        if let idx = comments.firstIndex(where: { $0.id == commentId}) {
+            comments[idx].onDelete = flag
+        } else if let idx = replies.firstIndex(where: { $0.id == commentId }) {
+            replies[idx].onDelete = flag
+        }
+    }
+    
+    func deleteComment(commentId: String) {
+        if let idx = comments.firstIndex(where: { $0.id == commentId}) {
+            comments.remove(at: idx)
+        } else if let idx = replies.firstIndex(where: { $0.id == commentId }) {
+            replies.remove(at: idx)
+        }
+    }
+    
+    func deleteTalk(talkId: String) {
+        if let idx = talks.firstIndex(where: {$0.id == talkId}) {
+            talks.remove(at: idx)
+        }
+    }
+    
+    func setDeleteFlagToTalk(talkId: String, flag: Bool) {
+        if let idx = talks.firstIndex(where: {$0.id == talkId}) {
+            talks[idx].onDelete = flag
+        }
+    }
+
 }
 
 enum TalkStatusType {
@@ -564,9 +641,9 @@ struct TalkCard: Identifiable, Equatable {
     let bookMarkId: String?
     var commentsCount: Int?
     let shareUrl: String?
-    
-    
-    
+    var onDelete = false
+
+
     let related: TalkRelated? /* For gcores talks. It may related to some videos/podcasts/articles.*/
     
     var createdAt: String {
@@ -603,6 +680,7 @@ struct TalkCommentCard: Identifiable, Equatable {
     var voteId: String?
     let bookMarkId: String?
     let shareUrl: String?
+    var onDelete = false
     
     let related: TalkRelated? /* For gcores talks. It may related to some videos/podcasts/articles.*/
     

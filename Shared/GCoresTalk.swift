@@ -775,7 +775,9 @@ class GCoresTalk: ObservableObject{
                 let respCards = resp.formalize()
                 let comment = respCards[0][0]
                 let replies = respCards[1]
-                
+                if status.targetTalkId == nil {
+                    status.targetTalkId = resp.data.relationships.commentable.data.id
+                }
                 status.loadingEarlier = .empty
                 status.targetRelated = resp.getRelated()
                 status.targetComment = comment
@@ -961,7 +963,6 @@ class GCoresTalk: ObservableObject{
             }
         }
         .resume()
-        
     }
     func voteTo(targetId: String, targetType: VoteTargetType, voteFlag: Bool, status: ViewStatus) {
         //        {
@@ -1050,10 +1051,10 @@ class GCoresTalk: ObservableObject{
         .resume()
     }
     
-    func sendComment(talkId: String, commentId: String?, status: ViewStatus, comment: String) {
+    func sendComment(talkId: String, commentId: String?, sendStatus: ViewStatus, viewStatus: ViewStatus, comment: String) {
         let userId = loginInfo.userId
-        status.requestLatest = .sending
-        status.objectWillChange.send()
+        sendStatus.requestLatest = .sending
+        sendStatus.objectWillChange.send()
         
         
         var data: [String: String]? = nil
@@ -1099,15 +1100,20 @@ class GCoresTalk: ObservableObject{
                 if let errorMessage = self.checkResponse(data,  response, error) {
                     print("Failed to comment to \(talkId)-(\(String(describing: commentId)))!")
                     print(errorMessage)
-                    status.requestLatest = .failed
+                    sendStatus.requestLatest = .failed
                     return
                 }
                 
                 guard let res = response as? HTTPURLResponse, res.statusCode == 201, let data = data else {
-                    status.requestLatest = .failed
+                    sendStatus.requestLatest = .failed
                     return
                 }
-                status.requestLatest = .succeed
+                sendStatus.requestLatest = .succeed
+//                if status.statusType == .replies {
+//                    self.loadReplies(commentId: commentId!, status: status)
+//                } else if status.statusType == .comments {
+//                    self.loadComments(talkId: talkId, status: status, earlier: false)
+//                }
                 let commentRes = try! JSONDecoder().decode(NewCommentResponse.self, from: data)
                 let comment = commentRes.formalize()
 //                NSApplication.shared.keyWindow?.close()
@@ -1116,38 +1122,22 @@ class GCoresTalk: ObservableObject{
                 // * For talkTimeLine status:
                 // The comment is to a talk.
                 //  Update the number of comments to the target talk.
-                if let targetTalkIndex = status.talks.firstIndex(where: {$0.id == talkId}) {
-                    let count = status.talks[targetTalkIndex].commentsCount ?? 0
-                    status.talks[targetTalkIndex].commentsCount = count + 1
+                if let targetTalkIndex = viewStatus.talks.firstIndex(where: {$0.id == talkId}) {
+                    let count = viewStatus.talks[targetTalkIndex].commentsCount ?? 0
+                    viewStatus.talks[targetTalkIndex].commentsCount = count + 1
                 }
                 // * For commentsList status, update the comment count of target Talk
-                if let _ = status.targetTalk {
-                    let count = status.targetTalk!.commentsCount ?? 0
-                    status.targetTalk!.commentsCount = count + 1
+                if let _ = viewStatus.targetTalk {
+                    let count = viewStatus.targetTalk!.commentsCount ?? 0
+                    viewStatus.targetTalk!.commentsCount = count + 1
                 }
-                
+
                 if commentId == nil {
                     //  And
                     //      * If the comment is replied to the target talk, add the comment to the commentList
-                    status.comments.insert(comment, at: 0)
+                    viewStatus.comments.insert(comment, at: 0)
                 } else {
-                    //      * If the comment is replied to a comment or a reply, append the new comment to the replies list,
-                    status.replies.append(comment)
-                    //      * If the comment is replied to a comment ,locate the targetComment and nsert the new commentId to its oldestDecendant list
-                    if let index = status.comments.firstIndex(where: {$0.id == commentId}) {
-                        status.comments[index].oldestDescendants.append(comment.id)
-                    }
-                    //      * If the comment is replied to a reply, locate the targetComment by its parentId
-                    else if let commendIndex = status.comments.firstIndex(where: { element in
-                        if element.oldestDescendants.contains(where: {$0 == comment.replyTo}) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    }){
-                        status.comments[commendIndex].oldestDescendants.append(comment.id)
-                    }
-                    
+                    viewStatus.addComment(comment: comment, replyTargetCommentId: commentId)
                 }
                 NSApplication.shared.keyWindow?.close()
             }
@@ -1505,4 +1495,57 @@ class GCoresTalk: ObservableObject{
         }
         task.resume()
     }
+    
+    func deleteComment(status: ViewStatus, commentId: String) {
+        let url = URL(string: "https://www.gcores.com/gapi/v1/comments/\(commentId)?from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: "DELETE")
+        mainQueue.async {
+            withAnimation {
+                status.setDeleteFlagToComment(commentId: commentId, flag: true)
+            }
+        }
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            self.mainQueue.async {
+                if let errorMessage = self.checkResponse(data,  response, error) {
+                    print(errorMessage)
+                    withAnimation {
+                        status.setDeleteFlagToComment(commentId: commentId, flag: false)
+                    }
+                    return
+                }
+                withAnimation {
+                    status.deleteComment(commentId: commentId)
+                }
+                
+            }
+        }
+        .resume()
+    }
+    
+    func deleteTalk(status: ViewStatus, talkId: String) {
+        let url = URL(string: "https://www.gcores.com/gapi/v1/talks/\(talkId)?from-app=1")!
+        let request = gcoresRequest(url: url, httpMethod: "DELETE")
+        mainQueue.async {
+            withAnimation {
+                status.setDeleteFlagToTalk(talkId: talkId, flag: true)
+            }
+        }
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            self.mainQueue.async {
+                if let errorMessage = self.checkResponse(data,  response, error) {
+                    print(errorMessage)
+                    withAnimation {
+                        status.setDeleteFlagToTalk(talkId: talkId, flag: false)
+                    }
+                    return
+                }
+                withAnimation {
+                    status.deleteTalk(talkId: talkId)
+                }
+                
+            }
+        }
+        .resume()
+    }
+
 }

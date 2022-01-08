@@ -251,7 +251,7 @@ struct GCoresTalkCommentResponse: Decodable {
             _createdAt: DateUtils.dateFromString(string: commentData.attributes.createdAt, platform: .gcores),
             _updatedAt: DateUtils.dateFromString(string: commentData.attributes.createdAt, platform: .gcores),
             edited: false,
-            replyTo: nil,
+            replyTo: commentData.relationships.parent.data?.id,
             descendantsCount: commentData.attributes.descendantsCount,
             descendants: descendants ?? [String](),
             oldestDescendants: oldestDescendants ?? [String](),
@@ -773,6 +773,12 @@ struct GCoresTalkReplyResponse: Codable {
             return nil
         }
     }
+    
+//    func targettalk() -> TalkCard {
+//        let talkId = data.relationships.commentable.data.id
+//        let talk = included!.first { $0.id == talkId }
+//        let userId = talk?.attributes.au
+//    }
 
     func formalize() -> [[TalkCommentCard]] {
         var comment: TalkCommentCard
@@ -1288,7 +1294,7 @@ struct NewCommentResponse: Codable {
             _createdAt: DateUtils.dateFromString(string: commentData.attributes.createdAt, platform: .gcores),
             _updatedAt: DateUtils.dateFromString(string: commentData.attributes.createdAt, platform: .gcores),
             edited: false,
-            replyTo: nil,
+            replyTo: commentData.relationships.parent.data?.id,
             descendantsCount: commentData.attributes.descendantsCount,
             descendants: descendants ?? [String](),
             oldestDescendants: oldestDescendants ?? [String](),

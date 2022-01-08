@@ -39,9 +39,20 @@ struct StatusTalksTimelineView: View {
                             ForEach(status.talks){ card in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
                                 TalkCardView(status: status, card: card, isSelected: card.id == status.targetTalk?.id).id(Int(card.id))
+                                    .opacity(card.onDelete ? ON_DELETE_OPACITY : 1.0)
                                     .onTapGesture(count: 2) {
                                         print(card.id)
                                         gtalk.addStatusToCurrentScene(after: status, statusType: .comments, title: "评论", icon: "bubble.right.fill", targetTalkId: card.id)
+                                    }
+                                    .contextMenu {
+                                        if card.user.id == gtalk.user?.id {
+                                            Button {
+                                                gtalk.deleteTalk(status: status, talkId: card.id)
+                                            } label: {
+                                                Text("删除")
+                                            }
+                                            
+                                        }
                                     }
                                 Divider()
                             }.padding([.leading, .trailing])

@@ -19,13 +19,15 @@ let SIDEBAR_TOP_PADDING = CGFloat(20)
 //let CornerRadius = CGFloat(10)
 let SearchBoxCornerRadius = CGFloat(5)
 
+let ON_DELETE_OPACITY = 0.3
+
 enum CornerRadius: CGFloat {
     case normal = 10
     case profileFollowship = 5
 }
 
 enum TopOffsetTrigger: Int {
-    case timeline = 80
+    case timeline = 800
     case topics = 280
     case profile = 200
     case userList = 70

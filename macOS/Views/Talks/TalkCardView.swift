@@ -94,7 +94,7 @@ struct TalkCardBottomView: View {
                 HStack {
                     Label(String(commentsCount), systemImage: "bubble.right").foregroundColor(.red)
                         .onTapGesture {
-                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, status: status.copy(), gtalk: gtalk))
+                            newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: talkCard.id, targetCommentId: nil, sendStatus: status.copy(), viewStatus: status, gtalk: gtalk))
                         }
                 }
             }

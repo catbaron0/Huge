@@ -11,7 +11,9 @@ struct NewCommentView: View {
     let targetUser: TalkUser?
     let targetTalkId: String
     let targetCommentId: String?
-    @ObservedObject var status: ViewStatus
+    // TODO: The sendStatus should be very simple, only containing sending states
+    @StateObject var sendStatus: ViewStatus
+    @StateObject var viewStatus: ViewStatus
     @ObservedObject var gtalk: GCoresTalk
     @State var comment: String = ""
     @State var checkInfo: String = ""
@@ -19,11 +21,11 @@ struct NewCommentView: View {
     
 
     var body: some View {
-        let sendState = status.requestState
+        let sendState = sendStatus.requestState
         let opacity = (sendState != nil && sendState! == .sending) ? 0.5 : 1.0
         VStack{
             if let targetCommentId = targetCommentId {
-                let replyToUser = status.getUserOfReplyTo(replyToId: targetCommentId)
+                let replyToUser = viewStatus.getUserOfReplyTo(replyToId: targetCommentId)
                 HStack{
                     Text("回复").font(.callout)
                     Text("\(replyToUser!.nickname)").foregroundColor(.red).font(.callout.bold())
@@ -58,14 +60,14 @@ struct NewCommentView: View {
                         checkInfo = ""
                     }
                     if sendState == nil || sendState! == .failed {
-                        status.requestState = .sending
-                        gtalk.sendComment(talkId: targetTalkId, commentId: targetCommentId, status: status, comment: comment)
+                        sendStatus.requestState = .sending
+                        gtalk.sendComment(talkId: targetTalkId, commentId: targetCommentId, sendStatus: sendStatus, viewStatus: viewStatus, comment: comment)
                     }
                 } label: {
                     Label("发送", systemImage: "paperplane.fill").frame(width: 60, height: 30)
                         .background(RoundedRectangle(cornerRadius: CornerRadius.normal.rawValue).fill(.red))
                 }.padding(.trailing, 8).padding(.bottom, 8).buttonStyle(PlainButtonStyle()).opacity(opacity)
-                    .disabled(status.requestState != nil && status.requestState! == .sending)
+                    .disabled(sendStatus.requestState != nil && sendStatus.requestState! == .sending)
 
             }
         }

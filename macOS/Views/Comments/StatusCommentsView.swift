@@ -42,9 +42,10 @@ struct TalkCommentBottomView: View {
         HStack{
             // thumb up
             let likesCount = comment.likesCount ?? 0
-            if let isVoting = comment.isVoting, isVoting {
-                Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.gray).font(.caption)
-            } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, voteFlag  {
+//            if let isVoting = comment.isVoting, isVoting {
+//                Label("\(likesCount)", systemImage: "hand.thumbsup.circle").foregroundColor(.gray).font(.caption)
+//            } else
+            if let voteId = comment.voteId, let voteFlag = comment.voteFlag, voteFlag  {
                 Label("\(likesCount)", systemImage: "hand.thumbsup.circle.fill").foregroundColor(.red)
                     .onTapGesture {
                         gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
@@ -56,9 +57,10 @@ struct TalkCommentBottomView: View {
                     }
             }
             // thumb down
-            if let isVoting = comment.isVoting, isVoting {
-                Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.gray).font(.caption)
-            } else if let voteId = comment.voteId, let voteFlag = comment.voteFlag, !voteFlag  {
+//            if let isVoting = comment.isVoting, isVoting {
+//                Label("-", systemImage: "hand.thumbsdown.circle").labelStyle(.iconOnly).foregroundColor(.gray).font(.caption)
+//            } else
+            if let voteId = comment.voteId, let voteFlag = comment.voteFlag, !voteFlag  {
                 Label("-", systemImage: "hand.thumbsdown.circle.fill").labelStyle(.iconOnly).foregroundColor(.red)
                     .onTapGesture {
                         gtalk.cancelVote(targetId: comment.id, targetType: .comments, voteId: voteId, status: status)
@@ -71,7 +73,7 @@ struct TalkCommentBottomView: View {
             }
             Spacer()
             Button{
-                newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: status.targetTalk!.id, targetCommentId: comment.id, status: status.copy(), gtalk: gtalk))
+                newNSWindow(view: NewCommentView(targetUser: nil, targetTalkId: status.targetTalk?.id ?? status.targetTalkId!, targetCommentId: comment.id, sendStatus: status.copy(), viewStatus: status, gtalk: gtalk))
             } label: {Image(systemName: "arrowshape.turn.up.left.circle")}.foregroundColor(.red)
                 .buttonStyle(.plain).padding(5)
         }.font(.title3.bold())
@@ -126,12 +128,34 @@ struct CommentCardView: View {
                 
             }
             .padding(EdgeInsets(top: 10, leading: 5, bottom: 0, trailing: 10))
+            .opacity(comment.onDelete ? ON_DELETE_OPACITY : 1.0)
+            .contentShape(Rectangle())
+            .contextMenu {
+                if comment.user.id == gtalk.user?.id {
+                    Button {
+                        gtalk.deleteComment(status: status, commentId: comment.id)
+                    } label: {
+                        Text("删除")
+                    }
+                }
+            }
             if let oldestDecendants = comment.oldestDescendants, withReply {
                 VStack {
                     ForEach(oldestDecendants, id: \.self) { replyId in
                         if let reply = status.replies.first {$0.id == replyId} {
                             Divider()
                             ReplyCardView(status: status, reply: reply)
+                                .opacity(reply.onDelete ? ON_DELETE_OPACITY : 1.0)
+                                .contentShape(Rectangle())
+                                .contextMenu {
+                                    if reply.user.id == gtalk.user?.id {
+                                        Button {
+                                            gtalk.deleteComment(status: status, commentId: reply.id)
+                                        } label: {
+                                            Text("删除")
+                                        }
+                                    }
+                                }
                         }
                     }
                     if let decendantsCount = comment.descendantsCount, let oldestDecendants = comment.oldestDescendants, decendantsCount > oldestDecendants.count {
@@ -176,6 +200,7 @@ struct StatusCommentsView: View {
                             ForEach(status.comments){ comment in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
                                 CommentCardView(status: status, comment: comment, withReply: true)
+
                                 Divider()
                             }
                             if status.loadingEarlier == .empty {
@@ -214,6 +239,17 @@ struct StatusCommentsView: View {
                             ForEach(status.replies){ reply in
                                 // We need foreach to avoid reloading images everytime the talkcards appear
                                 ReplyCardView(status: status, reply: reply)
+                                    .opacity(reply.onDelete ? ON_DELETE_OPACITY : 1.0)
+                                    .contentShape(Rectangle())
+                                    .contextMenu {
+                                        if reply.user.id == gtalk.user?.id {
+                                            Button {
+                                                gtalk.deleteComment(status: status, commentId: reply.id)
+                                            } label: {
+                                                Text("删除")
+                                            }
+                                        }
+                                    }
                                 Divider()
                             }
                             if status.loadingEarlier == .empty {
