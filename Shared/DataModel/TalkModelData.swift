@@ -89,11 +89,12 @@ struct GCoresNotification: Identifiable, Equatable {
     }
     
     var actorNames: String {
-        if actors.count > 1 {
-            return actors[0].nickname + " 等人"
-        } else {
-            return actors[0].nickname
-        }
+        return actors[0].nickname
+//        if actors.count > 1 {
+//            return actors[0].nickname + " 等人"
+//        } else {
+//            return actors[0].nickname
+//        }
     }
     
     var verb: String {
@@ -108,6 +109,9 @@ struct GCoresNotification: Identifiable, Equatable {
     }
     
     var objectStr: [String] {
+        if object.isEmpty {
+            return ["内容", ""]
+        }
         let objType = object[0].type
         switch objType {
         case .videos:
@@ -141,6 +145,9 @@ struct GCoresNotification: Identifiable, Equatable {
         var styledActorName = AttributedString(actorNames)
         styledActorName.foregroundColor = .red
         styledActorName.font = .body.bold()
+        if actors.count > 1 {
+            styledActorName += AttributedString("等人")
+        }
         var styledVerb = AttributedString(verb + objectStr[0])
         styledVerb.font = .body.weight(.light)
         var styledObject = AttributedString(objectStr[1])

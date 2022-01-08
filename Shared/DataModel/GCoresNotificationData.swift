@@ -624,6 +624,9 @@ struct GCoresNotificationResponse: Codable {
             }
             
             let notificationDate = DateUtils.dateFromString(string: d.attributes.createdAt!, platform: .gcores)
+            if object.isEmpty {
+                print("object is Empty!")
+            }
             return GCoresNotification(id: ntfId, type: ntfType, object: object, target: target, actors: actors, unRead: notificationDate > lastReadDate)
             
         }
